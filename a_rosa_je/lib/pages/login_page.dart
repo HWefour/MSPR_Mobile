@@ -25,7 +25,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 SizedBox(height: 24.0),
                 ElevatedButtonWidget(
-                  buttonText: 'Se connecter',
+                  buttonText: 'Se connect',
                   buttonColor: Colors.red,
                   onPressed: () {
                     // Handle login logic
