@@ -120,7 +120,7 @@ class LogoWidget extends StatelessWidget {
       child: Center(
         // Replace with your actual logo image
         child: Text(
-          'LOGO',
+          'LOGOSS',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
