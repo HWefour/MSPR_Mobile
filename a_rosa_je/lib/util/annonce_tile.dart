@@ -29,7 +29,7 @@ class AnnonceTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(15.0), // Rayon de l'arrondi
       ),
       child: Container(
-        height: 180.0, // Hauteur fixe de la Card
+        height: 200.0, // Hauteur fixe de la Card
         child: Row(
           children: [
             ClipRRect( // Clipper l'image pour qu'elle ait aussi les bords arrondis
@@ -37,7 +37,7 @@ class AnnonceTile extends StatelessWidget {
               child: Image.network(
                 imageUrl,
                 width: 150.0, // Largeur fixe pour l'image
-                height: 180.0, // Hauteur fixe pour l'image
+                height: 200.0, // Hauteur fixe pour l'image
                 fit: BoxFit.cover, // Remplit l'espace alloué tout en gardant les proportions
               ),
             ),
@@ -49,19 +49,34 @@ class AnnonceTile extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Text(titre, style: TextStyle(fontWeight: FontWeight.bold)),
-                    Row( // Nouvelle Row pour localisation et nbPlantes
-                      mainAxisAlignment: MainAxisAlignment.start,
+                    Row( // Row pour localisation et nbPlantes
+                      crossAxisAlignment: CrossAxisAlignment.start, // Aligner horizontalement à gauche
+                      mainAxisAlignment: MainAxisAlignment.center, // Centrer verticalement
                       children: [
                         Expanded(
-                          child: Text(localisation, overflow: TextOverflow.ellipsis),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start, // Aligner horizontalement à gauche
+                            mainAxisAlignment: MainAxisAlignment.center, // Centrer verticalement
+                            children: [
+                              Image.asset('images/bx_map-pin.png', height: 40.0),
+                              Text(localisation, overflow: TextOverflow.ellipsis),
+                            ],
+                          ),
                         ),
-                        SizedBox(width: 0), // Espace entre les deux textes
+                        SizedBox(width: 0), // Espace entre les deux colonnes
                         Expanded(
-                          child: Text(nbPlantes, overflow: TextOverflow.ellipsis),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start, // Aligner horizontalement à gauche
+                            mainAxisAlignment: MainAxisAlignment.center, // Centrer verticalement
+                            children: [
+                              Image.asset('images/ph_plant-light.png', height: 40.0),
+                              Text(nbPlantes, overflow: TextOverflow.ellipsis),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 30.0), // Ajoute un espace
+                    SizedBox(height: 10.0), // Ajoute un espace
                     Expanded(
                       child: Text(
                         description,
@@ -76,7 +91,7 @@ class AnnonceTile extends StatelessWidget {
                         Expanded(
                           child: Text('Du : ' + dateDebut, overflow: TextOverflow.ellipsis),
                         ),
-                      SizedBox(width: 10), // Espace entre les deux textes
+                      SizedBox(width: 0), // Espace entre les deux textes
                         Expanded(
                           child: Text('au ' + dateFin, overflow: TextOverflow.ellipsis),
                       ),
