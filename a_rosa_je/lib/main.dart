@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/home.dart';
 import 'package:a_rosa_je/pages/profil.dart';
 import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
@@ -17,8 +18,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoginPage(),
+      //home: LoginPage(),
       //home: ProfilePage(),
+      home: HomePage(),
     );
   }
 }
