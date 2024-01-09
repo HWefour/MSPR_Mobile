@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
+      backgroundColor: Color(0xFF1B5E20),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -13,15 +15,29 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                LogoWidget(),
+                Image(image: AssetImage('images/LOGO.png')),
                 SizedBox(height: 48.0),
                 TextFieldWidget(
+                  controller: _usernameController,
                   hintText: 'Nom d\'utilisateur',
+                                validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter your username';
+                }
+                return null;
+              },
                 ),
                 SizedBox(height: 16.0),
                 TextFieldWidget(
+                  controller: _passwordController,
                   hintText: 'Mot de Passe',
                   obscureText: true,
+                  validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter your password';
+                }
+                return null;
+              },
                 ),
                 SizedBox(height: 24.0),
                 ElevatedButtonWidget(
@@ -49,6 +65,8 @@ class LoginPage extends StatelessWidget {
   }
 }
 
+
+
 class TextFieldWidget extends StatelessWidget {
   final String hintText;
   final bool obscureText;
@@ -56,7 +74,7 @@ class TextFieldWidget extends StatelessWidget {
   const TextFieldWidget({
     Key? key,
     required this.hintText,
-    this.obscureText = false,
+    this.obscureText = false, required TextEditingController controller, required String? Function(dynamic value) validator,
   }) : super(key: key);
 
   @override
@@ -105,25 +123,25 @@ class ElevatedButtonWidget extends StatelessWidget {
   }
 }
 
-class LogoWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // Ideally, you'd use an AssetImage or NetworkImage depending on where your logo is hosted
-    // For example, AssetImage('assets/logo.png'),
-    return Container(
-      height: 200,
-      width: 200,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.rectangle,
-      ),
-      child: Center(
-        // Replace with your actual logo image
-        child: Text(
-          'LOGe',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-}
+// class LogoWidget extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     // Ideally, you'd use an AssetImage or NetworkImage depending on where your logo is hosted
+//     // For example, AssetImage('assets/logo.png'),
+//     return Container(
+//       height: 200,
+//       width: 200,
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         shape: BoxShape.rectangle,
+//       ),
+//       child: Center(
+//         // Replace with your actual logo image
+//         child: Text(
+//           'LOGe',
+//           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+//         ),
+//       ),
+//     );
+//   }
+// }
