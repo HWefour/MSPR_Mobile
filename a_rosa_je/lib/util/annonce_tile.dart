@@ -32,15 +32,24 @@ class AnnonceTile extends StatelessWidget {
         height: 200.0, // Hauteur fixe de la Card
         child: Row(
           children: [
-            ClipRRect( // Clipper l'image pour qu'elle ait aussi les bords arrondis
-              borderRadius: BorderRadius.horizontal(left: Radius.circular(15.0)), // Rayon de l'arrondi pour le côté gauche de l'image
-              child: Image.network(
-                imageUrl,
-                width: 150.0, // Largeur fixe pour l'image
-                height: 200.0, // Hauteur fixe pour l'image
-                fit: BoxFit.cover, // Remplit l'espace alloué tout en gardant les proportions
-              ),
+            ClipRRect(
+              borderRadius:
+                  BorderRadius.horizontal(left: Radius.circular(15.0)),
+              child: imageUrl.isNotEmpty && Uri.parse(imageUrl).isAbsolute
+                  ? Image.network(
+                      imageUrl,
+                      width: 150.0,
+                      height: 200.0,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      'images/plant_default.png', // Chemin vers une image par défaut
+                      width: 150.0,
+                      height: 200.0,
+                      fit: BoxFit.cover,
+                    ),
             ),
+
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(8.0),

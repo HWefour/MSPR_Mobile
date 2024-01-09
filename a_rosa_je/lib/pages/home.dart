@@ -1,6 +1,8 @@
-import 'package:a_rosa_je/util/footer.dart';
 import 'package:flutter/material.dart';
+import 'package:a_rosa_je/util/footer.dart';
 import '../util/annonce_tile.dart';
+import '../api/api_service.dart';
+import '../util/annonce.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,6 +11,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  final ApiService apiService = ApiService();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -16,47 +19,40 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Accueil'),
-        backgroundColor: Colors.green, // Couleur de l'arrière-plan de la barre d'applications
-        // Ajoutez d'autres propriétés à AppBar si nécessaire
+        backgroundColor: Colors.green,
       ),
-      body: ListView(
-        children: <Widget>[
-          // Vous pouvez utiliser un ListView.builder si vous chargez une liste d'annonces
-          AnnonceTile(
-            titre: 'Monstera à garder',
-            localisation: 'Tourcoing',
-            nbPlantes: '2 plantes moyennes',
-            description: 'Bonjour, je dois m’absenter pour Noël et je cherche quelqu’un qui pourrait garder mes deux monsteras sur la ville de Tourcoing. Je suis disponible...',
-            imageUrl: 'https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg',
-            dateDebut: '21/12/23',
-            dateFin: '31/12/23',
-          ),
-          AnnonceTile(
-            titre: 'Monstera à garder',
-            localisation: 'Tourcoing',
-            nbPlantes: '2 plantes moyennes',
-            description: 'Bonjour, je dois m’absenter pour Noël et je cherche quelqu’un qui pourrait garder mes deux monsteras sur la ville de Tourcoing. Je suis disponible...',
-            imageUrl: 'https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg',
-            dateDebut: '21/12/23',
-            dateFin: '31/12/23',
-          ),
-          AnnonceTile(
-            titre: 'Monstera à garder',
-            localisation: 'Tourcoing',
-            nbPlantes: '2 plantes moyennes',
-            description: 'Bonjour, je dois m’absenter pour Noël et je cherche quelqu’un qui pourrait garder mes deux monsteras sur la ville de Tourcoing. Je suis disponible...',
-            imageUrl: 'https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg',
-            dateDebut: '21/12/23',
-            dateFin: '31/12/23',
-          ),
-          // Ajoutez autant de AnnonceTile que nécessaire
-        ],
+      body: FutureBuilder<List<Annonce>>(
+        future: apiService.fetchAnnonces(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text("Error: ${snapshot.error}");
+          } else if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                Annonce annonce = snapshot.data![index];
+                return AnnonceTile(
+                  titre: annonce.titreAnnonce,
+                  localisation: annonce.statutAnnonce, // Assurez-vous que c'est le champ correct pour 'localisation'
+                  nbPlantes:'', // Vous devrez peut-être ajuster cela selon vos données
+                  description: annonce.texteAnnonce,
+                  imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
+                  dateDebut: annonce.dateDebutGardeAnnonce,
+                  dateFin: annonce.dateFinGardeAnnonce,
+                );
+              },
+            );
+          } else {
+            return Text("No data");
+          }
+        },
       ),
       bottomNavigationBar: Footer(
         selectedIndex: _selectedIndex,
