@@ -81,6 +81,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 if (value!.isEmpty) {
                   return 'Veuillez entrer votre email';
                 }
+                if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+                    .hasMatch(value)) {
+                  return 'Adresse email invalide';
+                }
                 return null;
               },
             ),
@@ -92,6 +96,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Veuillez entrer votre mot de passe';
+                }
+                if (value.length < 8) {
+                  return 'Le mot de passe doit contenir au moins 8 caractères';
+                }
+                if (!value.contains(RegExp(r'[A-Z]'))) {
+                  return 'Le mot de passe doit contenir au moins une majuscule';
+                }
+                if (!value.contains(RegExp(r'[0-9]'))) {
+                  return 'Le mot de passe doit contenir au moins un chiffre';
+                }
+                if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+                  return 'Le mot de passe doit contenir au moins un caractère spécial';
                 }
                 return null;
               },
@@ -111,13 +127,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             GestureDetector(
               onTap: () {
                 setState(() {
-                  isChecked = !isChecked; // Inversez l'état de la case à cocher lors du clic
+                  isChecked =
+                      !isChecked; // Inversez l'état de la case à cocher lors du clic
                 });
               },
               child: Row(
                 children: [
                   SvgPicture.asset(
-                    isChecked ? 'assets/checked_checkbox.svg' : 'assets/unchecked_checkbox.svg',
+                    isChecked
+                        ? 'assets/checked_checkbox.svg'
+                        : 'assets/unchecked_checkbox.svg',
                     width: 24,
                     height: 24,
                   ),
