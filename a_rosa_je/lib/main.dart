@@ -19,10 +19,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // home: LoginPage(),
+      home: LoginPage(),
       //home: ProfilePage(),
       // home: HomePage(),
-      home: RegistrationScreen(),
+      // home: RegistrationScreen(),
     );
   }
 }

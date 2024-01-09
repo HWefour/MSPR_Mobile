@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/sign_in.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
@@ -20,12 +21,12 @@ class LoginPage extends StatelessWidget {
                 TextFieldWidget(
                   controller: _usernameController,
                   hintText: 'Nom d\'utilisateur',
-                                validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter your username';
-                }
-                return null;
-              },
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter your username';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 16.0),
                 TextFieldWidget(
@@ -33,11 +34,11 @@ class LoginPage extends StatelessWidget {
                   hintText: 'Mot de Passe',
                   obscureText: true,
                   validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter your password';
-                }
-                return null;
-              },
+                    if (value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 24.0),
                 ElevatedButtonWidget(
@@ -53,7 +54,10 @@ class LoginPage extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
-                    // Navigate to sign up page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RegistrationScreen(),)
+                    );
                   },
                 ),
               ],
@@ -74,7 +78,9 @@ class TextFieldWidget extends StatelessWidget {
   const TextFieldWidget({
     Key? key,
     required this.hintText,
-    this.obscureText = false, required TextEditingController controller, required String? Function(dynamic value) validator,
+    this.obscureText = false,
+    required TextEditingController controller,
+    required String? Function(dynamic value) validator,
   }) : super(key: key);
 
   @override

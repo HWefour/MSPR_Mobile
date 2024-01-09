@@ -153,8 +153,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors
-                                      .black, // Couleur de la bordure de la case à cocher
+                                  color: Colors.black, // Couleur de la bordure de la case à cocher
                                   width: 2.0,
                                 ),
                               ),
