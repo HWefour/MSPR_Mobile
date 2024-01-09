@@ -133,14 +133,37 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               },
               child: Row(
                 children: [
-                  SvgPicture.asset(
-                    isChecked
-                        ? 'assets/checked_checkbox.svg'
-                        : 'assets/unchecked_checkbox.svg',
-                    width: 24,
-                    height: 24,
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color:
+                          Colors.white, // Couleur de la case à cocher blanche
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: isChecked
+                          ? Icon(
+                              Icons.check,
+                              size: 16.0,
+                              color: Color(0xFF1B5E20), // Couleur de la coche verte
+                            )
+                          : Container(
+                              width: 16.0,
+                              height: 16.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors
+                                      .black, // Couleur de la bordure de la case à cocher
+                                  width: 2.0,
+                                ),
+                              ),
+                            ),
+                    ),
                   ),
-                  SizedBox(width: 8),
+                  SizedBox(
+                      width:
+                          8), // Espacement entre la case à cocher et le texte (facultatif)
                   Expanded(
                     child: Text(
                       'J\'accepte les conditions générales et la politique de confidentialité',
