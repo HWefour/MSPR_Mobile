@@ -25,7 +25,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 SizedBox(height: 24.0),
                 ElevatedButtonWidget(
-                  buttonText: 'Se connect',
+                  buttonText: 'Se connecter',
                   buttonColor: Colors.red,
                   onPressed: () {
                     // Handle login logic
@@ -120,7 +120,7 @@ class LogoWidget extends StatelessWidget {
       child: Center(
         // Replace with your actual logo image
         child: Text(
-          'LOGO',
+          'LOGe',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
