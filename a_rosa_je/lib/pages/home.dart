@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:a_rosa_je/util/footer.dart';
+import '../util/annonce_popup_card.dart';
 import '../util/annonce_tile.dart';
 import '../api/api_service.dart';
 import '../util/annonce.dart';
@@ -17,6 +18,15 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _showPopup(Annonce annonce) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AnnoncePopupCard(annonce: annonce);
+      },
+    );
   }
 
   @override
@@ -38,14 +48,17 @@ class _HomePageState extends State<HomePage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 Annonce annonce = snapshot.data![index];
-                return AnnonceTile(
-                  titre: annonce.titreAnnonce,
-                  localisation: annonce.statutAnnonce, // Assurez-vous que c'est le champ correct pour 'localisation'
-                  nbPlantes:'', // Vous devrez peut-être ajuster cela selon vos données
-                  description: annonce.texteAnnonce,
-                  imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
-                  dateDebut: annonce.dateDebutGardeAnnonce,
-                  dateFin: annonce.dateFinGardeAnnonce,
+                return GestureDetector(
+                  onTap: () => _showPopup(annonce),
+                  child: AnnonceTile(
+                    titre: annonce.titreAnnonce,
+                    localisation: annonce.statutAnnonce, // Assurez-vous que c'est le champ correct pour 'localisation'
+                    nbPlantes:'', // Vous devrez peut-être ajuster cela selon vos données
+                    description: annonce.texteAnnonce,
+                    imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
+                    dateDebut: annonce.dateDebutGardeAnnonce,
+                    dateFin: annonce.dateFinGardeAnnonce,
+                  ),
                 );
               },
             );
