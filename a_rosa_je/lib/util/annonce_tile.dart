@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 
 class AnnonceTile extends StatelessWidget {
-  final String titre;
-  final String localisation;
-  final String nbPlantes;
+ final String idAdvertisement;
+  final String title;
+  final String city;
+  final String idPlant;
+  final String userName;
   final String description;
-  final String imageUrl;
-  final String dateDebut;
-  final String dateFin;
+  final String imageUrl; 
+  final String createdAt;
+  final String? updatedAt;
 
   AnnonceTile({
     Key? key,
-    required this.titre,
-    required this.localisation,
-    required this.nbPlantes,
+    required this.idAdvertisement,
+    required this.title,
+    required this.city,
+    required this.idPlant,
+    required this.userName,
     required this.description,
     required this.imageUrl,
-    required this.dateDebut,
-    required this.dateFin,
+    required this.createdAt,
+    this.updatedAt,
   }) : super(key: key);
 
   @override
@@ -57,7 +61,7 @@ class AnnonceTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text(titre, style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
                     Row( // Row pour localisation et nbPlantes
                       crossAxisAlignment: CrossAxisAlignment.start, // Aligner horizontalement à gauche
                       mainAxisAlignment: MainAxisAlignment.center, // Centrer verticalement
@@ -68,7 +72,7 @@ class AnnonceTile extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center, // Centrer verticalement
                             children: [
                               Image.asset('images/bx_map-pin.png', height: 40.0),
-                              Text(localisation, overflow: TextOverflow.ellipsis),
+                              Text(city, overflow: TextOverflow.ellipsis),
                             ],
                           ),
                         ),
@@ -79,7 +83,7 @@ class AnnonceTile extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center, // Centrer verticalement
                             children: [
                               Image.asset('images/ph_plant-light.png', height: 40.0),
-                              Text(nbPlantes, overflow: TextOverflow.ellipsis),
+                              Text(idPlant, overflow: TextOverflow.ellipsis),
                             ],
                           ),
                         ),
@@ -98,11 +102,11 @@ class AnnonceTile extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: Text('Du : ' + dateDebut, overflow: TextOverflow.ellipsis),
+                          child: Text('Du : ' + createdAt, overflow: TextOverflow.ellipsis),
                         ),
                       SizedBox(width: 0), // Espace entre les deux textes
                         Expanded(
-                          child: Text('au ' + dateFin, overflow: TextOverflow.ellipsis),
+                          child: Text('au ' + createdAt, overflow: TextOverflow.ellipsis),
                       ),
                       ],
                     ),

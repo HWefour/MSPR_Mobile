@@ -26,7 +26,7 @@ class AnnoncePopupCard extends StatelessWidget {
                   children: <Widget>[
                     Center(
                       child: Text(
-                        annonce.titreAnnonce,
+                        annonce.title,
                         style: TextStyle(
                           fontWeight: FontWeight.bold, 
                           fontSize: 24.0,
@@ -41,10 +41,10 @@ class AnnoncePopupCard extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Annonce de : Marc',
+                              Text('Annonce de : ${annonce.usersName}',
                                   style: TextStyle(fontSize: 18)),
                               SizedBox(height: 8.0),
-                              Text(('Localisation : Montpellier'),
+                              Text(('Localisation : ${annonce.city}'),
                                   style: TextStyle(fontSize: 18)),
                               SizedBox(height: 8.0),
                               Text('Plantes : 2 plantes moyennes',
@@ -60,7 +60,7 @@ class AnnoncePopupCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Du ${annonce.dateDebutGardeAnnonce}',
+                            'Du ${annonce.createdAt}',
                             style: TextStyle(fontSize: 16),
                             overflow: TextOverflow
                                 .ellipsis, // Ajouté pour gérer le débordement de texte
@@ -68,7 +68,7 @@ class AnnoncePopupCard extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            'au ${annonce.dateFinGardeAnnonce}',
+                            'au ${annonce.createdAt}',
                             style: TextStyle(fontSize: 16),
                             overflow: TextOverflow
                                 .ellipsis, // Ajouté pour gérer le débordement de texte
@@ -78,7 +78,7 @@ class AnnoncePopupCard extends StatelessWidget {
                     ),
                     SizedBox(height: 40.0),
                     Text(
-                      annonce.texteAnnonce,
+                      annonce.description,
                       textAlign: TextAlign.justify,
                       style: TextStyle(fontSize: 16.0),
                     ),

@@ -51,13 +51,15 @@ class _HomePageState extends State<HomePage> {
                 return GestureDetector(
                   onTap: () => _showPopup(annonce),
                   child: AnnonceTile(
-                    titre: annonce.titreAnnonce,
-                    localisation: annonce.statutAnnonce, // Assurez-vous que c'est le champ correct pour 'localisation'
-                    nbPlantes:'', // Vous devrez peut-être ajuster cela selon vos données
-                    description: annonce.texteAnnonce,
+                    idAdvertisement: '',
+                    title: annonce.title,
+                    city: annonce.city, // Assurez-vous que c'est le champ correct pour 'localisation'
+                    idPlant:'', // Vous devrez peut-être ajuster cela selon vos données
+                    userName: '',
+                    description: annonce.description,
                     imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
-                    dateDebut: annonce.dateDebutGardeAnnonce,
-                    dateFin: annonce.dateFinGardeAnnonce,
+                    createdAt: annonce.createdAt,
+                    //createdAt: annonce.createdAt,
                   ),
                 );
               },
