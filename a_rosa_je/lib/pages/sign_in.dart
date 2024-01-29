@@ -23,6 +23,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _uservilleController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
@@ -69,6 +70,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Veuillez entrer votre pseudonyme';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 24.0),
+            TextFieldWidget(
+              controller: _uservilleController,
+              hintText: 'Ville',
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Veuillez entrer votre ville';
                 }
                 return null;
               },
