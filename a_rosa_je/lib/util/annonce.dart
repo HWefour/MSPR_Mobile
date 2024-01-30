@@ -11,6 +11,8 @@ class Annonce {
   final String lastName;
   final String usersName;
   final String bio;
+  final String? startDate;
+  final String? endDate;
 
   Annonce({
     required this.idAdvertisement,
@@ -25,6 +27,8 @@ class Annonce {
     required this.lastName,
     required this.usersName,
     required this.bio,
+    this.startDate,
+    this.endDate,
   });
 
   factory Annonce.fromJson(Map<String, dynamic> json) {
@@ -41,6 +45,8 @@ class Annonce {
       lastName: json['lastName'] as String,
       usersName: json['usersName'] as String,
       bio: json['bio'] as String,
+      startDate: json['start_date'] as String?,
+      endDate: json['end_date'] as String?,
     );
   }
 }

@@ -4,6 +4,7 @@ import '../util/annonce_popup_card.dart';
 import '../util/annonce_tile.dart';
 import '../api/api_service.dart';
 import '../util/annonce.dart';
+import 'create_annonce.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -57,9 +58,10 @@ class _HomePageState extends State<HomePage> {
                     idPlant:'', // Vous devrez peut-être ajuster cela selon vos données
                     userName: '',
                     description: annonce.description,
+                    startDate: annonce.startDate ?? 'N/A',
+                    endDate: annonce.endDate ?? 'N/A',
                     imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
-                    createdAt: annonce.createdAt,
-                    //createdAt: annonce.createdAt,
+                    createdAt: '',
                   ),
                 );
               },
@@ -75,7 +77,9 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Logic for posting an ad
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => CreateAnnonce()),
+          );
         },
         child: Icon(Icons.add, color: Colors.white),
         backgroundColor: Color(0xFF1B5E20),

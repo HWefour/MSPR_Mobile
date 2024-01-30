@@ -7,6 +7,8 @@ class AnnonceTile extends StatelessWidget {
   final String idPlant;
   final String userName;
   final String description;
+  final String startDate;
+  final String endDate;
   final String imageUrl; 
   final String createdAt;
   final String? updatedAt;
@@ -19,6 +21,8 @@ class AnnonceTile extends StatelessWidget {
     required this.idPlant,
     required this.userName,
     required this.description,
+    required this.startDate,
+    required this.endDate,
     required this.imageUrl,
     required this.createdAt,
     this.updatedAt,
@@ -102,11 +106,11 @@ class AnnonceTile extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: Text('Du : ' + createdAt, overflow: TextOverflow.ellipsis),
+                          child: Text('Du : ' + startDate, overflow: TextOverflow.ellipsis),
                         ),
                       SizedBox(width: 0), // Espace entre les deux textes
                         Expanded(
-                          child: Text('au ' + createdAt, overflow: TextOverflow.ellipsis),
+                          child: Text('au ' + endDate, overflow: TextOverflow.ellipsis),
                       ),
                       ],
                     ),
