@@ -81,9 +81,15 @@
     },
     {
       "name": "flutter_lints",
-      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-2.0.3",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-3.0.1",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "flutter_map",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_map-6.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "flutter_plugin_android_lifecycle",
@@ -105,9 +111,9 @@
     },
     {
       "name": "http",
-      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/http-0.13.6",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.2.0",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.2"
     },
     {
       "name": "http_parser",
@@ -117,9 +123,9 @@
     },
     {
       "name": "image_picker",
-      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker-0.8.9",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker-1.0.7",
       "packageUri": "lib/",
-      "languageVersion": "2.18"
+      "languageVersion": "3.0"
     },
     {
       "name": "image_picker_android",
@@ -165,15 +171,57 @@
     },
     {
       "name": "intl",
-      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.17.0",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.19.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "js",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/js-0.6.7",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "latlong2",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/latlong2-0.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "lints",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/lints-3.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "lists",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/lists-1.0.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
-      "name": "lints",
-      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/lints-2.1.1",
+      "name": "location",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/location-5.0.3",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "location_platform_interface",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/location_platform_interface-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "location_web",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/location_web-4.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "logger",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/logger-2.0.2+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
     },
     {
       "name": "matcher",
@@ -194,6 +242,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "mgrs_dart",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/mgrs_dart-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "mime",
       "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/mime-1.0.5",
       "packageUri": "lib/",
@@ -210,6 +264,18 @@
       "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/plugin_platform_interface-2.1.8",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "polylabel",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/polylabel-1.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.13"
+    },
+    {
+      "name": "proj4dart",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/proj4dart-2.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "sky_engine",
@@ -260,6 +326,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "unicode",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/unicode-0.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "vector_math",
       "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/vector_math-2.1.4",
       "packageUri": "lib/",
@@ -272,13 +344,23 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "wkt_parser",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/wkt_parser-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "a_rosa_je",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     }
   ],
+<<<<<<< Updated upstream
   "generated": "2024-01-30T09:03:02.791616Z",
+=======
+  "generated": "2024-01-31T15:46:05.385565Z",
+>>>>>>> Stashed changes
   "generator": "pub",
   "generatorVersion": "3.2.3"
 }

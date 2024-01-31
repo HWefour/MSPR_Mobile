@@ -25,5 +25,10 @@ public final class GeneratedPluginRegistrant {
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin image_picker_android, io.flutter.plugins.imagepicker.ImagePickerPlugin", e);
     }
+    try {
+      flutterEngine.getPlugins().add(new com.lyokone.location.LocationPlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin location, com.lyokone.location.LocationPlugin", e);
+    }
   }
 }
