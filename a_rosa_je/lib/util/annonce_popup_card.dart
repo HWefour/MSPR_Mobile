@@ -47,7 +47,7 @@ class AnnoncePopupCard extends StatelessWidget {
                               Text(('Localisation : ${annonce.city}'),
                                   style: TextStyle(fontSize: 18)),
                               SizedBox(height: 8.0),
-                              Text('Plantes : 2 plantes moyennes',
+                              Text('Plante : ${annonce.name} ',
                                   style: TextStyle(fontSize: 18)),
                             ],
                           ),

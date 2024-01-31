@@ -5,6 +5,7 @@ class Annonce {
   final String? updatedAt; // This can be null
   final String city;
   final String idPlant;
+  final String name;
   final String idUser;
   final String description;
   final String firstName;
@@ -21,6 +22,7 @@ class Annonce {
     this.updatedAt,
     required this.city,
     required this.idPlant,
+    required this.name,
     required this.idUser,
     required this.description,
     required this.firstName,
@@ -39,6 +41,7 @@ class Annonce {
       updatedAt: json['updated_at'] as String?,
       city: json['city'] as String,
       idPlant: json['idPlant'] as String,
+      name: json['name'] as String,
       idUser: json['idUser'] as String,
       description: json['description'] as String,
       firstName: json['firstName'] as String,

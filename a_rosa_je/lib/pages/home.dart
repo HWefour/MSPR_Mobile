@@ -54,8 +54,9 @@ class _HomePageState extends State<HomePage> {
                   child: AnnonceTile(
                     idAdvertisement: '',
                     title: annonce.title,
-                    city: annonce.city, // Assurez-vous que c'est le champ correct pour 'localisation'
-                    idPlant:'', // Vous devrez peut-être ajuster cela selon vos données
+                    city: annonce.city, 
+                    idPlant:'', 
+                    name: annonce.name,
                     userName: '',
                     description: annonce.description,
                     startDate: annonce.startDate ?? 'N/A',

@@ -5,6 +5,7 @@ class AnnonceTile extends StatelessWidget {
   final String title;
   final String city;
   final String idPlant;
+  final String name;
   final String userName;
   final String description;
   final String startDate;
@@ -19,6 +20,7 @@ class AnnonceTile extends StatelessWidget {
     required this.title,
     required this.city,
     required this.idPlant,
+    required this.name,
     required this.userName,
     required this.description,
     required this.startDate,
@@ -57,7 +59,6 @@ class AnnonceTile extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
             ),
-
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(8.0),
@@ -66,6 +67,24 @@ class AnnonceTile extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(
+                        height:
+                            8.0), // Ajoute un espace entre la description et les dates
+                    Row(
+                      // Nouvelle Row pour dateDebut et dateFin
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text('Du : ' + startDate,
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                        SizedBox(width: 0), // Espace entre les deux textes
+                        Expanded(
+                          child: Text('au ' + endDate,
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                      ],
+                    ),
                     Row( // Row pour localisation et nbPlantes
                       crossAxisAlignment: CrossAxisAlignment.start, // Aligner horizontalement à gauche
                       mainAxisAlignment: MainAxisAlignment.center, // Centrer verticalement
@@ -87,7 +106,7 @@ class AnnonceTile extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center, // Centrer verticalement
                             children: [
                               Image.asset('images/ph_plant-light.png', height: 40.0),
-                              Text(idPlant, overflow: TextOverflow.ellipsis),
+                              Text(name, overflow: TextOverflow.ellipsis),
                             ],
                           ),
                         ),
@@ -96,23 +115,10 @@ class AnnonceTile extends StatelessWidget {
                     SizedBox(height: 10.0), // Ajoute un espace
                     Expanded(
                       child: Text(
-                        description,
+                        '"' + description + '"',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 3,
                       ),
-                    ),
-                    SizedBox(height: 8.0), // Ajoute un espace entre la description et les dates
-                    Row( // Nouvelle Row pour dateDebut et dateFin
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text('Du : ' + startDate, overflow: TextOverflow.ellipsis),
-                        ),
-                      SizedBox(width: 0), // Espace entre les deux textes
-                        Expanded(
-                          child: Text('au ' + endDate, overflow: TextOverflow.ellipsis),
-                      ),
-                      ],
                     ),
                   ],
                 ),
