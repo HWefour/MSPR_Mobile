@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
 import 'pages/sign_in.dart';
 import 'pages/parametre_menu.dart';
+import 'pages/profil_info.dart';
 // ignore: duplicate_import
 //import 'pages/profil.dart';
 
@@ -21,10 +22,11 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       // home: LoginPage(),
-      //home: ProfilePage(),
+      // home: ProfilePage(),
       // home: HomePage(),
       // home: RegistrationScreen(),
-      home: ParametreMenu()
+      home: ParametreMenu(),
+      // home: SettingsPage(),
     );
   }
 }
