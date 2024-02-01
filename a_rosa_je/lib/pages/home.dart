@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'package:http/http.dart' as http;
 import 'package:a_rosa_je/util/footer.dart';
 import '../util/annonce_popup_card.dart';
 import '../util/annonce_tile.dart';
@@ -19,6 +21,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   LocationData? _currentLocation;
   var _locationService = Location();
   bool _isSearchMode = false;
+  Key _mapKey = ValueKey("InitialKey");
 
  @override
   void initState() {
@@ -169,6 +172,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ],
     );  
   }
+
+
+  //gestion de la localisation pour la map
+  Future<LatLng?> searchCity(String city) async {
+    final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$city&format=json');
+    final response = await http.get(url, headers: {
+      'User-Agent': 'YourAppName', // Remplacez par le nom de votre application
+    });
+
+    if (response.statusCode == 200) {
+      final results = json.decode(response.body);
+      if (results.isNotEmpty) {
+        final lat = double.parse(results[0]["lat"]);
+        final lon = double.parse(results[0]["lon"]);
+        return LatLng(lat, lon);
+      }
+    }
+    return null; // Renvoie null si la recherche ne donne aucun résultat ou en cas d'erreur
+  }
+  //gestion de la carte
   Widget _buildMap() {
     return Column(
       children: [
@@ -176,16 +199,29 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              decoration: InputDecoration(
-                labelText: "Rechercher...",
-                hintText: "Entrez un mot-clé",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                decoration: InputDecoration(
+                  labelText: "Rechercher...",
+                  hintText: "Entrez un mot-clé",
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 ),
               ),
-              onChanged: (value) {
-                // Mettre à jour la logique pour filtrer les annonces basées sur la recherche
+              onSubmitted: (value) async {
+                final coordinates = await searchCity(value);
+                if (coordinates != null) {
+                  setState(() {
+                    _currentLocation = LocationData.fromMap({
+                      "latitude": coordinates.latitude,
+                      "longitude": coordinates.longitude,
+                    });
+                    _isSearchMode = false;
+                    // Mettre à jour la clé pour forcer la reconstruction de la carte
+                    _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
+                  });
+                } else {
+                  print("Ville non trouvée ou erreur de requête");
+                }
               },
             ),
           ),
@@ -217,6 +253,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       child: _currentLocation == null
         ? Center(child: CircularProgressIndicator())
         : FlutterMap(
+            key: _mapKey,
             options: MapOptions(
               initialCenter: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
               initialZoom: 13.0,
