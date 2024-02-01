@@ -75,7 +75,7 @@
     },
     {
       "name": "flutter",
-      "rootUri": "file:///E:/Dev/flutter/packages/flutter",
+      "rootUri": "file:///D:/flutter/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -99,13 +99,13 @@
     },
     {
       "name": "flutter_test",
-      "rootUri": "file:///E:/Dev/flutter/packages/flutter_test",
+      "rootUri": "file:///D:/flutter/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "flutter_web_plugins",
-      "rootUri": "file:///E:/Dev/flutter/packages/flutter_web_plugins",
+      "rootUri": "file:///D:/flutter/packages/flutter_web_plugins",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -279,7 +279,7 @@
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///E:/Dev/flutter/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///D:/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -356,11 +356,7 @@
       "languageVersion": "3.2"
     }
   ],
-<<<<<<< Updated upstream
-  "generated": "2024-01-30T09:03:02.791616Z",
-=======
-  "generated": "2024-01-31T15:46:05.385565Z",
->>>>>>> Stashed changes
+  "generated": "2024-02-01T07:53:51.801062Z",
   "generator": "pub",
   "generatorVersion": "3.2.3"
 }

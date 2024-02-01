@@ -19,11 +19,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   LocationData? _currentLocation;
   var _locationService = Location();
 
-  @override
+ @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _determinePosition();
+
+    _tabController!.addListener(() {
+      if (_tabController!.index == 1) { // index 1 correspond au deuxième onglet
+        _determinePosition();
+      }
+    });
   }
 
   void _determinePosition() async {
@@ -117,21 +122,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         },
       );
   }
-
   Widget _buildMap() {
-    return FlutterMap(
-      options: MapOptions(
-        initialCenter: LatLng(48.8566, 2.3522), // Coordonnées de Paris
-        initialZoom: 13.0,
-      ),
-      children: [
-          TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'com.example.app',
-          ),
-          // Ajouter d'autres couches comme des marqueurs si nécessaire
-        ],
-    );
+    return _currentLocation == null
+        ? Center(child: CircularProgressIndicator())
+        : FlutterMap(
+            options: MapOptions(
+              initialCenter: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+              initialZoom: 13.0,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.example.app',
+              ),
+              // Ajouter d'autres couches si nécessaire
+            ],
+          );
   }
 
   @override
