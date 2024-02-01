@@ -22,6 +22,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   var _locationService = Location();
   bool _isSearchMode = false;
   Key _mapKey = ValueKey("InitialKey");
+  final MapController _mapController = MapController();
+  TextEditingController searchController = TextEditingController();
+
 
  @override
   void initState() {
@@ -96,6 +99,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              controller: searchController,
               decoration: InputDecoration(
                 labelText: "Rechercher...",
                 hintText: "Entrez un mot-clé",
@@ -104,8 +108,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 ),
               ),
-              onChanged: (value) {
-                // Mettre à jour la logique pour filtrer les annonces basées sur la recherche
+              onSubmitted: (value) {
+                // Appelez votre API avec la nouvelle ville lorsque l'utilisateur valide sa saisie
+                setState(() {
+                  // Vous pouvez choisir de faire quelque chose ici si nécessaire
+                });
               },
             ),
           ),
@@ -135,7 +142,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
       Expanded(
         child: FutureBuilder<List<Annonce>>(
-          future: apiService.fetchAnnonces(),
+          future: apiService.fetchAnnonces(searchController.text.isEmpty ? "Montpellier" : searchController.text),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
@@ -250,22 +257,46 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ),
     Expanded (
-      child: _currentLocation == null
-        ? Center(child: CircularProgressIndicator())
-        : FlutterMap(
-            key: _mapKey,
-            options: MapOptions(
-              initialCenter: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-              initialZoom: 13.0,
-            ),
+        child: _currentLocation == null
+          ? Center(child: CircularProgressIndicator())
+          : Stack(
             children: [
-              TileLayer(
-                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.app',
+              FlutterMap(
+                key: _mapKey,
+                options: MapOptions(
+                  initialCenter: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                  initialZoom: 13.0,
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.example.app',
+                  ),
+                  // Ajouter d'autres couches si nécessaire
+                ],
               ),
-              // Ajouter d'autres couches si nécessaire
+              Positioned(
+                right: 20.0,
+                bottom: 20.0,
+                child: FloatingActionButton(
+                  onPressed: () async {
+                    _determinePosition();
+                    // Logique pour réinitialiser la position de la carte
+                    if (_currentLocation != null) {
+                      // Obtenez la localisation actuelle.
+                      _currentLocation = await _locationService.getLocation();
+                      _mapController.move(
+                        LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                        13.0
+                      );
+                    }
+                  },
+                  child: Icon(Icons.my_location),
+                  tooltip: 'Reset to Current Location',
+                ),
+              ),
             ],
-          ),
+          ),   
         ),
       ],
     );  
