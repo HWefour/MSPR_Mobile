@@ -18,6 +18,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   TabController? _tabController;
   LocationData? _currentLocation;
   var _locationService = Location();
+  bool _isSearchMode = false;
 
  @override
   void initState() {
@@ -86,41 +87,87 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _buildAnnoncesList() {
-    return FutureBuilder<List<Annonce>>(
-        future: apiService.fetchAnnonces(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text("Error: ${snapshot.error}");
-          } else if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                Annonce annonce = snapshot.data![index];
-                return GestureDetector(
-                  onTap: () => _showPopup(annonce),
-                  child: AnnonceTile(
-                    idAdvertisement: '',
-                    title: annonce.title,
-                    city: annonce.city, 
-                    idPlant:'', 
-                    name: annonce.name,
-                    userName: '',
-                    description: annonce.description,
-                    startDate: annonce.startDate ?? 'N/A',
-                    endDate: annonce.endDate ?? 'N/A',
-                    imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
-                    createdAt: '',
-                  ),
-                );
+    return Column(
+      children: [
+        if (_isSearchMode)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: "Rechercher...",
+                hintText: "Entrez un mot-clé",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                ),
+              ),
+              onChanged: (value) {
+                // Mettre à jour la logique pour filtrer les annonces basées sur la recherche
               },
-            );
-          } else {
-            return Text("No data");
-          }
-        },
-      );
+            ),
+          ),
+        Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0), // Ajustez selon vos besoins
+            child: Row(
+              mainAxisSize: MainAxisSize.min, // Important pour garder les éléments collés
+              children: [
+                Text(
+                  "Filtrer les annonces",
+                  style: TextStyle(
+                    fontSize: 16.0, // Ajustez la taille de police selon vos besoins
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+                  onPressed: () {
+                    setState(() {
+                      _isSearchMode = !_isSearchMode;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      Expanded(
+        child: FutureBuilder<List<Annonce>>(
+          future: apiService.fetchAnnonces(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text("Error: ${snapshot.error}");
+            } else if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  Annonce annonce = snapshot.data![index];
+                  return GestureDetector(
+                    onTap: () => _showPopup(annonce),
+                    child: AnnonceTile(
+                      idAdvertisement: '',
+                      title: annonce.title,
+                      city: annonce.city, 
+                      idPlant:'', 
+                      name: annonce.name,
+                      userName: '',
+                      description: annonce.description,
+                      startDate: annonce.startDate ?? 'N/A',
+                      endDate: annonce.endDate ?? 'N/A',
+                      imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
+                      createdAt: '',
+                    ),
+                  );
+                },
+              );
+            } else {
+              return Text("No data");
+            }
+          }),
+        ),
+      ],
+    );  
   }
   Widget _buildMap() {
     return _currentLocation == null
