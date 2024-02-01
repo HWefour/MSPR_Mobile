@@ -170,7 +170,51 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );  
   }
   Widget _buildMap() {
-    return _currentLocation == null
+    return Column(
+      children: [
+        if (_isSearchMode)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: "Rechercher...",
+                hintText: "Entrez un mot-clé",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                ),
+              ),
+              onChanged: (value) {
+                // Mettre à jour la logique pour filtrer les annonces basées sur la recherche
+              },
+            ),
+          ),
+        Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0), // Ajustez selon vos besoins
+            child: Row(
+              mainAxisSize: MainAxisSize.min, // Important pour garder les éléments collés
+              children: [
+                Text(
+                  "Filtrer les annonces",
+                  style: TextStyle(
+                    fontSize: 16.0, // Ajustez la taille de police selon vos besoins
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+                  onPressed: () {
+                    setState(() {
+                      _isSearchMode = !_isSearchMode;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+    Expanded (
+      child: _currentLocation == null
         ? Center(child: CircularProgressIndicator())
         : FlutterMap(
             options: MapOptions(
@@ -184,7 +228,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ),
               // Ajouter d'autres couches si nécessaire
             ],
-          );
+          ),
+        ),
+      ],
+    );  
   }
 
   @override
