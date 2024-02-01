@@ -36,7 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('http://localhost:1212/auth/login'));
+    final response = await http.get(Uri.parse('http://localhost:1212/auth/login/'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       // Récupérez les données de l'utilisateur à partir de jsonData et mettez à jour les contrôleurs de texte.
