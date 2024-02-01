@@ -25,12 +25,10 @@ class MyApp extends StatelessWidget {
       ),
       // home: LoginPage(),
       // home: ProfilePage(),
-      //  home: HomePage(),
-      home: RegistrationScreen(),
+      home: HomePage(),
+      // home: RegistrationScreen(),
       // home: ParametreMenu(),
       // home: SettingsPage(),
     );
   }
 }
-
-
