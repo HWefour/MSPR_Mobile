@@ -35,14 +35,14 @@ class Annonce {
 
   factory Annonce.fromJson(Map<String, dynamic> json) {
     return Annonce(
-      idAdvertisement: json['idAdvertisement'] as String,
+      idAdvertisement: json['idAdvertisement'].toString(),
       title: json['title'] as String,
       createdAt: json['created_at'] as String,
       updatedAt: json['updated_at'] as String?,
       city: json['city'] as String,
-      idPlant: json['idPlant'] as String,
+      idPlant: json['idPlant'].toString(),
       name: json['name'] as String,
-      idUser: json['idUser'] as String,
+      idUser: json['idUser'].toString(),
       description: json['description'] as String,
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
