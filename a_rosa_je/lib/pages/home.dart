@@ -226,8 +226,38 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return null; // Renvoie null si aucune annonce n'est trouvée ou en cas d'erreur
   }
 
-
-
+  void _showAnnoncesModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16.0),
+          child: ListView.builder(
+            itemCount: _currentAnnonces.length, // Utilisez _currentAnnonces au lieu de snapshot.data!
+            itemBuilder: (context, index) {
+              Annonce annonce = _currentAnnonces[index]; // Utilisez _currentAnnonces au lieu de snapshot.data!
+              return GestureDetector(
+                onTap: () => _showPopup(annonce), // Afficher le modal d'annonce lorsque l'élément est tapé
+                child: AnnonceTile(
+                  idAdvertisement: '',
+                  title: annonce.title,
+                  city: annonce.city, 
+                  idPlant:'', 
+                  name: annonce.name,
+                  userName: '',
+                  description: annonce.description,
+                  startDate: annonce.startDate ?? 'N/A',
+                  endDate: annonce.endDate ?? 'N/A',
+                  imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
+                  createdAt: '',
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 
   //gestion de la carte
   Widget _buildMap() {
@@ -320,8 +350,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   onTap: (tapPosition, point) {
                     if (_currentMarker != null) {
                         // Gérer l'appui sur la carte uniquement si _currentMarker est présent
-                        print("J'ai appuyé sur la carte à la position : $point");
-                        // Ajoutez ici le code que vous souhaitez exécuter en cas d'appui sur la carte
+                        _showAnnoncesModal(context);
                       }
                   },
                 ),
