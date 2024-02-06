@@ -38,6 +38,7 @@ dependencies:
   location: ^5.0.3
   flutter_svg: ^2.0.9  # Remplacez la version par la dernière disponible
   flutter_lints: ^3.0.1
+  flutter_map_marker_popup: ^6.1.2
 
   # http: ^1.13.3
   # geocoder: ^1.38.1

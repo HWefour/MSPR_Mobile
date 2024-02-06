@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:a_rosa_je/util/footer.dart';
 import '../util/annonce_popup_card.dart';
 import '../util/annonce_tile.dart';
@@ -26,6 +27,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   TextEditingController searchController = TextEditingController();
   Marker? _currentMarker;
   bool _hasAnnonces = true;
+  List<Annonce> _currentAnnonces = []; //pour stocker les annonces de la map
+  final PopupController _popupController = PopupController();
 
 
  @override
@@ -196,6 +199,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       // Tentative de récupérer les annonces pour la ville spécifiée
       List<Annonce> annonces = await apiService.fetchAnnonces(city);
       if (annonces.isNotEmpty) {
+
+      // Si des annonces existent pour la ville, stockez-les dans l'état du widget
+      setState(() {
+        _currentAnnonces = annonces;
+      });
+
         // Si des annonces existent pour la ville, procéder à la recherche de la localisation
         final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$city&format=json');
         final response = await http.get(url, headers: {
@@ -308,6 +317,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 options: MapOptions(
                   initialCenter: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
                   initialZoom: 13.0,
+                  onTap: (tapPosition, point) {
+                    if (_currentMarker != null) {
+                        // Gérer l'appui sur la carte uniquement si _currentMarker est présent
+                        print("J'ai appuyé sur la carte à la position : $point");
+                        // Ajoutez ici le code que vous souhaitez exécuter en cas d'appui sur la carte
+                      }
+                  },
                 ),
                 children: [
                   TileLayer(
