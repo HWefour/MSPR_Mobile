@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
   LocationData? _currentLocation;
   var _locationService = Location();
@@ -33,8 +33,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
  @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
-
     _tabController!.addListener(() {
       searchController.clear();
       if (_tabController!.index == 1) { // index 1 correspond au deuxième onglet
@@ -77,9 +77,37 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _tabController?.dispose();
     super.dispose();
   }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // L'application est ramenée au premier plan (ou l'utilisateur revient à cette page)
+      // Insérez ici votre logique de rafraîchissement
+      _refreshData();
+    }
+  }
+
+  void _refreshData() {
+    // Exemple : Recharger les annonces
+    apiService.fetchAnnonces(searchController.text).then((annonces) {
+      setState(() {
+        _currentAnnonces = annonces;
+        // Ajoutez toute autre logique de mise à jour de l'état ici si nécessaire
+      });
+    }).catchError((error) {
+      // Gérez les erreurs ici si nécessaire
+      print("Erreur lors du chargement des annonces: $error");
+    });
+    setState(() {
+      // Ici, vous pouvez appeler vos méthodes pour recharger les données
+    });
+  }
+
 
   int _selectedIndex = 0;
   final ApiService apiService = ApiService();
@@ -167,29 +195,40 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ),
       ],
-      Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Filtrer les annonces",
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
-              ),
-              IconButton(
-                icon: Icon(_isSearchMode ? Icons.close : Icons.search),
-                onPressed: () {
-                  searchController.clear();
-                  setState(() {
-                    _isSearchMode = !_isSearchMode;
-                  });
-                },
-              ),
-            ],
+      if (!_hasAnnonces)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            "Pas d'annonces dans cette ville",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: Colors.red,
+            ),
           ),
+        ),
+      if (!_hasAnnonces) // Ajout d'un espace uniquement si _hasAnnonces est false
+        SizedBox(height: 10.0),
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Filtrer les annonces",
+              style: TextStyle(fontSize: 16.0),
+            ),
+            IconButton(
+              icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+              onPressed: () {
+                _hasAnnonces = true;
+                searchController.clear();
+                setState(() {
+                  _isSearchMode = !_isSearchMode;
+                  
+                });
+              },
+            ),
+          ],
         ),
       ),
       Expanded(
@@ -224,6 +263,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 },
               );
             } else {
+              setState(() {
+                          _hasAnnonces = false; // Aucune annonce trouvée
+                        });
               return Text("No data");
             }
           },
