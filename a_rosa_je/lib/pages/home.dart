@@ -320,27 +320,27 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   // Ajouter d'autres couches si nécessaire
                 ],
               ),
-              Positioned(
-                right: 20.0,
-                bottom: 20.0,
-                child: FloatingActionButton(
-                  onPressed: () async {
-                    _determinePosition();
-                    // Attendre la mise à jour de la position
-                    if (_currentLocation != null) {
-                      setState(() {
-                        // Déplacer la vue de la carte vers la nouvelle position
-                        _mapController.move(
-                          LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                          13.0
-                        );
-                      });
-                    }
-                  },
-                  child: Icon(Icons.my_location),
-                  tooltip: 'Reset to Current Location',
-                )
-              ),
+              // Positioned(
+              //   right: 20.0,
+              //   bottom: 20.0,
+              //   child: FloatingActionButton(
+              //     onPressed: () async {
+              //       _determinePosition();
+              //       // Attendre la mise à jour de la position
+              //       if (_currentLocation != null) {
+              //         setState(() {
+              //           // Déplacer la vue de la carte vers la nouvelle position
+              //           _mapController.move(
+              //             LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+              //             13.0
+              //           );
+              //         });
+              //       }
+              //     },
+              //     child: Icon(Icons.my_location),
+              //     tooltip: 'Reset to Current Location',
+              //   )
+              // ),
             ],
           ),   
         ),
