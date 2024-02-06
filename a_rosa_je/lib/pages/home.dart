@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   final MapController _mapController = MapController();
   TextEditingController searchController = TextEditingController();
   Marker? _currentMarker;
+  bool _hasAnnonces = true;
 
 
  @override
@@ -191,21 +192,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   //gestion de la localisation pour la map
   Future<LatLng?> searchCity(String city) async {
-    final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$city&format=json');
-    final response = await http.get(url, headers: {
-      'User-Agent': 'a_rosa_je', 
-    });
+    try {
+      // Tentative de récupérer les annonces pour la ville spécifiée
+      List<Annonce> annonces = await apiService.fetchAnnonces(city);
+      if (annonces.isNotEmpty) {
+        // Si des annonces existent pour la ville, procéder à la recherche de la localisation
+        final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$city&format=json');
+        final response = await http.get(url, headers: {
+          'User-Agent': 'a_rosa_je',
+        });
 
-    if (response.statusCode == 200) {
-      final results = json.decode(response.body);
-      if (results.isNotEmpty) {
-        final lat = double.parse(results[0]["lat"]);
-        final lon = double.parse(results[0]["lon"]);
-        return LatLng(lat, lon);
+        if (response.statusCode == 200) {
+          final results = json.decode(response.body);
+          if (results.isNotEmpty) {
+            final lat = double.parse(results[0]["lat"]);
+            final lon = double.parse(results[0]["lon"]);
+            return LatLng(lat, lon);
+          }
+        }
       }
+    } catch (e) {
+      print("Erreur lors de la récupération des annonces ou de la localisation : $e");
     }
-    return null; // Renvoie null si la recherche ne donne aucun résultat ou en cas d'erreur
+    return null; // Renvoie null si aucune annonce n'est trouvée ou en cas d'erreur
   }
+
+
+
+
   //gestion de la carte
   Widget _buildMap() {
     return Column(
@@ -239,37 +253,51 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     _isSearchMode = false;
                     // Mettre à jour la clé pour forcer la reconstruction de la carte
                     _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
+                    _hasAnnonces = true;
                   });
                 } else {
-                  print("Ville non trouvée ou erreur de requête");
+                  setState(() {
+                    _hasAnnonces = false; // Aucune annonce trouvée
+                  });
                 }
               },
             ),
           ),
-        Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0), // Ajustez selon vos besoins
-            child: Row(
-              mainAxisSize: MainAxisSize.min, // Important pour garder les éléments collés
-              children: [
-                Text(
-                  "Filtrer les annonces",
-                  style: TextStyle(
-                    fontSize: 16.0, // Ajustez la taille de police selon vos besoins
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(_isSearchMode ? Icons.close : Icons.search),
-                  onPressed: () {
-                    setState(() {
-                      _isSearchMode = !_isSearchMode;
-                    });
-                  },
-                ),
-              ],
+        if (!_hasAnnonces)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            "Pas d'annonces dans cette ville",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: Colors.red,
             ),
           ),
         ),
+      if (!_hasAnnonces) // Ajout d'un espace uniquement si _hasAnnonces est false
+        SizedBox(height: 10.0),
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Filtrer les annonces",
+              style: TextStyle(fontSize: 16.0),
+            ),
+            IconButton(
+              icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+              onPressed: () {
+                _hasAnnonces = true;
+                setState(() {
+                  _isSearchMode = !_isSearchMode;
+                  
+                });
+              },
+            ),
+          ],
+        ),
+      ),
     Expanded (
         child: _currentLocation == null
           ? Center(child: CircularProgressIndicator())
