@@ -42,40 +42,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void _determinePosition() async {
-  bool serviceEnabled;
-  PermissionStatus permissionGranted;
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
 
-  // Vérifiez si le service de localisation est activé.
-  serviceEnabled = await _locationService.serviceEnabled();
-  if (!serviceEnabled) {
-    serviceEnabled = await _locationService.requestService();
+    // Vérifiez si le service de localisation est activé.
+    serviceEnabled = await _locationService.serviceEnabled();
     if (!serviceEnabled) {
-      return; // Si les services ne sont pas activés même après la demande, retour.
+      serviceEnabled = await _locationService.requestService();
+      if (!serviceEnabled) {
+        return;
+      }
     }
-  }
 
-  // Demandez la permission d'utiliser la localisation.
-  permissionGranted = await _locationService.hasPermission();
-  if (permissionGranted == PermissionStatus.denied) {
-    permissionGranted = await _locationService.requestPermission();
-    if (permissionGranted != PermissionStatus.granted) {
-      return; // Si la permission n'est pas accordée, retour.
+    // Demandez la permission d'utiliser la localisation.
+    permissionGranted = await _locationService.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await _locationService.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        return;
+      }
     }
+
+    // Obtenez la localisation actuelle.
+    _currentLocation = await _locationService.getLocation();
+
+    setState(() {
+      // Mettre à jour l'interface utilisateur avec la localisation actuelle.
+    });
   }
-
-  // Obtenez la localisation actuelle.
-  _currentLocation = await _locationService.getLocation();
-
-  // Mettez à jour l'état pour refléter la nouvelle localisation.
-  setState(() {
-    // Mettez à jour ici tout ce qui doit l'être en fonction de la nouvelle localisation.
-    // Par exemple, vous pouvez vouloir déplacer la carte pour centrer sur la nouvelle localisation :
-    _mapController.move(
-      LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-      13.0
-    );
-  });
-}
 
 
   @override
