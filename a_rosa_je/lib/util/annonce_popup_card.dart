@@ -120,7 +120,7 @@ class AnnoncePopupCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(double.infinity, 36), // makes it stretch
                   ),
-                  child: Text('Contacter Marc'),
+                  child: Text('Contacter ${annonce.usersName}'),
                 ),
               ),
             ),
