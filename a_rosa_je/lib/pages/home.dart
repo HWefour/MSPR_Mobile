@@ -24,6 +24,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Key _mapKey = ValueKey("InitialKey");
   final MapController _mapController = MapController();
   TextEditingController searchController = TextEditingController();
+  Marker? _currentMarker;
 
 
  @override
@@ -39,34 +40,41 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void _determinePosition() async {
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
+  bool serviceEnabled;
+  PermissionStatus permissionGranted;
 
-    // Vérifiez si le service de localisation est activé.
-    serviceEnabled = await _locationService.serviceEnabled();
+  // Vérifiez si le service de localisation est activé.
+  serviceEnabled = await _locationService.serviceEnabled();
+  if (!serviceEnabled) {
+    serviceEnabled = await _locationService.requestService();
     if (!serviceEnabled) {
-      serviceEnabled = await _locationService.requestService();
-      if (!serviceEnabled) {
-        return;
-      }
+      return; // Si les services ne sont pas activés même après la demande, retour.
     }
-
-    // Demandez la permission d'utiliser la localisation.
-    permissionGranted = await _locationService.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _locationService.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    // Obtenez la localisation actuelle.
-    _currentLocation = await _locationService.getLocation();
-
-    setState(() {
-      // Mettre à jour l'interface utilisateur avec la localisation actuelle.
-    });
   }
+
+  // Demandez la permission d'utiliser la localisation.
+  permissionGranted = await _locationService.hasPermission();
+  if (permissionGranted == PermissionStatus.denied) {
+    permissionGranted = await _locationService.requestPermission();
+    if (permissionGranted != PermissionStatus.granted) {
+      return; // Si la permission n'est pas accordée, retour.
+    }
+  }
+
+  // Obtenez la localisation actuelle.
+  _currentLocation = await _locationService.getLocation();
+
+  // Mettez à jour l'état pour refléter la nouvelle localisation.
+  setState(() {
+    // Mettez à jour ici tout ce qui doit l'être en fonction de la nouvelle localisation.
+    // Par exemple, vous pouvez vouloir déplacer la carte pour centrer sur la nouvelle localisation :
+    _mapController.move(
+      LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+      13.0
+    );
+  });
+}
+
 
   @override
   void dispose() {
@@ -185,7 +193,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Future<LatLng?> searchCity(String city) async {
     final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$city&format=json');
     final response = await http.get(url, headers: {
-      'User-Agent': 'YourAppName', // Remplacez par le nom de votre application
+      'User-Agent': 'a_rosa_je', 
     });
 
     if (response.statusCode == 200) {
@@ -222,6 +230,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       "latitude": coordinates.latitude,
                       "longitude": coordinates.longitude,
                     });
+                    _currentMarker = Marker(
+                      point: coordinates,
+                      width: 80.0,
+                      height: 80.0,
+                      child: Icon(Icons.location_on, size: 50.0, color: Colors.red),
+                    );
                     _isSearchMode = false;
                     // Mettre à jour la clé pour forcer la reconstruction de la carte
                     _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
@@ -270,7 +284,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 children: [
                   TileLayer(
                     urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.example.app',
+                    userAgentPackageName: 'com.a_rosa_je.app',
+                  ),
+                  if (_currentMarker != null) MarkerLayer(
+                    markers: [_currentMarker!],
                   ),
                   // Ajouter d'autres couches si nécessaire
                 ],
@@ -281,19 +298,20 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 child: FloatingActionButton(
                   onPressed: () async {
                     _determinePosition();
-                    // Logique pour réinitialiser la position de la carte
+                    // Attendre la mise à jour de la position
                     if (_currentLocation != null) {
-                      // Obtenez la localisation actuelle.
-                      _currentLocation = await _locationService.getLocation();
-                      _mapController.move(
-                        LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                        13.0
-                      );
+                      setState(() {
+                        // Déplacer la vue de la carte vers la nouvelle position
+                        _mapController.move(
+                          LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                          13.0
+                        );
+                      });
                     }
                   },
                   child: Icon(Icons.my_location),
                   tooltip: 'Reset to Current Location',
-                ),
+                )
               ),
             ],
           ),   
