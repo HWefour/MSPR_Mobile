@@ -22,11 +22,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   var _locationService = Location();
   bool _isSearchMode = false;
   Key _mapKey = ValueKey("InitialKey");
-  final MapController _mapController = MapController();
   TextEditingController searchController = TextEditingController();
   Marker? _currentMarker;
   bool _hasAnnonces = true;
   List<Annonce> _currentAnnonces = []; //pour stocker les annonces de la map
+  List<String> cities = []; // Pour stocker les villes en fonction du nom de la ville
+   String selectedCity = ''; // Pour stocker la ville sélectionnée
 
 
  @override
@@ -35,8 +36,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _tabController = TabController(length: 2, vsync: this);
 
     _tabController!.addListener(() {
+      searchController.clear();
       if (_tabController!.index == 1) { // index 1 correspond au deuxième onglet
         _determinePosition();
+        
       }
     });
   }
@@ -96,54 +99,99 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
+  //api pour chercher une ville
+  Future<void> fetchCities(String cityName) async {
+    final response = await http.get(
+        Uri.parse('https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      List<String> cityNames = [];
+      for (var cityData in jsonData) {
+        cityNames.add(cityData['nom']);
+      }
+      setState(() {
+        cities = cityNames;
+      });
+    } else {
+      // La requête a échoué, traitez les erreurs ici.
+      throw Exception('Échec de la récupération des données');
+    }
+  }
+
+
   Widget _buildAnnoncesList() {
-    return Column(
-      children: [
-        if (_isSearchMode)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                labelText: "Rechercher...",
-                hintText: "Entrez un mot-clé",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                ),
+  return Column(
+    children: [
+      if (_isSearchMode) 
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              labelText: "Rechercher...",
+              hintText: "Entrez une ville",
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(25.0)),
               ),
-              onSubmitted: (value) {
-                // Appelez votre API avec la nouvelle ville lorsque l'utilisateur valide sa saisie
-                setState(() {
-                  // Vous pouvez choisir de faire quelque chose ici si nécessaire
-                });
-              },
             ),
-          ),
-        Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0), // Ajustez selon vos besoins
-            child: Row(
-              mainAxisSize: MainAxisSize.min, // Important pour garder les éléments collés
-              children: [
-                Text(
-                  "Filtrer les annonces",
-                  style: TextStyle(
-                    fontSize: 16.0, // Ajustez la taille de police selon vos besoins
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(_isSearchMode ? Icons.close : Icons.search),
-                  onPressed: () {
-                    setState(() {
-                      _isSearchMode = !_isSearchMode;
-                    });
-                  },
-                ),
-              ],
-            ),
+            onChanged: (cityName) {
+              if (cityName.isNotEmpty) {
+                fetchCities(cityName);
+              }
+            },
           ),
         ),
+      SizedBox(height: 8.0),
+      if (cities.isNotEmpty) ...[ // Ajout de ... pour étendre la liste de widgets
+        Container(
+          height: 100.0,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: ListView.builder(
+            itemCount: cities.length,
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                title: Text(cities[index]),
+                onTap: () {
+                  setState(() {
+                    selectedCity = cities[index];
+                    searchController.text = selectedCity;
+                    cities.clear();
+                  });
+                },
+              );
+            },
+          ),
+        ),
+      ],
+      Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Filtrer les annonces",
+                style: TextStyle(
+                  fontSize: 16.0,
+                ),
+              ),
+              IconButton(
+                icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+                onPressed: () {
+                  searchController.clear();
+                  setState(() {
+                    _isSearchMode = !_isSearchMode;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
       Expanded(
         child: FutureBuilder<List<Annonce>>(
           future: apiService.fetchAnnonces(searchController.text.isEmpty ? "Montpellier" : searchController.text),
@@ -162,14 +210,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     child: AnnonceTile(
                       idAdvertisement: '',
                       title: annonce.title,
-                      city: annonce.city, 
+                      city: annonce.city,
                       idPlant:'', 
                       name: annonce.name,
                       userName: '',
                       description: annonce.description,
                       startDate: annonce.startDate ?? 'N/A',
                       endDate: annonce.endDate ?? 'N/A',
-                      imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
+                      imageUrl: 'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
                       createdAt: '',
                     ),
                   );
@@ -178,11 +226,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             } else {
               return Text("No data");
             }
-          }),
+          },
         ),
-      ],
-    );  
-  }
+      ),
+    ],
+  );  
+}
+
 
 
   //gestion de la localisation pour la map
@@ -259,41 +309,70 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+                controller: searchController,
                 decoration: InputDecoration(
-                  labelText: "Rechercher...",
-                  hintText: "Entrez un mot-clé",
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                labelText: "Rechercher...",
+                hintText: "Entrez une ville",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 ),
               ),
-              onSubmitted: (value) async {
-                final coordinates = await searchCity(value);
-                if (coordinates != null) {
-                  setState(() {
-                    _currentLocation = LocationData.fromMap({
-                      "latitude": coordinates.latitude,
-                      "longitude": coordinates.longitude,
-                    });
-                    _currentMarker = Marker(
-                      point: coordinates,
-                      width: 80.0,
-                      height: 80.0,
-                      child: Icon(Icons.location_on, size: 50.0, color: Colors.red),
-                    );
-                    _isSearchMode = false;
-                    // Mettre à jour la clé pour forcer la reconstruction de la carte
-                    _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
-                    _hasAnnonces = true;
-                  });
-                } else {
-                  setState(() {
-                    _hasAnnonces = false; // Aucune annonce trouvée
-                  });
+              onChanged: (cityName) async {
+                if (cityName.isNotEmpty) {
+                  fetchCities(cityName);
                 }
               },
             ),
           ),
+          SizedBox(height: 8.0),
+          if (cities.isNotEmpty) ...[ // Ajout de ... pour étendre la liste de widgets
+            Container(
+              height: 100.0,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: ListView.builder(
+                itemCount: cities.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(cities[index]),
+                    onTap: () async {
+                      setState(() {
+                        selectedCity = cities[index];
+                        searchController.text = selectedCity;
+                        cities.clear();
+                      });
+                      final coordinates = await searchCity(searchController.text);
+                      if (coordinates != null) {
+                        setState(() {
+                          _currentLocation = LocationData.fromMap({
+                            "latitude": coordinates.latitude,
+                            "longitude": coordinates.longitude,
+                          });
+                          _currentMarker = Marker(
+                            point: coordinates,
+                            width: 80.0,
+                            height: 80.0,
+                            child: Icon(Icons.location_on, size: 50.0, color: Colors.red),
+                          );
+                          _isSearchMode = false;
+                          // Mettre à jour la clé pour forcer la reconstruction de la carte
+                          _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
+                          _hasAnnonces = true;
+                        });
+                      } else {
+                        setState(() {
+                          _hasAnnonces = false; // Aucune annonce trouvée
+                        });
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         if (!_hasAnnonces)
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
@@ -320,6 +399,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               icon: Icon(_isSearchMode ? Icons.close : Icons.search),
               onPressed: () {
                 _hasAnnonces = true;
+                searchController.clear();
                 setState(() {
                   _isSearchMode = !_isSearchMode;
                   
