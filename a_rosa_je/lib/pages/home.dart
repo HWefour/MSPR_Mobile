@@ -4,7 +4,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:a_rosa_je/util/footer.dart';
 import '../util/annonce_popup_card.dart';
 import '../util/annonce_tile.dart';
@@ -28,7 +27,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Marker? _currentMarker;
   bool _hasAnnonces = true;
   List<Annonce> _currentAnnonces = []; //pour stocker les annonces de la map
-  final PopupController _popupController = PopupController();
 
 
  @override
