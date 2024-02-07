@@ -8,12 +8,12 @@ import '../util/annonce.dart';
 import 'create_annonce.dart';
 import 'home.dart';
 
-class ProfilPage extends StatefulWidget {
+class GestionAnnoncesPage extends StatefulWidget {
   @override
-  _ProfilPageState createState() => _ProfilPageState();
+  _GestionAnnoncesPageState createState() => _GestionAnnoncesPageState();
 }
 
-class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+class _GestionAnnoncesPageState extends State<GestionAnnoncesPage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
   int _selectedIndex = 4;
   final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
