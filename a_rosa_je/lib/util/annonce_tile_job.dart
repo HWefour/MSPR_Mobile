@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AnnonceTile extends StatelessWidget {
+class AnnonceTileJob extends StatelessWidget {
  final String idAdvertisement;
   final String title;
   final String city;
@@ -13,7 +13,7 @@ class AnnonceTile extends StatelessWidget {
   final String imageUrl; 
   final String createdAt;
 
-  AnnonceTile({
+  AnnonceTileJob({
     Key? key,
     required this.idAdvertisement,
     required this.title,

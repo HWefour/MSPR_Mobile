@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:io';
+import '../api/api_service.dart';
+import 'home.dart';
+
 
 class CreateAnnonce extends StatefulWidget {
   @override
@@ -11,10 +16,16 @@ class CreateAnnonce extends StatefulWidget {
 class _CreateAnnonceState extends State<CreateAnnonce> {
   DateTime selectedStartDate = DateTime.now();
   DateTime selectedEndDate = DateTime.now().add(Duration(days: 7));
+  DateTime creationDate = DateTime.now(); // Ajout de la date de création
   final _formKey = GlobalKey<FormState>();
-  String city = '';
+  String title = ''; // Variable pour stocker le titre de l'annonce
+  String city = 'Montpellier'; //à modifier plus tard
   String description = '';
   int numberOfPlants = 0;
+  int selectedPlantId = 0;
+  TextEditingController plantSearchController = TextEditingController();
+  List<Map<String, dynamic>> plants = [];
+
   List<XFile>? imageFiles = [];
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
@@ -84,6 +95,33 @@ class _CreateAnnonceState extends State<CreateAnnonce> {
     }
   }
 
+
+  //api pour chercher une plante
+  Future<void> fetchNamePlant(String namePlant) async {
+    final response = await http.get(
+      Uri.parse('http://localhost:1212/plant/'),
+    );
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      List<Map<String, dynamic>> plantsData = []; // Stockez les noms et IDs des plantes
+      for (var plantData in jsonData) {
+        if (plantData['name'].toLowerCase().contains(namePlant.toLowerCase())) {
+          plantsData.add({
+            'name': plantData['name'],
+            'idPlant': plantData['idPlant'], // Supposons que chaque plante a un champ 'idPlant'
+          });
+        }
+      }
+      setState(() {
+        plants = plantsData;
+      });
+    } else {
+      throw Exception('Échec de la récupération des données');
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,25 +136,95 @@ class _CreateAnnonceState extends State<CreateAnnonce> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0), // Add space between form fields
-                //ajouter titre Poster une annonce
+              //champ titre
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: TextFormField(
                   decoration: InputDecoration(
-                    labelText: 'Ville',
-                    border: OutlineInputBorder(), // Adds a border around the text field
+                    labelText: 'Titre',
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer un nom de ville';
+                      return 'Veuillez entrer un titre';
                     }
                     return null;
                   },
                   onSaved: (value) {
-                    city = value!;
+                    title = value!;
                   },
                 ),
               ),
+              //champ date creation
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: TextFormField(
+                  initialValue: DateFormat('dd/MM/yyyy').format(creationDate), // Affichez la date de création
+                  enabled: false, // Désactive l'édition
+                  decoration: InputDecoration(
+                    labelText: 'Date de création',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              //champ ville
+               Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: TextFormField(
+                  initialValue: city, // Affichez la ville actuelle
+                  enabled: false, // Désactive l'édition
+                  decoration: InputDecoration(
+                    labelText: 'Ville',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              //champ namePlante
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: TextField(
+                  controller: plantSearchController,
+                  decoration: InputDecoration(
+                    labelText: "Rechercher une plante...",
+                    hintText: "Entrez le nom d'une plante",
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    ),
+                  ),
+                  onChanged: (plantName) {
+                    if (plantName.isNotEmpty) {
+                      fetchNamePlant(plantName);
+                    }
+                  },
+                ),
+              ),
+              SizedBox(height: 8.0),
+              if (plants.isNotEmpty) ...[ // Ajout de ... pour étendre la liste de widgets
+                Container(
+                  height: 200.0, // Ajustez la hauteur selon vos besoins
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: ListView.builder(
+                    itemCount: plants.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        title: Text(plants[index]['name']),
+                        onTap: () {
+                          setState(() {
+                            selectedPlantId = plants[index]['idPlant'];
+                            plantSearchController.text = plants[index]['name'];
+                            plants.clear();
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+              //date début et date fin
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
@@ -148,7 +256,7 @@ class _CreateAnnonceState extends State<CreateAnnonce> {
                     alignLabelWithHint: true, // Aligns the label with the hint text
                     border: OutlineInputBorder(),
                   ),
-                  maxLines: 5, // Set to your preference
+                  maxLines: 4, // Set to your preference
                   keyboardType: TextInputType.multiline,
                   onSaved: (value) {
                     description = value!;
@@ -211,15 +319,48 @@ class _CreateAnnonceState extends State<CreateAnnonce> {
               // Submit button
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      // Handle the form submission logic here
+                      // Conversion des dates au format String dd/MM/yyyy
+                      String formattedStartDate = DateFormat('dd/MM/yyyy').format(selectedStartDate);
+                      String formattedEndDate = DateFormat('dd/MM/yyyy').format(selectedEndDate);
+                      String formattedCreationDate = DateFormat('dd/MM/yyyy').format(creationDate);
+                      
+                      // Appel à l'API pour créer l'annonce
+                      final response = await ApiCreateAnnounce.createAnnounce(
+                        title: title,
+                        createdAt: formattedCreationDate,
+                        idPlant: selectedPlantId, // Vous devez adapter cette partie selon votre logique d'application
+                        idUser: "16", // Id user
+                        description: description,
+                        startDate: formattedStartDate,
+                        endDate: formattedEndDate,
+                      );
+                      
+                      // Vérifier la réponse de l'API
+                      if (response.statusCode == 200 || response.statusCode == 201 ) {
+                        // Gestion de la réponse réussie
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Annonce créée avec succès')),
+                        );
+                        // Retour à la page d'accueil en retirant toutes les routes jusqu'à celle-ci
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => HomePage()), // Remplacez HomePage() par votre widget de page d'accueil
+                          (Route<dynamic> route) => false,
+                        );
+                      } else {
+                        // Gestion de l'échec de la réponse
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Erreur lors de la création de l\'annonce ${response.statusCode}')),
+                        );
+                      }
                     }
                   },
                   child: Text('Poster votre annonce'),
                 ),
               ),
+
             ],
           ),
         ),

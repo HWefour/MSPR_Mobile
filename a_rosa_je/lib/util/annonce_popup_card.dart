@@ -26,7 +26,7 @@ class AnnoncePopupCard extends StatelessWidget {
                   children: <Widget>[
                     Center(
                       child: Text(
-                        annonce.title,
+                        annonce.title ?? 'N/A',
                         style: TextStyle(
                           fontWeight: FontWeight.bold, 
                           fontSize: 24.0,
@@ -78,7 +78,7 @@ class AnnoncePopupCard extends StatelessWidget {
                     ),
                     SizedBox(height: 40.0),
                     Text(
-                      annonce.description,
+                      annonce.description ?? 'N/A',
                       textAlign: TextAlign.justify,
                       style: TextStyle(fontSize: 16.0),
                     ),
@@ -120,7 +120,7 @@ class AnnoncePopupCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(double.infinity, 36), // makes it stretch
                   ),
-                  child: Text('Contacter Marc'),
+                  child: Text('Contacter ${annonce.usersName}'),
                 ),
               ),
             ),

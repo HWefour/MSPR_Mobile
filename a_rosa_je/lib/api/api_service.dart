@@ -70,3 +70,45 @@ class ApiService {
     }
   }
 }
+
+//api pour récupérer les annonces par User
+class ApiAnnoncesUser {
+  Future<List<Annonce>> fetchAnnoncesUser(String idUser) async {
+    final response = await http.get(Uri.parse('http://localhost:1212/profile/profileAds/$idUser'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => Annonce.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load annonces from API');
+    }
+  }
+}
+
+//api pour créer une annonce
+class ApiCreateAnnounce {
+  static Future<http.Response> createAnnounce({
+    required String title,
+    required String createdAt,
+    required int idPlant,
+    required String idUser,
+    required String description,
+    required String startDate,
+    required String endDate,
+  }) async {
+    final url = Uri.parse('http://localhost:1212/create_adv');
+    final response = await http.post(url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "title": title,
+          "created_at": createdAt,
+          "idPlant": idPlant,
+          "idUser": idUser,
+          "description": description,
+          "start_date": startDate,
+          "end_date": endDate,
+        }));
+
+    return response;
+  }
+}
