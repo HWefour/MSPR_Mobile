@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/create_annonce.dart';
 import 'package:a_rosa_je/pages/home.dart';
 import 'package:a_rosa_je/pages/profil.dart';
 import 'package:flutter/material.dart';
@@ -24,12 +25,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // home: LoginPage(),
       // home: ProfilePage(),
-      home: HomePage(),
-      // home: RegistrationScreen(),
+      home: LoginPage(),
       // home: ParametreMenu(),
       // home: SettingsPage(),
+      // home: RegistrationScreen(),
+      // home: CreateAnnonce(),
+      
     );
   }
 }
