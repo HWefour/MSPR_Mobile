@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import '../api/api_create_announce.dart';
+import '../api/api_service.dart';
 import 'home.dart';
 
 
