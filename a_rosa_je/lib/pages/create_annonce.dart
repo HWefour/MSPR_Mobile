@@ -331,7 +331,7 @@ class _CreateAnnonceState extends State<CreateAnnonce> {
                       final response = await ApiCreateAnnounce.createAnnounce(
                         title: title,
                         createdAt: formattedCreationDate,
-                        idPlant: selectedPlantId, // Vous devez adapter cette partie selon votre logique d'application
+                        idPlant: selectedPlantId,
                         idUser: "16", // Id user
                         description: description,
                         startDate: formattedStartDate,

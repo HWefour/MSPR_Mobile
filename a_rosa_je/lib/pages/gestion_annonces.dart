@@ -172,13 +172,13 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
                 CircleAvatar(
                   radius: 50, // Rayon du cercle de la photo de profil
                   backgroundImage: AssetImage(
-                      'assets/profile_picture.jpg'), // Remplacez par le chemin de votre photo de profil
+                      'images/LOGO.png'), 
                 ),
                 SizedBox(
                     height:
                         10), // Espace entre la photo de profil et le nom de l'utilisateur
                 Text(
-                  'Nom de l\'utilisateur',
+                  '',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -188,7 +188,7 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
                     height:
                         10), // Espace entre le nom de l'utilisateur et la biographie
                 Text(
-                  'Biographie de l\'utilisateur',
+                  'Mes annonces et gardiennage en cours',
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -200,8 +200,8 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
             child: TabBar(
               controller: _tabController,
               tabs: [
-                Tab(icon: Icon(Icons.image), text: "Mes Images"),
-                Tab(icon: Icon(Icons.list), text: "Mes Annonces"),
+                Tab(icon: Icon(Icons.add_alert), text: "Mes Annonces"),
+                Tab(icon: Icon(Icons.list), text: "Mes Gardiennages"),
               ],
             ),
           ),

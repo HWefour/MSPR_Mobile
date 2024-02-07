@@ -9,7 +9,7 @@ import 'pages/profil_info.dart';
 import 'package:http/http.dart' as http;
 
 // ignore: duplicate_import
-//import 'pages/profil.dart';
+import 'pages/profil.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       // home: ProfilePage(),
-      home: LoginPage(),
+     // home: LoginPage(),
+        home: HomePage(),
       // home: ParametreMenu(),
       // home: SettingsPage(),
       // home: RegistrationScreen(),
