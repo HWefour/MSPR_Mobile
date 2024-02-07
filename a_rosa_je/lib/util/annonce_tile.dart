@@ -12,7 +12,6 @@ class AnnonceTile extends StatelessWidget {
   final String endDate;
   final String imageUrl; 
   final String createdAt;
-  final String? updatedAt;
 
   AnnonceTile({
     Key? key,
@@ -27,7 +26,6 @@ class AnnonceTile extends StatelessWidget {
     required this.endDate,
     required this.imageUrl,
     required this.createdAt,
-    this.updatedAt,
   }) : super(key: key);
 
   @override

@@ -22,8 +22,8 @@ class ApiAnnoncesVille {
 
 //api pour récupérer les annonces par User
 class ApiAnnoncesUser {
-  Future<List<Annonce>> fetchAnnoncesUser(String city) async {
-    final response = await http.get(Uri.parse('http://localhost:1212/home/city/$city'));
+  Future<List<Annonce>> fetchAnnoncesUser(String idUser) async {
+    final response = await http.get(Uri.parse('http://localhost:1212/profile/profileAds/$idUser'));
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);

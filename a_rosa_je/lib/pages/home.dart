@@ -239,13 +239,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   return GestureDetector(
                     onTap: () => _showPopup(annonce),
                     child: AnnonceTile(
-                      idAdvertisement: '',
-                      title: annonce.title,
-                      city: annonce.city,
+                      idAdvertisement: annonce.idAdvertisement ?? '',
+                      title: annonce.title ?? 'N/A',
+                      city: annonce.city ?? 'N/A',
                       idPlant:'', 
-                      name: annonce.name,
+                      name: annonce.name ?? 'N/A',
                       userName: '',
-                      description: annonce.description,
+                      description: annonce.description ?? 'N/A',
                       startDate: annonce.startDate ?? 'N/A',
                       endDate: annonce.endDate ?? 'N/A',
                       imageUrl: 'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
@@ -316,12 +316,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 onTap: () => _showPopup(annonce), // Afficher le modal d'annonce lorsque l'élément est tapé
                 child: AnnonceTile(
                   idAdvertisement: '',
-                  title: annonce.title,
-                  city: annonce.city, 
+                  title: annonce.title ?? 'N/A',
+                  city: annonce.city ?? 'N/A', 
                   idPlant:'', 
-                  name: annonce.name,
+                  name: annonce.name ?? 'N/A',
                   userName: '',
-                  description: annonce.description,
+                  description: annonce.description ?? 'N/A',
                   startDate: annonce.startDate ?? 'N/A',
                   endDate: annonce.endDate ?? 'N/A',
                   imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
