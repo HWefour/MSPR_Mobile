@@ -157,12 +157,35 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Profil'),
-        backgroundColor: Colors.green,
-      ),
       body: Column(
         children: <Widget>[
+          SizedBox(height: 10), // Espace au-dessus du Container
+          // Espace pour afficher la photo de profil, le nom de l'utilisateur et la biographie
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 50, // Rayon du cercle de la photo de profil
+                  backgroundImage: AssetImage('assets/profile_picture.jpg'), // Remplacez par le chemin de votre photo de profil
+                ),
+                SizedBox(height: 10), // Espace entre la photo de profil et le nom de l'utilisateur
+                Text(
+                  'Nom de l\'utilisateur',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10), // Espace entre le nom de l'utilisateur et la biographie
+                Text(
+                  'Biographie de l\'utilisateur',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20), // Espace en dessous du Container
           Container(
             color: Colors.white, // Couleur de fond pour TabBar
             child: TabBar(
