@@ -6,6 +6,7 @@ import '../util/annonce_tile.dart';
 import '../api/api_service.dart';
 import '../util/annonce.dart';
 import 'create_annonce.dart';
+import 'gestion_annonces.dart';
 import 'home.dart';
 
 class ProfilPage extends StatefulWidget {
@@ -13,19 +14,18 @@ class ProfilPage extends StatefulWidget {
   _ProfilPageState createState() => _ProfilPageState();
 }
 
-class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+class _ProfilPageState extends State<ProfilPage>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
   int _selectedIndex = 4;
   final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
 
-
- @override
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
   }
-
 
   @override
   void dispose() {
@@ -72,7 +72,6 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
     );
   }
 
-
   //widget d'affichage de la list des annonces
   Widget _buildAnnoncesList() {
     return Column(
@@ -98,49 +97,58 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
                         idAdvertisement: annonce.idAdvertisement ?? 'N/A',
                         title: annonce.title ?? 'N/A',
                         city: annonce.city ?? 'N/A',
-                        idPlant: annonce.name ??'N/A', 
+                        idPlant: annonce.name ?? 'N/A',
                         name: annonce.name ?? 'N/A',
                         userName: annonce.usersName ?? 'N/A',
                         description: annonce.description ?? 'N/A',
                         startDate: annonce.startDate ?? 'N/A',
                         endDate: annonce.endDate ?? 'N/A',
-                        imageUrl: 'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
+                        imageUrl:
+                            'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
                         createdAt: annonce.createdAt ?? 'N/A',
                       ),
                     );
                   },
                 );
               } else {
-                setState(() {
-            
-                          });
+                setState(() {});
                 return Text("No data");
               }
             },
           ),
         ),
       ],
-    );  
+    );
   }
 
   //widget d'affichage des images du User
   Widget _buildImageProfil() {
     return Column(
       children: [
-        // affichage des images 
+        // affichage des images
       ],
-    );  
+    );
   }
-  
+
   //gestion du tap sur le footer
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
     switch (index) {
-      case 0: 
+      case 0:
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => HomePage()), // permet d'aller vers la page sans conserver les routes
+          MaterialPageRoute(
+              builder: (context) =>
+                  HomePage()), // permet d'aller vers la page sans conserver les routes
+          (Route<dynamic> route) => false,
+        );
+        break;
+      case 1:
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) =>
+                  GestionAnnoncesPage()), // permet d'aller vers la page sans conserver les routes
           (Route<dynamic> route) => false,
         );
         break;
@@ -149,7 +157,7 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
     }
   }
 
-  //build 
+  //build
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,9 +171,12 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
               children: [
                 CircleAvatar(
                   radius: 50, // Rayon du cercle de la photo de profil
-                  backgroundImage: AssetImage('assets/profile_picture.jpg'), // Remplacez par le chemin de votre photo de profil
+                  backgroundImage: AssetImage(
+                      'assets/profile_picture.jpg'), // Remplacez par le chemin de votre photo de profil
                 ),
-                SizedBox(height: 10), // Espace entre la photo de profil et le nom de l'utilisateur
+                SizedBox(
+                    height:
+                        10), // Espace entre la photo de profil et le nom de l'utilisateur
                 Text(
                   'Nom de l\'utilisateur',
                   style: TextStyle(
@@ -173,7 +184,9 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10), // Espace entre le nom de l'utilisateur et la biographie
+                SizedBox(
+                    height:
+                        10), // Espace entre le nom de l'utilisateur et la biographie
                 Text(
                   'Biographie de l\'utilisateur',
                   textAlign: TextAlign.center,

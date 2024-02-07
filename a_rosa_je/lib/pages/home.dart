@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/gestion_annonces.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
@@ -505,6 +506,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       _selectedIndex = index;
     });
     switch (index) {
+      case 1:
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) =>
+                  GestionAnnoncesPage()), // permet d'aller vers la page sans conserver les routes
+          (Route<dynamic> route) => false,
+        );
+        break;
       case 4: 
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => ProfilPage()), // permet d'aller vers la page sans conserver les routes
