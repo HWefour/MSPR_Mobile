@@ -10,6 +10,7 @@ import '../util/annonce_tile.dart';
 import '../api/api_service.dart';
 import '../util/annonce.dart';
 import 'create_annonce.dart';
+import 'profil.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -28,7 +29,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   List<Annonce> _currentAnnonces = []; //pour stocker les annonces de la map
   List<String> cities = []; // Pour stocker les villes en fonction du nom de la ville
    String selectedCity = ''; // Pour stocker la ville sélectionnée
-
+  int _selectedIndex = 0;
+  final ApiService apiService = ApiService();
 
  @override
   void initState() {
@@ -105,16 +107,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     });
     setState(() {
       // Ici, vous pouvez appeler vos méthodes pour recharger les données
-    });
-  }
-
-
-  int _selectedIndex = 0;
-  final ApiService apiService = ApiService();
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
     });
   }
 
@@ -507,6 +499,24 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );  
   }
 
+  //gestion du tap sur le footer
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 4: 
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => ProfilPage()), // permet d'aller vers la page sans conserver les routes
+          (Route<dynamic> route) => false,
+        );
+        break;
+      default:
+        break;
+    }
+  }
+
+  //build affichage 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -553,4 +563,5 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
+  //fin app
 }
