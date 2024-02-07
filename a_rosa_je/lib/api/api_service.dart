@@ -39,7 +39,7 @@ class ApiCreateAnnounce {
   static Future<http.Response> createAnnounce({
     required String title,
     required String createdAt,
-    required String idPlant,
+    required int idPlant,
     required String idUser,
     required String description,
     required String startDate,
