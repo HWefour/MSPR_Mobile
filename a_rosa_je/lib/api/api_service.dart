@@ -7,8 +7,22 @@ import '../util/annonce.dart';
 //localhost: http://localhost:1212/home/city/Montpellier
 
 //api pour récupérer les annonces par ville
-class ApiService {
-  Future<List<Annonce>> fetchAnnonces(String city) async {
+class ApiAnnoncesVille {
+  Future<List<Annonce>> fetchAnnoncesVille(String city) async {
+    final response = await http.get(Uri.parse('http://localhost:1212/home/city/$city'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => Annonce.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load annonces from API');
+    }
+  }
+}
+
+//api pour récupérer les annonces par User
+class ApiAnnoncesUser {
+  Future<List<Annonce>> fetchAnnoncesUser(String city) async {
     final response = await http.get(Uri.parse('http://localhost:1212/home/city/$city'));
 
     if (response.statusCode == 200) {

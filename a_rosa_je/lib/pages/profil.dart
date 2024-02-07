@@ -30,7 +30,7 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
   List<String> cities = []; // Pour stocker les villes en fonction du nom de la ville
    String selectedCity = ''; // Pour stocker la ville sélectionnée
   int _selectedIndex = 4;
-  final ApiService apiService = ApiService();
+  final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
 
 
  @override
@@ -97,7 +97,7 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
 
   void _refreshData() {
     // Exemple : Recharger les annonces
-    apiService.fetchAnnonces(searchController.text).then((annonces) {
+    apiAnnoncesUser.fetchAnnoncesUser(searchController.text).then((annonces) {
       setState(() {
         _currentAnnonces = annonces;
         // Ajoutez toute autre logique de mise à jour de l'état ici si nécessaire
@@ -227,7 +227,7 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
       ),
       Expanded(
         child: FutureBuilder<List<Annonce>>(
-          future: apiService.fetchAnnonces(searchController.text.isEmpty ? "Montpellier" : searchController.text),
+          future: apiAnnoncesUser.fetchAnnoncesUser(searchController.text.isEmpty ? "Montpellier" : searchController.text),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
@@ -275,7 +275,7 @@ class _ProfilPageState extends State<ProfilPage> with SingleTickerProviderStateM
   Future<LatLng?> searchCity(String city) async {
     try {
       // Tentative de récupérer les annonces pour la ville spécifiée
-      List<Annonce> annonces = await apiService.fetchAnnonces(city);
+      List<Annonce> annonces = await apiAnnoncesUser.fetchAnnoncesUser(city);
       if (annonces.isNotEmpty) {
 
       // Si des annonces existent pour la ville, stockez-les dans l'état du widget

@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   List<String> cities = []; // Pour stocker les villes en fonction du nom de la ville
    String selectedCity = ''; // Pour stocker la ville sélectionnée
   int _selectedIndex = 0;
-  final ApiService apiService = ApiService();
+  final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
 
  @override
   void initState() {
@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   void _refreshData() {
     // Exemple : Recharger les annonces
-    apiService.fetchAnnonces(searchController.text).then((annonces) {
+    apiAnnoncesVille.fetchAnnoncesVille(searchController.text).then((annonces) {
       setState(() {
         _currentAnnonces = annonces;
         // Ajoutez toute autre logique de mise à jour de l'état ici si nécessaire
@@ -225,7 +225,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
       Expanded(
         child: FutureBuilder<List<Annonce>>(
-          future: apiService.fetchAnnonces(searchController.text.isEmpty ? "Montpellier" : searchController.text),
+          future: apiAnnoncesVille.fetchAnnoncesVille(searchController.text.isEmpty ? "Montpellier" : searchController.text),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
@@ -273,7 +273,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Future<LatLng?> searchCity(String city) async {
     try {
       // Tentative de récupérer les annonces pour la ville spécifiée
-      List<Annonce> annonces = await apiService.fetchAnnonces(city);
+      List<Annonce> annonces = await apiAnnoncesVille.fetchAnnoncesVille(city);
       if (annonces.isNotEmpty) {
 
       // Si des annonces existent pour la ville, stockez-les dans l'état du widget
