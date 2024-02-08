@@ -122,17 +122,17 @@ class ApiCreateAnnounce {
     required String endDate,
   }) async {
     final url = Uri.parse('http://localhost:1212/create_adv');
-    final response = await http.post(url, headers: {
-      "Content-Type": "application/json"
-    }, body: {
-      "title": title,
-      "created_at": createdAt,
-      "idPlant": idPlant,
-      "idUser": idUser,
-      "description": description,
-      "start_date": startDate,
-      "end_date": endDate,
-    });
+    final response = await http.post(url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "title": title,
+          "created_at": createdAt,
+          "idPlant": idPlant,
+          "idUser": idUser,
+          "description": description,
+          "start_date": startDate,
+          "end_date": endDate,
+        }));
 
     return response;
   }

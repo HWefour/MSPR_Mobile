@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/profil.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:a_rosa_je/util/footer.dart';
@@ -6,18 +7,17 @@ import '../util/annonce_tile.dart';
 import '../api/api_service.dart';
 import '../util/annonce.dart';
 import 'create_annonce.dart';
-import 'gestion_annonces.dart';
 import 'home.dart';
 
-class ProfilPage extends StatefulWidget {
+class GestionAnnoncesPage extends StatefulWidget {
   @override
-  _ProfilPageState createState() => _ProfilPageState();
+  _GestionAnnoncesPageState createState() => _GestionAnnoncesPageState();
 }
 
-class _ProfilPageState extends State<ProfilPage>
+class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
-  int _selectedIndex = 4;
+  int _selectedIndex = 1;
   final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
 
   @override
@@ -98,7 +98,7 @@ class _ProfilPageState extends State<ProfilPage>
                         title: annonce.title ?? 'N/A',
                         city: annonce.city ?? 'N/A',
                         idPlant: annonce.name ?? 'N/A',
-                        name: annonce.name ?? '',
+                        name: annonce.name ?? 'N/A',
                         userName: annonce.usersName ?? 'N/A',
                         description: annonce.description ?? 'N/A',
                         startDate: annonce.startDate ?? 'N/A',
@@ -144,11 +144,11 @@ class _ProfilPageState extends State<ProfilPage>
           (Route<dynamic> route) => false,
         );
         break;
-      case 1:
+      case 4:
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
               builder: (context) =>
-                  GestionAnnoncesPage()), // permet d'aller vers la page sans conserver les routes
+                  ProfilPage()), // permet d'aller vers la page sans conserver les routes
           (Route<dynamic> route) => false,
         );
         break;
@@ -172,13 +172,13 @@ class _ProfilPageState extends State<ProfilPage>
                 CircleAvatar(
                   radius: 50, // Rayon du cercle de la photo de profil
                   backgroundImage: AssetImage(
-                      'assets/profile_picture.jpg'), // Remplacez par le chemin de votre photo de profil
+                      'images/LOGO.png'), 
                 ),
                 SizedBox(
                     height:
                         10), // Espace entre la photo de profil et le nom de l'utilisateur
                 Text(
-                  'Nom de l\'utilisateur',
+                  '',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -188,7 +188,7 @@ class _ProfilPageState extends State<ProfilPage>
                     height:
                         10), // Espace entre le nom de l'utilisateur et la biographie
                 Text(
-                  'Biographie de l\'utilisateur',
+                  'Mes annonces et gardiennage en cours',
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -200,8 +200,8 @@ class _ProfilPageState extends State<ProfilPage>
             child: TabBar(
               controller: _tabController,
               tabs: [
-                Tab(icon: Icon(Icons.image), text: "Mes Images"),
-                Tab(icon: Icon(Icons.list), text: "Mes Annonces"),
+                Tab(icon: Icon(Icons.add_alert), text: "Mes Annonces"),
+                Tab(icon: Icon(Icons.list), text: "Mes Gardiennages"),
               ],
             ),
           ),
