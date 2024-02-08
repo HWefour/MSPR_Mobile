@@ -178,6 +178,7 @@
 import 'package:a_rosa_je/pages/home.dart';
 import 'package:a_rosa_je/pages/sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -190,6 +191,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+
+  //fonction loginUser
   Future<void> loginUser(BuildContext context) async {
     final url = Uri.parse('http://localhost:1212/auth/login');
 
@@ -204,15 +207,13 @@ class _LoginPageState extends State<LoginPage> {
           "password": _passwordController.text,
         }),
       );
-
+      print('premier ${response.statusCode}');
       if (response.statusCode == 200) {
         // L'authentification a réussi. Vous pouvez afficher un message de succès ou effectuer d'autres actions ici.
-
-        // Redirigez l'utilisateur vers la page d'accueil
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
+        //ajout test lucas
+        //connexion avec l'api pour trouver l'utilisateur correspondant
+        print('je suis la');
+        fetchUsersAndCompareEmail(context);
       } else {
         // L'authentification a échoué.
         // Vous pouvez afficher un message d'erreur ou effectuer d'autres actions ici.
@@ -226,6 +227,56 @@ class _LoginPageState extends State<LoginPage> {
       print('Erreur lors de la connexion : $e');
     }
   }
+
+  
+  Future<void> fetchUsersAndCompareEmail(BuildContext context) async {
+    final url = Uri.parse('http://localhost:1212/backoffice/users/');
+    print('je suis ici');
+    try {
+      final response = await http.get(url);
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        final List<dynamic> users = jsonDecode(response.body);
+        final userInputEmail = _emailController.text;
+
+        // Trouver l'utilisateur avec l'email correspondant
+        final user = users.firstWhere(
+          (user) => user['email'] == userInputEmail,
+          orElse: () => null,
+        );
+
+        if (user != null) {
+          // Utilisateur trouvé, vous pouvez maintenant utiliser les données de l'utilisateur
+          // Convertir l'utilisateur en chaîne JSON
+          String userJson = jsonEncode(user);
+          print("Détails de l'utilisateur trouvé : $userJson");
+
+          //j'ouvre la boite Hive
+          var box = await Hive.openBox('userBox');
+          // Stocker la chaîne JSON
+          await box.put('userDetails', userJson);
+          // Redirigez l'utilisateur vers la page d'accueil
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        } else {
+          // Aucun utilisateur trouvé avec cet email
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Aucun utilisateur trouvé avec cet email.'),
+            ),
+          );
+        }
+      } else {
+        // Gestion des erreurs de réponse
+        print("Erreur lors de la récupération des utilisateurs: ${response.statusCode}");
+      }
+    } catch (e) {
+      print('Erreur lors de la connexion : $e');
+    }
+  }
+        
 
   @override
   Widget build(BuildContext context) {

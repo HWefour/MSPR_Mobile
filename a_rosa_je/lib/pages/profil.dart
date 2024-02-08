@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:a_rosa_je/util/footer.dart';
+import 'package:hive/hive.dart';
 import '../util/annonce_popup_card.dart';
 import '../util/annonce_tile.dart';
 import '../api/api_service.dart';
@@ -19,14 +20,49 @@ class _ProfilPageState extends State<ProfilPage>
   TabController? _tabController;
   int _selectedIndex = 4;
   final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
+  int _idUser = 0 ;
+  String _firstName = '';
+  String _lastName = '';
+  String _usersName = '';
+  String _email = '';
+  String _city = '';
+  String _bio = '';
+  String _siret = '';
+  String _companyName = '';
+  String _companyNumber = '';
+  int _idRole = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
+    _loadUserProfile();
   }
 
+  Future<void> _loadUserProfile() async {
+    var box = await Hive.openBox('userBox');
+    var userJson = box.get('userDetails');
+    if (userJson != null) {
+      // Assume userJson is a JSON string that needs to be decoded
+      Map<String, dynamic> user = jsonDecode(userJson);
+      // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
+      setState(() {
+        //Mettez à jour votre état avec les informations de l'utilisateur
+        _idUser = user['idUser'] ?? 0;
+        _firstName = user['firstName'] ?? 'N/A';
+        _lastName = user['lastName'] ?? 'N/A';
+        _usersName = user['usersName'] ?? 'N/A';
+        _email = user['email'] ?? 'N/A';
+        _city = user['city'] ?? 'N/A';
+        _bio = user['bio'] ?? 'N/A';
+        _siret = user['siret']??'N/A';
+        _companyName = user['companyName'] ??'N/A';
+        _companyNumber = user['companyNumber'] ?? 'N/A';
+        _idRole = user['idRole'];
+      });
+    }
+  }
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -79,7 +115,7 @@ class _ProfilPageState extends State<ProfilPage>
         // affichage des annonces de l'utilisateur
         Expanded(
           child: FutureBuilder<List<Annonce>>(
-            future: apiAnnoncesUser.fetchAnnoncesUser('16'),
+            future: apiAnnoncesUser.fetchAnnoncesUser(_idUser.toString()),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return CircularProgressIndicator();
@@ -178,7 +214,7 @@ class _ProfilPageState extends State<ProfilPage>
                     height:
                         10), // Espace entre la photo de profil et le nom de l'utilisateur
                 Text(
-                  'Nom de l\'utilisateur',
+                  _usersName,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -188,7 +224,7 @@ class _ProfilPageState extends State<ProfilPage>
                     height:
                         10), // Espace entre le nom de l'utilisateur et la biographie
                 Text(
-                  'Biographie de l\'utilisateur',
+                  _bio,
                   textAlign: TextAlign.center,
                 ),
               ],

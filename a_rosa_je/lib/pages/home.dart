@@ -2,6 +2,7 @@ import 'package:a_rosa_je/pages/gestion_annonces.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:hive/hive.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
@@ -35,8 +36,19 @@ class _HomePageState extends State<HomePage>
   String selectedCity = ''; // Pour stocker la ville sélectionnée
   int _selectedIndex = 0;
   final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
-
-  @override
+  int _idUser = 0;
+  String _firstName = '';
+  String _lastName = '';
+  String _usersName = '';
+  String _email = '';
+  String _city = '';
+  String _bio = '';
+  String _siret = '';
+  String _companyName = '';
+  String _companyNumber = '';
+  int _idRole = 0;
+  
+ @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
@@ -46,9 +58,36 @@ class _HomePageState extends State<HomePage>
       if (_tabController!.index == 1) {
         // index 1 correspond au deuxième onglet
         _determinePosition();
+        
       }
     });
+    _loadUserProfile();
   }
+
+  Future<void> _loadUserProfile() async {
+    var box = await Hive.openBox('userBox');
+    var userJson = box.get('userDetails');
+    if (userJson != null) {
+      // Assume userJson is a JSON string that needs to be decoded
+      Map<String, dynamic> user = jsonDecode(userJson);
+      // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
+      setState(() {
+        //Mettez à jour votre état avec les informations de l'utilisateur
+        _idUser = user['idUser'] ?? 0;
+        _firstName = user['firstName'] ?? 'N/A';
+        _lastName = user['lastName'] ?? 'N/A';
+        _usersName = user['usersName'] ?? 'N/A';
+        _email = user['email'] ?? 'N/A';
+        _city = user['city'] ?? 'N/A';
+        _bio = user['bio'] ?? 'N/A';
+        _siret = user['siret'] ?? 'N/A';
+        _companyName = user['companyName'] ?? 'N/A';
+        _companyNumber = user['companyNumber'] ?? 'N/A';
+        _idRole = user['idRole'];
+      });
+    }
+  }
+
 
   void _determinePosition() async {
     bool serviceEnabled;
@@ -531,7 +570,7 @@ class _HomePageState extends State<HomePage>
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Bonjour nom user',
+                  'Bonjour $_usersName',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

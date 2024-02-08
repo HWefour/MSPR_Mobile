@@ -7,11 +7,13 @@ import 'pages/sign_in.dart';
 import 'pages/parametre_menu.dart';
 import 'pages/profil_info.dart';
 import 'package:http/http.dart' as http;
+import 'package:hive_flutter/hive_flutter.dart'; //pour le stockage en local
 
 // ignore: duplicate_import
 import 'pages/profil.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
   runApp(MyApp());
 }
 
@@ -26,8 +28,8 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       // home: ProfilePage(),
-     home: LoginPage(),
-        // home: HomePage(),
+      home: LoginPage(),
+       // home: HomePage(),
       // home: ParametreMenu(),
       // home: SettingsPage(),
       // home: RegistrationScreen(),

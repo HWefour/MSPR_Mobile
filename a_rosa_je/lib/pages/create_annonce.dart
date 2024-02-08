@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,8 @@ class CreateAnnonce extends StatefulWidget {
   _CreateAnnonceState createState() => _CreateAnnonceState();
 }
 
-class _CreateAnnonceState extends State<CreateAnnonce> {
+class _CreateAnnonceState extends State<CreateAnnonce> 
+   with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   DateTime selectedStartDate = DateTime.now();
   DateTime selectedEndDate = DateTime.now().add(Duration(days: 7));
   DateTime creationDate = DateTime.now(); // Ajout de la date de création
@@ -25,8 +27,49 @@ class _CreateAnnonceState extends State<CreateAnnonce> {
   int selectedPlantId = 0;
   TextEditingController plantSearchController = TextEditingController();
   List<Map<String, dynamic>> plants = [];
-
+  int _idUser = 0;
+  String _firstName = '';
+  String _lastName = '';
+  String _usersName = '';
+  String _email = '';
+  String _city = '';
+  String _bio = '';
+  String _siret = '';
+  String _companyName = '';
+  String _companyNumber = '';
+  int _idRole = 0;
   List<XFile>? imageFiles = [];
+
+   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    var box = await Hive.openBox('userBox');
+    var userJson = box.get('userDetails');
+    if (userJson != null) {
+      // Assume userJson is a JSON string that needs to be decoded
+      Map<String, dynamic> user = jsonDecode(userJson);
+      // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
+      setState(() {
+        //Mettez à jour votre état avec les informations de l'utilisateur
+        _idUser = user['idUser'] ?? 0;
+        _firstName = user['firstName'] ?? 'N/A';
+        _lastName = user['lastName'] ?? 'N/A';
+        _usersName = user['usersName'] ?? 'N/A';
+        _email = user['email'] ?? 'N/A';
+        _city = user['city'] ?? 'N/A';
+        _bio = user['bio'] ?? 'N/A';
+        _siret = user['siret'] ?? 'N/A';
+        _companyName = user['companyName'] ?? 'N/A';
+        _companyNumber = user['companyNumber'] ?? 'N/A';
+        _idRole = user['idRole'];
+      });
+    }
+  }
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     final DateTime? picked = await showDatePicker(
@@ -171,10 +214,10 @@ class _CreateAnnonceState extends State<CreateAnnonce> {
                Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: TextFormField(
-                  initialValue: city, // Affichez la ville actuelle
+                  initialValue: _city, // Affichez la ville actuelle
                   enabled: false, // Désactive l'édition
                   decoration: InputDecoration(
-                    labelText: 'Ville',
+                    labelText: _city,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -332,7 +375,7 @@ class _CreateAnnonceState extends State<CreateAnnonce> {
                         title: title,
                         createdAt: formattedCreationDate,
                         idPlant: selectedPlantId,
-                        idUser: "16", // Id user
+                        idUser: _idUser, // Id user
                         description: description,
                         startDate: formattedStartDate,
                         endDate: formattedEndDate,
