@@ -249,6 +249,7 @@ class _LoginPageState extends State<LoginPage> {
           // Utilisateur trouvé, vous pouvez maintenant utiliser les données de l'utilisateur
           // Convertir l'utilisateur en chaîne JSON
           String userJson = jsonEncode(user);
+          print("Détails de l'utilisateur trouvé : $userJson");
 
           //j'ouvre la boite Hive
           var box = await Hive.openBox('userBox');

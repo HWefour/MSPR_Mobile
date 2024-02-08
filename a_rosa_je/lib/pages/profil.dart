@@ -20,7 +20,7 @@ class _ProfilPageState extends State<ProfilPage>
   TabController? _tabController;
   int _selectedIndex = 4;
   final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
-  String _idUser = '';
+  int _idUser = 0 ;
   String _firstName = '';
   String _lastName = '';
   String _usersName = '';
@@ -30,7 +30,7 @@ class _ProfilPageState extends State<ProfilPage>
   String _siret = '';
   String _companyName = '';
   String _companyNumber = '';
-  String _idRole = '';
+  int _idRole = 0;
 
   @override
   void initState() {
@@ -49,16 +49,16 @@ class _ProfilPageState extends State<ProfilPage>
       // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
       setState(() {
         //Mettez à jour votre état avec les informations de l'utilisateur
-        _idUser = user['idUser'];
-        _firstName = user['firstName'];
-        _lastName = user['lastName'];
-        _usersName = user['userName'];
-        _email = user['email'];
-        _city = user['city'];
-        _bio = user['bio'];
-        _siret = user['siret'];
-        _companyName = user['companyName'];
-        _companyNumber = user['companyNumber'];
+        _idUser = user['idUser'] ?? 0;
+        _firstName = user['firstName'] ?? 'N/A';
+        _lastName = user['lastName'] ?? 'N/A';
+        _usersName = user['usersName'] ?? 'N/A';
+        _email = user['email'] ?? 'N/A';
+        _city = user['city'] ?? 'N/A';
+        _bio = user['bio'] ?? 'N/A';
+        _siret = user['siret']??'N/A';
+        _companyName = user['companyName'] ??'N/A';
+        _companyNumber = user['companyNumber'] ?? 'N/A';
         _idRole = user['idRole'];
       });
     }
