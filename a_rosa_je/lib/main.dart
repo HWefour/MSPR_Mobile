@@ -16,25 +16,46 @@ void main() async {
   await Hive.initFlutter();
   runApp(MyApp());
 }
-
+Future<bool> _checkUserLoggedIn() async {
+  await Hive.initFlutter();
+  var box = await Hive.openBox('userBox');
+  var userJson = box.get('userDetails');
+  await box
+      .close(); // Fermer la boîte après l'accès pour libérer des ressources
+  return userJson != null;
+}
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Login UI',
-      debugShowCheckedModeBanner: false, // Enlever le bandeau debug
+      title: 'A Rosa Je',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // home: ProfilePage(),
-      home: LoginPage(),
-       // home: HomePage(),
-      // home: ParametreMenu(),
-      // home: SettingsPage(),
-      // home: RegistrationScreen(),
-      // home: CreateAnnonce(),
-      
+      home: FutureBuilder<bool>(
+        future: _checkUserLoggedIn(),
+        builder: (context, snapshot) {
+          // Vérifier si la future est terminée et si l'utilisateur est connecté
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.data == true) {
+              // Les données utilisateur existent, donc diriger vers HomePage
+              return HomePage();
+            } else {
+              // Pas de données utilisateur, donc diriger vers LoginPage
+              return LoginPage();
+            }
+          } else {
+            // Afficher un indicateur de chargement pendant que la vérification est en cours
+            return Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 }

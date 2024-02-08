@@ -2,6 +2,8 @@ import 'package:a_rosa_je/util/annonce.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
+//ip machine lucas 192.168.56.1
 class ApiService {
   Future<Map<String, dynamic>> createUser({
     required String firstName,
@@ -12,7 +14,7 @@ class ApiService {
     required String password,
     required String idRole,
   }) async {
-    final url = Uri.parse('http://localhost:1212/auth/signup');
+    final url = Uri.parse('http://192.168.56.1:1212/auth/signup');
     final response = await http.post(
       url,
       headers: <String, String>{
@@ -44,7 +46,7 @@ class ApiService {
 class ApiAnnoncesVille {
   Future<List<Annonce>> fetchAnnoncesVille(String city) async {
     final response =
-        await http.get(Uri.parse('http://localhost:1212/home/city/$city'));
+        await http.get(Uri.parse('http://192.168.56.1:1212/home/city/$city'));
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
@@ -58,7 +60,7 @@ class ApiAnnoncesVille {
 class ApiAnnoncesUser {
   Future<List<Annonce>> fetchAnnoncesUser(String idUser) async {
     final response = await http
-        .get(Uri.parse('http://localhost:1212/profile/profileAds/$idUser'));
+        .get(Uri.parse('http://192.168.56.1:1212/profile/profileAds/$idUser'));
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
@@ -79,7 +81,7 @@ class ApiCreateAnnounce {
     required String startDate,
     required String endDate,
   }) async {
-    final url = Uri.parse('http://localhost:1212/create_adv');
+    final url = Uri.parse('http://192.168.56.1:1212/create_adv');
     final response = await http.post(url,
         headers: {"Content-Type": "application/json"},
         body: json.encode({
