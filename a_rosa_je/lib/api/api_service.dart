@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/profil_info.dart';
 import 'package:a_rosa_je/util/annonce.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -24,7 +25,7 @@ class ApiService {
         "usersName": userName,
         "email": email,
         "city": city,
-        "bio": "bio", // Vous pouvez modifier cela si nécessaire
+        "bio": "", // Vous pouvez modifier cela si nécessaire
         "password": password,
         "idRole": idRole, // Vous pouvez modifier cela si nécessaire
       }),
@@ -37,6 +38,47 @@ class ApiService {
       // La création de l'utilisateur a échoué.
       final errorMessage = json.decode(response.body)['message'];
       return {'success': false, 'error': errorMessage};
+    }
+  }
+
+  // Méthode pour récupérer les données utilisateur
+ Future<UserData> getUserData() async {
+    final response =
+        await http.get(Uri.parse('http://localhost:1212/auth/login/'));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      return UserData(
+        firstName: jsonData['firstName'],
+        lastName: jsonData['lastName'],
+        userName: jsonData['userName'],
+        city: jsonData['city'],
+        email: jsonData['email'],
+        bio: jsonData['bio'],
+      );
+    } else {
+      throw Exception('Échec de la récupération des données');
+    }
+  }
+
+  // Méthode pour mettre à jour les données utilisateur
+Future<void> updateUserData(UserData userData) async {
+    final url = Uri.parse('http://localhost:1212/auth/updateUser/');
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'firstName': userData.firstName,
+        'lastName': userData.lastName,
+        'userName': userData.userName,
+        'city': userData.city,
+        'email': userData.email,
+        'bio': userData.bio,
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Échec de la mise à jour des données utilisateur');
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'parametre_menu.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
@@ -17,7 +18,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
   LocationData? _currentLocation;
   var _locationService = Location();
@@ -27,21 +29,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Marker? _currentMarker;
   bool _hasAnnonces = true;
   List<Annonce> _currentAnnonces = []; //pour stocker les annonces de la map
-  List<String> cities = []; // Pour stocker les villes en fonction du nom de la ville
-   String selectedCity = ''; // Pour stocker la ville sélectionnée
+  List<String> cities =
+      []; // Pour stocker les villes en fonction du nom de la ville
+  String selectedCity = ''; // Pour stocker la ville sélectionnée
   int _selectedIndex = 0;
   final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
 
- @override
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
     _tabController!.addListener(() {
       searchController.clear();
-      if (_tabController!.index == 1) { // index 1 correspond au deuxième onglet
+      if (_tabController!.index == 1) {
+        // index 1 correspond au deuxième onglet
         _determinePosition();
-        
       }
     });
   }
@@ -75,7 +78,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       // Mettre à jour l'interface utilisateur avec la localisation actuelle.
     });
   }
-
 
   @override
   void dispose() {
@@ -121,8 +123,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   //api pour chercher une ville
   Future<void> fetchCities(String cityName) async {
-    final response = await http.get(
-        Uri.parse('https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
+    final response = await http.get(Uri.parse(
+        'https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       List<String> cityNames = [];
@@ -138,136 +140,134 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-
   Widget _buildAnnoncesList() {
-  return Column(
-    children: [
-      if (_isSearchMode) 
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            controller: searchController,
-            decoration: InputDecoration(
-              labelText: "Rechercher...",
-              hintText: "Entrez une ville",
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
+    return Column(
+      children: [
+        if (_isSearchMode)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                labelText: "Rechercher...",
+                hintText: "Entrez une ville",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                ),
+              ),
+              onChanged: (cityName) {
+                if (cityName.isNotEmpty) {
+                  fetchCities(cityName);
+                }
+              },
+            ),
+          ),
+        SizedBox(height: 8.0),
+        if (cities.isNotEmpty) ...[
+          Container(
+            height: 100.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: ListView.builder(
+              itemCount: cities.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(cities[index]),
+                  onTap: () {
+                    setState(() {
+                      selectedCity = cities[index];
+                      searchController.text = selectedCity;
+                      cities.clear();
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+        if (!_hasAnnonces)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              "Pas d'annonces dans cette ville",
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Colors.red,
               ),
             ),
-            onChanged: (cityName) {
-              if (cityName.isNotEmpty) {
-                fetchCities(cityName);
+          ),
+        if (!_hasAnnonces) SizedBox(height: 10.0),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Filtrer les annonces",
+                style: TextStyle(fontSize: 16.0),
+              ),
+              IconButton(
+                icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+                onPressed: () {
+                  _hasAnnonces = true;
+                  searchController.clear();
+                  setState(() {
+                    _isSearchMode = !_isSearchMode;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: FutureBuilder<List<Annonce>>(
+            future: apiAnnoncesVille.fetchAnnoncesVille(
+                searchController.text.isEmpty
+                    ? "Montpellier"
+                    : searchController.text),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text("Error: ${snapshot.error}");
+              } else if (snapshot.hasData) {
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    Annonce annonce = snapshot.data![index];
+                    return GestureDetector(
+                      onTap: () => _showPopup(annonce),
+                      child: AnnonceTile(
+                        idAdvertisement: annonce.idAdvertisement ?? '',
+                        title: annonce.title ?? 'N/A',
+                        city: annonce.city ?? 'N/A',
+                        idPlant: '',
+                        name: annonce.name ?? 'N/A',
+                        userName: '',
+                        description: annonce.description ?? 'N/A',
+                        startDate: annonce.startDate ?? 'N/A',
+                        endDate: annonce.endDate ?? 'N/A',
+                        imageUrl: 'images/plant_default.png',
+                        createdAt: '',
+                      ),
+                    );
+                  },
+                );
+              } else {
+                setState(() {
+                  _hasAnnonces = false;
+                });
+                return Text("No data");
               }
             },
           ),
         ),
-      SizedBox(height: 8.0),
-      if (cities.isNotEmpty) ...[ // Ajout de ... pour étendre la liste de widgets
-        Container(
-          height: 100.0,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: ListView.builder(
-            itemCount: cities.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(cities[index]),
-                onTap: () {
-                  setState(() {
-                    selectedCity = cities[index];
-                    searchController.text = selectedCity;
-                    cities.clear();
-                  });
-                },
-              );
-            },
-          ),
-        ),
       ],
-      if (!_hasAnnonces)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text(
-            "Pas d'annonces dans cette ville",
-            style: TextStyle(
-              fontSize: 16.0,
-              color: Colors.red,
-            ),
-          ),
-        ),
-      if (!_hasAnnonces) // Ajout d'un espace uniquement si _hasAnnonces est false
-        SizedBox(height: 10.0),
-      Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Filtrer les annonces",
-              style: TextStyle(fontSize: 16.0),
-            ),
-            IconButton(
-              icon: Icon(_isSearchMode ? Icons.close : Icons.search),
-              onPressed: () {
-                _hasAnnonces = true;
-                searchController.clear();
-                setState(() {
-                  _isSearchMode = !_isSearchMode;
-                  
-                });
-              },
-            ),
-          ],
-        ),
-      ),
-      Expanded(
-        child: FutureBuilder<List<Annonce>>(
-          future: apiAnnoncesVille.fetchAnnoncesVille(searchController.text.isEmpty ? "Montpellier" : searchController.text),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text("Error: ${snapshot.error}");
-            } else if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  Annonce annonce = snapshot.data![index];
-                  return GestureDetector(
-                    onTap: () => _showPopup(annonce),
-                    child: AnnonceTile(
-                      idAdvertisement: annonce.idAdvertisement ?? '',
-                      title: annonce.title ?? 'N/A',
-                      city: annonce.city ?? 'N/A',
-                      idPlant:'', 
-                      name: annonce.name ?? 'N/A',
-                      userName: '',
-                      description: annonce.description ?? 'N/A',
-                      startDate: annonce.startDate ?? 'N/A',
-                      endDate: annonce.endDate ?? 'N/A',
-                      imageUrl: 'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
-                      createdAt: '',
-                    ),
-                  );
-                },
-              );
-            } else {
-              setState(() {
-                          _hasAnnonces = false; // Aucune annonce trouvée
-                        });
-              return Text("No data");
-            }
-          },
-        ),
-      ),
-    ],
-  );  
-}
-
-
+    );
+  }
 
   //gestion de la localisation pour la map
   Future<LatLng?> searchCity(String city) async {
@@ -275,14 +275,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       // Tentative de récupérer les annonces pour la ville spécifiée
       List<Annonce> annonces = await apiAnnoncesVille.fetchAnnoncesVille(city);
       if (annonces.isNotEmpty) {
-
-      // Si des annonces existent pour la ville, stockez-les dans l'état du widget
-      setState(() {
-        _currentAnnonces = annonces;
-      });
+        setState(() {
+          _currentAnnonces = annonces;
+        });
 
         // Si des annonces existent pour la ville, procéder à la recherche de la localisation
-        final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$city&format=json');
+        final url = Uri.parse(
+            'https://nominatim.openstreetmap.org/search?q=$city&format=json');
         final response = await http.get(url, headers: {
           'User-Agent': 'a_rosa_je',
         });
@@ -297,9 +296,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         }
       }
     } catch (e) {
-      print("Erreur lors de la récupération des annonces ou de la localisation : $e");
+      print(
+          "Erreur lors de la récupération des annonces ou de la localisation : $e");
     }
-    return null; // Renvoie null si aucune annonce n'est trouvée ou en cas d'erreur
+    return null;
   }
 
   void _showAnnoncesModal(BuildContext context) {
@@ -309,22 +309,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         return Container(
           padding: EdgeInsets.all(16.0),
           child: ListView.builder(
-            itemCount: _currentAnnonces.length, // Utilisez _currentAnnonces au lieu de snapshot.data!
+            itemCount: _currentAnnonces.length,
             itemBuilder: (context, index) {
-              Annonce annonce = _currentAnnonces[index]; // Utilisez _currentAnnonces au lieu de snapshot.data!
+              Annonce annonce = _currentAnnonces[index];
               return GestureDetector(
-                onTap: () => _showPopup(annonce), // Afficher le modal d'annonce lorsque l'élément est tapé
+                onTap: () => _showPopup(annonce),
                 child: AnnonceTile(
                   idAdvertisement: '',
                   title: annonce.title ?? 'N/A',
-                  city: annonce.city ?? 'N/A', 
-                  idPlant:'', 
+                  city: annonce.city ?? 'N/A',
+                  idPlant: '',
                   name: annonce.name ?? 'N/A',
                   userName: '',
                   description: annonce.description ?? 'N/A',
                   startDate: annonce.startDate ?? 'N/A',
                   endDate: annonce.endDate ?? 'N/A',
-                  imageUrl: 'images/plant_default.png', // Remplacez par l'URL de l'image si disponible
+                  imageUrl: 'images/plant_default.png',
                   createdAt: '',
                 ),
               );
@@ -343,8 +343,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-                controller: searchController,
-                decoration: InputDecoration(
+              controller: searchController,
+              decoration: InputDecoration(
                 labelText: "Rechercher...",
                 hintText: "Entrez une ville",
                 prefixIcon: Icon(Icons.search),
@@ -359,144 +359,121 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               },
             ),
           ),
-          SizedBox(height: 8.0),
-          if (cities.isNotEmpty) ...[ // Ajout de ... pour étendre la liste de widgets
-            Container(
-              height: 100.0,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: ListView.builder(
-                itemCount: cities.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Text(cities[index]),
-                    onTap: () async {
+        SizedBox(height: 8.0),
+        if (cities.isNotEmpty) ...[
+          Container(
+            height: 100.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: ListView.builder(
+              itemCount: cities.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(cities[index]),
+                  onTap: () async {
+                    setState(() {
+                      selectedCity = cities[index];
+                      searchController.text = selectedCity;
+                      cities.clear();
+                    });
+                    final coordinates = await searchCity(searchController.text);
+                    if (coordinates != null) {
                       setState(() {
-                        selectedCity = cities[index];
-                        searchController.text = selectedCity;
-                        cities.clear();
+                        _currentLocation = LocationData.fromMap({
+                          "latitude": coordinates.latitude,
+                          "longitude": coordinates.longitude,
+                        });
+                        _currentMarker = Marker(
+                          point: coordinates,
+                          width: 80.0,
+                          height: 80.0,
+                          child: Icon(Icons.location_on,
+                              size: 50.0, color: Colors.red),
+                        );
+                        _isSearchMode = false;
+                        _mapKey = ValueKey(
+                            "${coordinates.latitude}_${coordinates.longitude}");
+                        _hasAnnonces = true;
                       });
-                      final coordinates = await searchCity(searchController.text);
-                      if (coordinates != null) {
-                        setState(() {
-                          _currentLocation = LocationData.fromMap({
-                            "latitude": coordinates.latitude,
-                            "longitude": coordinates.longitude,
-                          });
-                          _currentMarker = Marker(
-                            point: coordinates,
-                            width: 80.0,
-                            height: 80.0,
-                            child: Icon(Icons.location_on, size: 50.0, color: Colors.red),
-                          );
-                          _isSearchMode = false;
-                          // Mettre à jour la clé pour forcer la reconstruction de la carte
-                          _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
-                          _hasAnnonces = true;
-                        });
-                      } else {
-                        setState(() {
-                          _hasAnnonces = false; // Aucune annonce trouvée
-                        });
-                      }
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        if (!_hasAnnonces)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text(
-            "Pas d'annonces dans cette ville",
-            style: TextStyle(
-              fontSize: 16.0,
-              color: Colors.red,
-            ),
-          ),
-        ),
-      if (!_hasAnnonces) // Ajout d'un espace uniquement si _hasAnnonces est false
-        SizedBox(height: 10.0),
-      Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Filtrer les annonces",
-              style: TextStyle(fontSize: 16.0),
-            ),
-            IconButton(
-              icon: Icon(_isSearchMode ? Icons.close : Icons.search),
-              onPressed: () {
-                _hasAnnonces = true;
-                searchController.clear();
-                setState(() {
-                  _isSearchMode = !_isSearchMode;
-                  
-                });
+                    } else {
+                      setState(() {
+                        _hasAnnonces = false;
+                      });
+                    }
+                  },
+                );
               },
             ),
-          ],
-        ),
-      ),
-    Expanded (
-        child: _currentLocation == null
-          ? Center(child: CircularProgressIndicator())
-          : Stack(
-            children: [
-              FlutterMap(
-                key: _mapKey,
-                options: MapOptions(
-                  initialCenter: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                  initialZoom: 13.0,
-                  onTap: (tapPosition, point) {
-                    if (_currentMarker != null) {
-                        // Gérer l'appui sur la carte uniquement si _currentMarker est présent
-                        _showAnnoncesModal(context);
-                      }
-                  },
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.a_rosa_je.app',
-                  ),
-                  if (_currentMarker != null) MarkerLayer(
-                    markers: [_currentMarker!],
-                  ),
-                  // Ajouter d'autres couches si nécessaire
-                ],
+          ),
+        ],
+        if (!_hasAnnonces)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              "Pas d'annonces dans cette ville",
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Colors.red,
               ),
-              // Positioned(
-              //   right: 20.0,
-              //   bottom: 20.0,
-              //   child: FloatingActionButton(
-              //     onPressed: () async {
-              //       _determinePosition();
-              //       // Attendre la mise à jour de la position
-              //       if (_currentLocation != null) {
-              //         setState(() {
-              //           // Déplacer la vue de la carte vers la nouvelle position
-              //           _mapController.move(
-              //             LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-              //             13.0
-              //           );
-              //         });
-              //       }
-              //     },
-              //     child: Icon(Icons.my_location),
-              //     tooltip: 'Reset to Current Location',
-              //   )
-              // ),
+            ),
+          ),
+        if (!_hasAnnonces) SizedBox(height: 10.0),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Filtrer les annonces",
+                style: TextStyle(fontSize: 16.0),
+              ),
+              IconButton(
+                icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+                onPressed: () {
+                  _hasAnnonces = true;
+                  searchController.clear();
+                  setState(() {
+                    _isSearchMode = !_isSearchMode;
+                  });
+                },
+              ),
             ],
-          ),   
+          ),
+        ),
+        Expanded(
+          child: _currentLocation == null
+              ? Center(child: CircularProgressIndicator())
+              : Stack(
+                  children: [
+                    FlutterMap(
+                      key: _mapKey,
+                      options: MapOptions(
+                        initialCenter: LatLng(_currentLocation!.latitude!,
+                            _currentLocation!.longitude!),
+                        initialZoom: 13.0,
+                        onTap: (tapPosition, point) {
+                          if (_currentMarker != null) {
+                            _showAnnoncesModal(context);
+                          }
+                        },
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.a_rosa_je.app',
+                        ),
+                        if (_currentMarker != null)
+                          MarkerLayer(markers: [_currentMarker!]),
+                      ],
+                    ),
+                  ],
+                ),
         ),
       ],
-    );  
+    );
   }
 
   //gestion du tap sur le footer
@@ -505,9 +482,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       _selectedIndex = index;
     });
     switch (index) {
-      case 4: 
+      case 4:
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => ProfilPage()), // permet d'aller vers la page sans conserver les routes
+          MaterialPageRoute(builder: (context) => ProfilPage()),
           (Route<dynamic> route) => false,
         );
         break;
@@ -516,23 +493,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-  //build affichage 
+  //build affichage
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              // Mettez ici la logique pour accéder à la page des paramètres
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ParametreMenu()));
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
-          SizedBox(height: 10), // Espace au-dessus du Container
-          // Espace pour afficher la photo de profil, le nom de l'utilisateur et la biographie
+          SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
                 CircleAvatar(
-                  radius: 50, // Rayon du cercle pour le logo
-                  backgroundImage: AssetImage('images/LOGO.png'), // Remplacez par le chemin de votre photo de profil
+                  radius: 50,
+                  backgroundImage: AssetImage('images/LOGO.png'),
                 ),
-                SizedBox(height: 10), // Espace entre la photo de profil et le nom de l'utilisateur
+                SizedBox(height: 10),
                 Text(
                   'Bonjour nom user',
                   style: TextStyle(
@@ -540,7 +528,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10), // Espace entre le nom de l'utilisateur et la biographie
+                SizedBox(height: 10),
                 Text(
                   'Trouver une plante à garder :',
                   textAlign: TextAlign.center,
@@ -548,9 +536,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ],
             ),
           ),
-          SizedBox(height: 20), // Espace en dessous du Container
+          SizedBox(height: 20),
           Container(
-            color: Colors.white, // Couleur de fond pour TabBar
+            color: Colors.white,
             child: TabBar(
               controller: _tabController,
               tabs: [
@@ -586,5 +574,4 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
-  //fin app
 }
