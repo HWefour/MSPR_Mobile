@@ -74,7 +74,7 @@ class ApiCreateAnnounce {
     required String title,
     required String createdAt,
     required int idPlant,
-    required String idUser,
+    required int idUser,
     required String description,
     required String startDate,
     required String endDate,

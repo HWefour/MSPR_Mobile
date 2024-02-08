@@ -115,7 +115,7 @@ class _ProfilPageState extends State<ProfilPage>
         // affichage des annonces de l'utilisateur
         Expanded(
           child: FutureBuilder<List<Annonce>>(
-            future: apiAnnoncesUser.fetchAnnoncesUser('16'),
+            future: apiAnnoncesUser.fetchAnnoncesUser(_idUser.toString()),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return CircularProgressIndicator();
