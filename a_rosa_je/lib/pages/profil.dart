@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:a_rosa_je/util/footer.dart';
+import 'package:hive/hive.dart';
 import '../util/annonce_popup_card.dart';
 import '../util/annonce_tile.dart';
 import '../api/api_service.dart';
@@ -19,14 +20,49 @@ class _ProfilPageState extends State<ProfilPage>
   TabController? _tabController;
   int _selectedIndex = 4;
   final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
+  String _idUser = '';
+  String _firstName = '';
+  String _lastName = '';
+  String _usersName = '';
+  String _email = '';
+  String _city = '';
+  String _bio = '';
+  String _siret = '';
+  String _companyName = '';
+  String _companyNumber = '';
+  String _idRole = '';
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
+    _loadUserProfile();
   }
 
+  Future<void> _loadUserProfile() async {
+    var box = await Hive.openBox('userBox');
+    var userJson = box.get('userDetails');
+    if (userJson != null) {
+      // Assume userJson is a JSON string that needs to be decoded
+      Map<String, dynamic> user = jsonDecode(userJson);
+      // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
+      setState(() {
+        //Mettez à jour votre état avec les informations de l'utilisateur
+        _idUser = user['idUser'];
+        _firstName = user['firstName'];
+        _lastName = user['lastName'];
+        _usersName = user['userName'];
+        _email = user['email'];
+        _city = user['city'];
+        _bio = user['bio'];
+        _siret = user['siret'];
+        _companyName = user['companyName'];
+        _companyNumber = user['companyNumber'];
+        _idRole = user['idRole'];
+      });
+    }
+  }
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -178,7 +214,7 @@ class _ProfilPageState extends State<ProfilPage>
                     height:
                         10), // Espace entre la photo de profil et le nom de l'utilisateur
                 Text(
-                  'Nom de l\'utilisateur',
+                  _usersName,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -188,7 +224,7 @@ class _ProfilPageState extends State<ProfilPage>
                     height:
                         10), // Espace entre le nom de l'utilisateur et la biographie
                 Text(
-                  'Biographie de l\'utilisateur',
+                  _bio,
                   textAlign: TextAlign.center,
                 ),
               ],

@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
    String selectedCity = ''; // Pour stocker la ville sélectionnée
   int _selectedIndex = 0;
   final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
-
+  
  @override
   void initState() {
     super.initState();
