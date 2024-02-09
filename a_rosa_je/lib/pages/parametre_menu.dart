@@ -1,5 +1,9 @@
-import 'package:a_rosa_je/pages/profil.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
+import 'login_page.dart';
 import 'profil_info.dart';
 
 void main() {
@@ -20,29 +24,57 @@ class ParametreMenu extends StatelessWidget {
 }
 
 class MySettingsPage extends StatelessWidget {
+  Future<void> deleteUserAccount(BuildContext context) async {
+    try {
+      final response = await http.delete(Uri.parse('http://localhost:1212/settings/delete/:id'));
+
+      if (response.statusCode == 200) {
+        // Si la suppression réussit, naviguer vers la page de connexion
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+          (Route<dynamic> route) => false,
+        );
+      } else {
+        // Gérer l'échec de la suppression
+        // Afficher un message d'erreur ou prendre d'autres mesures appropriées
+        print('Échec de la suppression du compte');
+      }
+    } catch (e) {
+      // Gérer les erreurs de connexion ou d'autres erreurs possibles
+      print('Erreur lors de la suppression du compte: $e');
+    }
+  }
+
+
+  Future<void> _loadUserProfile() async {
+    var box = await Hive.openBox('userBox');
+    var userJson = box.get('userDetails');
+    if (userJson != null) {
+      // Assume userJson is a JSON string that needs to be decoded
+      Map<String, dynamic> user = jsonDecode(userJson);
+      // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
+      // setState(() {
+      //   //Mettez à jour votre état avec les informations de l'utilisateur
+      //   _usersName = user['usersName'] ?? 'N/A';
+      //   _city = user['city'] ?? 'N/A';
+      // });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // leading: BackButton(),
         title: Row(
-          mainAxisAlignment:
-              MainAxisAlignment.center, // Center the children horizontally
+          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            // Image(
-            //   image: AssetImage('images/LOGO.png'),
-            //   height: 50, // You can adjust the size of the image here
-            // ),
-            SizedBox(
-                width: 5), // Provide some spacing between the logo and the text
+            SizedBox(width: 5),
             Text('Paramètres'),
           ],
         ),
-        // Other AppBar properties...
       ),
-      // The rest of your Scaffold content...
-
       body: ListView(
         children: ListTile.divideTiles(
           context: context,
@@ -53,7 +85,7 @@ class MySettingsPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => (SettingsPage())),
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
                 );
               },
             ),
@@ -84,50 +116,46 @@ class MySettingsPage extends StatelessWidget {
             ListTile(
               title: Text('Se déconnecter'),
               onTap: () {
-                // Handle tap
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  (Route<dynamic> route) => false,
+                );
               },
             ),
             ListTile(
               title: Text('Supprimer le compte',
                   style: TextStyle(color: Colors.red)),
               onTap: () {
-                // Handle tap
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Confirmation"),
+                      content:
+                          Text("Voulez-vous vraiment supprimer votre compte ?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Ferme la popup
+                          },
+                          child: Text("Non"),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            await deleteUserAccount(context);
+                          },
+                          child: Text("Oui"),
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ],
         ).toList(),
       ),
-      // body: ListView.builder(
-      //   itemCount: 7, // Nombre de tuiles
-      //   itemBuilder: (BuildContext context, int index) {
-      //     return Column(
-      //       children: [
-      //         SizedBox(height: 20), // Boîte de taille avec une largeur de 12
-      //         ListTile(
-      //           title: Text(
-      //             index == 0
-      //                 ? 'Informations du compte'
-      //                 : index == 1
-      //                     ? 'Notifications'
-      //                     : index == 2
-      //                         ? 'Demander le compte Botaniste'
-      //                         : index == 3
-      //                             ? 'Télécharger les données'
-      //                             : index == 4
-      //                                 ? 'Politique de confidentialité'
-      //                                 : index == 5
-      //                                     ? 'Se déconnecter'
-      //                                     : 'Supprimer le compte',
-      //             style: index == 6 ? TextStyle(color: Colors.red) : null,
-      //           ),
-      //           onTap: () {
-      //             // Gérer le clic ici
-      //           },
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // ),
     );
   }
 }

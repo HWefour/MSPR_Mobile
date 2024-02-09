@@ -42,7 +42,20 @@ class ApiService {
       return {'success': false, 'error': errorMessage};
     }
   }
+  Future<void> deleteUser(String userId) async {
+    try {
+      
+      final response = await http.delete(Uri.parse('http://localhost:1212/settings/delete/$userId'));
 
+      if (response.statusCode == 200) {
+        print('Utilisateur supprimé avec succès');
+      } else {
+        print('Échec de la suppression de l\'utilisateur');
+      }
+    } catch (e) {
+      print('Erreur lors de la suppression de l\'utilisateur: $e');
+    }
+  }
   // Méthode pour récupérer les données utilisateur
 //  Future<UserData> getUserData() async {
 //     final response =

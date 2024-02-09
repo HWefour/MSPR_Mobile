@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../api/api_service.dart';
-// import 'login_page.dart'; // Assurez-vous d'importer la page LoginPage ici
 
 void main() {
   runApp(MyApp());
@@ -32,46 +31,113 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  bool isChecked = false;
+
+  // Validation de l'email
+  bool isEmailValid(String email) {
+    String pattern =
+        '^[a-zA-Z0-9.!#\$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*\$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
+
+  // Validation du mot de passe
+  bool isPasswordValid(String password) {
+    String pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(password);
+  }
 
   Future<void> createUserAndNavigate() async {
-    final url = Uri.parse('http://localhost:1212/auth/signup');
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({
-        "firstName": _firstNameController.text,
-        "lastName": _lastNameController.text,
-        "usersName": _userNameController.text,
-        "email": _emailController.text,
-        "city": selectedCity,
-        "bio": "bio", // Vous pouvez modifier cela si nécessaire
-        "password": _passwordController.text,
-        "idRole": "2" // Vous pouvez modifier cela si nécessaire
-      }),
+    if (!isEmailValid(_emailController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Veuillez entrer une adresse e-mail valide.'),
+        ),
+      );
+      return;
+    }
+
+    if (!isPasswordValid(_passwordController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre, un caractère spécial et au moins 8 caractères.'),
+        ),
+      );
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Les mots de passe ne correspondent pas.'),
+        ),
+      );
+      return;
+    }
+
+    if (!isChecked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Veuillez accepter les conditions générales et la politique de confidentialité.'),
+        ),
+      );
+      return;
+    }
+
+final url = Uri.parse('http://localhost:1212/auth/signup');
+final response = await http.post(
+  url,
+  headers: <String, String>{
+    'Content-Type': 'application/json; charset=UTF-8',
+  },
+  body: jsonEncode({
+    "firstName": _firstNameController.text,
+    "lastName": _lastNameController.text,
+    "usersName": _userNameController.text,
+    "email": _emailController.text,
+    "city": selectedCity,
+    "bio": "bio", // Vous pouvez modifier cela si nécessaire
+    "password": _passwordController.text,
+    "idRole": "2" // Vous pouvez modifier cela si nécessaire
+  }),
+);
+
+if (response.statusCode == 201) {
+  final responseData = json.decode(response.body);
+  if (responseData['success'] == true) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
     );
-    int _selectedIndex = 0;
-    final ApiService apiService = ApiService();
-
-    if (response.statusCode == 201) {
-      // L'utilisateur a été créé avec succès.
-      // Vous pouvez afficher un message de succès ou effectuer d'autres actions ici.
-
-      // Redirigez l'utilisateur vers la page LoginPage
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+  } else {
+    if (responseData['error'] == 'email_exists') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Un utilisateur existe déjà avec cette adresse e-mail.'),
+        ),
       );
     } else {
-      // La création de l'utilisateur a échoué.
-      // Vous pouvez afficher un message d'erreur ou effectuer d'autres actions ici.
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Échec de la création de l\'utilisateur'),
         ),
       );
     }
+  }
+} else {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Échec de la création de l\'utilisateur'),
+    ),
+  );
+}
+
   }
 
   Future<void> fetchCities(String cityName) async {
@@ -177,16 +243,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             controller: _passwordController,
           ),
           SizedBox(height: 24.0),
+          TextFieldWidget(
+            hintText: 'Confirmer le mot de passe',
+            obscureText: true,
+            controller: _confirmPasswordController,
+          ),
+          SizedBox(height: 24.0),
           Row(
             children: [
-              // Checkbox(
-              //   value: isChecked,
-              //   onChanged: (bool? value) {
-              //     setState(() {
-              //       isChecked = value ?? false;
-              //     });
-              //   },
-              // ),
+              Checkbox(
+                value: isChecked,
+                onChanged: (bool? value) {
+                  setState(() {
+                    isChecked = value ?? false;
+                  });
+                },
+              ),
               SizedBox(width: 8.0),
               Expanded(
                 child: Text(
@@ -197,16 +269,36 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ],
           ),
           SizedBox(height: 24.0),
-          ElevatedButtonWidget(
-            buttonText: 'Inscription',
-            buttonColor: Colors.brown,
-            onPressed: () {
-              createUserAndNavigate();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
-            },
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButtonWidget(
+                  buttonText: 'Inscription',
+                  buttonColor: Colors.brown,
+                  onPressed: createUserAndNavigate,
+                ),
+              ),
+              SizedBox(width: 16.0),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.blue,
+                    onPrimary: Colors.white,
+                    shape: StadiumBorder(),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('Connexion'),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -275,19 +367,3 @@ class ElevatedButtonWidget extends StatelessWidget {
     );
   }
 }
-
-// Implémentez la page LoginPage ici selon vos besoins
-// class LoginPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Page de Connexion'),
-//       ),
-//       body: Center(
-//         child: Text(
-//             'Vous êtes redirigé vers la page de connexion après inscription.'),
-//       ),
-//     );
-//   }
-// }
