@@ -3,6 +3,8 @@ import 'package:a_rosa_je/util/annonce.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
+//ip machine gros ordi lucas 192.168.56.1
 class ApiService {
   Future<Map<String, dynamic>> createUser({
     required String firstName,
@@ -111,6 +113,21 @@ class ApiAnnoncesUser {
   }
 }
 
+class ApiAnnoncesIdAdvertisement {
+  Future<List<Annonce>> fetchAnnoncesIdAdvertisement(String idAdvertisement) async {
+    int idAdvertisementTmp = int.parse(idAdvertisement);
+    final response = await http
+        .get(Uri.parse('http://localhost:1212/home/$idAdvertisementTmp'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => Annonce.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load annonces from API');
+    }
+  }
+}
+
 class ApiCreateAnnounce {
   static Future<http.Response> createAnnounce({
     required String title,
@@ -132,6 +149,28 @@ class ApiCreateAnnounce {
           "description": description,
           "start_date": startDate,
           "end_date": endDate,
+        }));
+
+    return response;
+  }
+}
+
+
+class ApiCreateJob {
+  static Future<http.Response> createJob({
+    required String dateDuJour,
+    required int idUserAnnounceur,
+    required int idAdvertisement,
+    required int idUserGardien
+  }) async {
+    final url = Uri.parse('http://localhost:1212/job/create');
+    final response = await http.post(url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "dates": dateDuJour,
+          "idUser": idUserAnnounceur,
+          "idAdvertisement": idAdvertisement,
+          "idUserGardien": idUserGardien
         }));
 
     return response;

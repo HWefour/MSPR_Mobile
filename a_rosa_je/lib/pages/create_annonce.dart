@@ -27,7 +27,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
   int selectedPlantId = 0;
   TextEditingController plantSearchController = TextEditingController();
   List<Map<String, dynamic>> plants = [];
-  int _idUser = 0;
+  int _idUserLocal = 0;
   String _firstName = '';
   String _lastName = '';
   String _usersName = '';
@@ -56,7 +56,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
       // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
       setState(() {
         //Mettez à jour votre état avec les informations de l'utilisateur
-        _idUser = user['idUser'] ?? 0;
+        _idUserLocal = user['idUser'] ?? 0;
         _firstName = user['firstName'] ?? 'N/A';
         _lastName = user['lastName'] ?? 'N/A';
         _usersName = user['usersName'] ?? 'N/A';
@@ -375,7 +375,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
                         title: title,
                         createdAt: formattedCreationDate,
                         idPlant: selectedPlantId,
-                        idUser: _idUser, // Id user
+                        idUser: _idUserLocal, // Id user
                         description: description,
                         startDate: formattedStartDate,
                         endDate: formattedEndDate,
