@@ -35,7 +35,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> createUserAndNavigate() async {
-    final url = Uri.parse('http://192.168.56.1:1212/auth/signup');
+    final url = Uri.parse('http://localhost:1212/auth/signup');
     final response = await http.post(
       url,
       headers: <String, String>{
