@@ -22,7 +22,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
   LocationData? _currentLocation;
-  var _locationService = Location();
   bool _isSearchMode = false;
   Key _mapKey = ValueKey("InitialKey");
   TextEditingController searchController = TextEditingController();
@@ -33,31 +32,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
    String selectedCity = ''; // Pour stocker la ville sélectionnée
   int _selectedIndex = 0;
   final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
-  int _idUser = 0;
-  String _firstName = '';
-  String _lastName = '';
   String _usersName = '';
-  String _email = '';
   String _city = '';
-  String _bio = '';
-  String _siret = '';
-  String _companyName = '';
-  String _companyNumber = '';
-  int _idRole = 0;
+
   
  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _loadUserProfile();
     _tabController = TabController(length: 2, vsync: this);
     _tabController!.addListener(() {
       searchController.clear();
-      if (_tabController!.index == 1) { // index 1 correspond au deuxième onglet
-        _determinePosition();
-        
-      }
     });
-    _loadUserProfile();
   }
 
   Future<void> _loadUserProfile() async {
@@ -69,50 +56,40 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
       setState(() {
         //Mettez à jour votre état avec les informations de l'utilisateur
-        _idUser = user['idUser'] ?? 0;
-        _firstName = user['firstName'] ?? 'N/A';
-        _lastName = user['lastName'] ?? 'N/A';
         _usersName = user['usersName'] ?? 'N/A';
-        _email = user['email'] ?? 'N/A';
         _city = user['city'] ?? 'N/A';
-        _bio = user['bio'] ?? 'N/A';
-        _siret = user['siret'] ?? 'N/A';
-        _companyName = user['companyName'] ?? 'N/A';
-        _companyNumber = user['companyNumber'] ?? 'N/A';
-        _idRole = user['idRole'];
       });
     }
+    _determinePosition();
   }
 
-
+  //determine la localisation de la map à partir de la ville de l'user
   void _determinePosition() async {
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-
-    // Vérifiez si le service de localisation est activé.
-    serviceEnabled = await _locationService.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await _locationService.requestService();
-      if (!serviceEnabled) {
-        return;
+    final coordinates = await searchCity(_city);
+      if (coordinates != null) {
+        setState(() {
+          _currentLocation = LocationData.fromMap({
+            "latitude": coordinates.latitude,
+            "longitude": coordinates.longitude,
+          });
+          _currentMarker = Marker(
+            point: coordinates,
+            width: 80.0,
+            height: 80.0,
+            child: Icon(Icons.location_on, size: 50.0, color: Colors.red),
+          );
+          _isSearchMode = false;
+          // Mettre à jour la clé pour forcer la reconstruction de la carte
+          _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
+          _hasAnnonces = true;
+        });
+      } else {
+        setState(() {
+          _hasAnnonces = false; // Aucune annonce trouvée
+        });
       }
-    }
 
-    // Demandez la permission d'utiliser la localisation.
-    permissionGranted = await _locationService.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _locationService.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
 
-    // Obtenez la localisation actuelle.
-    _currentLocation = await _locationService.getLocation();
-
-    setState(() {
-      // Mettre à jour l'interface utilisateur avec la localisation actuelle.
-    });
   }
 
 
@@ -213,15 +190,38 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             itemCount: cities.length,
             itemBuilder: (BuildContext context, int index) {
               return ListTile(
-                title: Text(cities[index]),
-                onTap: () {
-                  setState(() {
-                    selectedCity = cities[index];
-                    searchController.text = selectedCity;
-                    cities.clear();
-                  });
-                },
-              );
+                    title: Text(cities[index]),
+                    onTap: () async {
+                      setState(() {
+                        selectedCity = cities[index];
+                        searchController.text = selectedCity;
+                        cities.clear();
+                      });
+                      final coordinates = await searchCity(searchController.text);
+                      if (coordinates != null) {
+                        setState(() {
+                          _currentLocation = LocationData.fromMap({
+                            "latitude": coordinates.latitude,
+                            "longitude": coordinates.longitude,
+                          });
+                          _currentMarker = Marker(
+                            point: coordinates,
+                            width: 80.0,
+                            height: 80.0,
+                            child: Icon(Icons.location_on, size: 50.0, color: Colors.red),
+                          );
+                          _isSearchMode = false;
+                          // Mettre à jour la clé pour forcer la reconstruction de la carte
+                          _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
+                          _hasAnnonces = true;
+                        });
+                      } else {
+                        setState(() {
+                          _hasAnnonces = false; // Aucune annonce trouvée
+                        });
+                      }
+                    },
+                  );
             },
           ),
         ),
@@ -263,44 +263,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
       ),
       Expanded(
-        child: FutureBuilder<List<Annonce>>(
-          future: apiAnnoncesVille.fetchAnnoncesVille(searchController.text.isEmpty ? "Montpellier" : searchController.text),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text("Error: ${snapshot.error}");
-            } else if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  Annonce annonce = snapshot.data![index];
-                  return GestureDetector(
-                    onTap: () => _showPopup(annonce),
-                    child: AnnonceTile(
-                      idAdvertisement: annonce.idAdvertisement ?? '',
-                      title: annonce.title ?? 'N/A',
-                      city: annonce.city ?? 'N/A',
-                      idPlant:'', 
-                      name: annonce.name ?? 'N/A',
-                      userName: '',
-                      description: annonce.description ?? 'N/A',
-                      startDate: annonce.startDate ?? 'N/A',
-                      endDate: annonce.endDate ?? 'N/A',
-                      imageUrl: 'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
-                      createdAt: '',
-                    ),
-                  );
-                },
-              );
-            } else {
-              setState(() {
-                          _hasAnnonces = false; // Aucune annonce trouvée
-                        });
-              return Text("No data");
-            }
-          },
-        ),
+        child: _showAnnonceList(context),
       ),
     ],
   );  
@@ -341,6 +304,32 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return null; // Renvoie null si aucune annonce n'est trouvée ou en cas d'erreur
   }
 
+  Widget _showAnnonceList(BuildContext context) {
+  // Utilisez un Container, ListView.builder, ou tout autre widget approprié ici
+    return ListView.builder(
+      itemCount: _currentAnnonces.length,
+      itemBuilder: (context, index) {
+        Annonce annonce = _currentAnnonces[index];
+        return GestureDetector(
+          onTap: () => _showPopup(annonce),
+          child: AnnonceTile(
+            idAdvertisement: annonce.idAdvertisement ?? '0',
+            title: annonce.title ?? 'N/A',
+            city: annonce.city ?? 'N/A',
+            idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
+            name: annonce.name ?? 'N/A',
+            userName: '', // Assurez-vous d'avoir la bonne valeur ici
+            description: annonce.description ?? 'N/A',
+            startDate: annonce.startDate ?? 'N/A',
+            endDate: annonce.endDate ?? 'N/A',
+            imageUrl: 'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
+            createdAt: '', // Assurez-vous d'avoir la bonne valeur ici
+          ),
+        );
+      },
+    );
+  }
+
   void _showAnnoncesModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -354,7 +343,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               return GestureDetector(
                 onTap: () => _showPopup(annonce), // Afficher le modal d'annonce lorsque l'élément est tapé
                 child: AnnonceTile(
-                  idAdvertisement: '',
+                  idAdvertisement: annonce.idAdvertisement ?? '0',
                   title: annonce.title ?? 'N/A',
                   city: annonce.city ?? 'N/A', 
                   idPlant:'', 
