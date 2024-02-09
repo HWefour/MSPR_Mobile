@@ -20,7 +20,7 @@ class _ProfilPageState extends State<ProfilPage>
   TabController? _tabController;
   int _selectedIndex = 4;
   final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
-  int _idUser = 0 ;
+  int _idUserLocal = 0 ;
   String _firstName = '';
   String _lastName = '';
   String _usersName = '';
@@ -49,7 +49,7 @@ class _ProfilPageState extends State<ProfilPage>
       // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
       setState(() {
         //Mettez à jour votre état avec les informations de l'utilisateur
-        _idUser = user['idUser'] ?? 0;
+        _idUserLocal = user['idUser'] ?? 0;
         _firstName = user['firstName'] ?? 'N/A';
         _lastName = user['lastName'] ?? 'N/A';
         _usersName = user['usersName'] ?? 'N/A';
@@ -115,7 +115,7 @@ class _ProfilPageState extends State<ProfilPage>
         // affichage des annonces de l'utilisateur
         Expanded(
           child: FutureBuilder<List<Annonce>>(
-            future: apiAnnoncesUser.fetchAnnoncesUser(_idUser.toString()),
+            future: apiAnnoncesUser.fetchAnnoncesUser(_idUserLocal.toString()),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return CircularProgressIndicator();
@@ -130,7 +130,7 @@ class _ProfilPageState extends State<ProfilPage>
                     return GestureDetector(
                       onTap: () => _showPopup(annonce),
                       child: AnnonceTile(
-                        idAdvertisement: annonce.idAdvertisement ?? 'N/A',
+                        idAdvertisement: annonce.idAdvertisement ?? '0',
                         title: annonce.title ?? 'N/A',
                         city: annonce.city ?? 'N/A',
                         idPlant: annonce.name ?? 'N/A',

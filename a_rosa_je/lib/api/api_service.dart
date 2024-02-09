@@ -73,8 +73,9 @@ class ApiAnnoncesUser {
 
 class ApiAnnoncesIdAdvertisement {
   Future<List<Annonce>> fetchAnnoncesIdAdvertisement(String idAdvertisement) async {
+    int idAdvertisementTmp = int.parse(idAdvertisement);
     final response = await http
-        .get(Uri.parse('http://localhost:1212/home/$idAdvertisement'));
+        .get(Uri.parse('http://localhost:1212/home/$idAdvertisementTmp'));
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);

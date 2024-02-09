@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
    String selectedCity = ''; // Pour stocker la ville sélectionnée
   int _selectedIndex = 0;
   final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
-  int _idUser = 0;
+  int _idUserLocal = 0;
   String _firstName = '';
   String _lastName = '';
   String _usersName = '';
@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
       setState(() {
         //Mettez à jour votre état avec les informations de l'utilisateur
-        _idUser = user['idUser'] ?? 0;
+        _idUserLocal = user['idUser'] ?? 0;
         _firstName = user['firstName'] ?? 'N/A';
         _lastName = user['lastName'] ?? 'N/A';
         _usersName = user['usersName'] ?? 'N/A';
@@ -278,7 +278,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   return GestureDetector(
                     onTap: () => _showPopup(annonce),
                     child: AnnonceTile(
-                      idAdvertisement: annonce.idAdvertisement ?? '',
+                      idAdvertisement: annonce.idAdvertisement ?? '0',
                       title: annonce.title ?? 'N/A',
                       city: annonce.city ?? 'N/A',
                       idPlant:'', 
@@ -354,7 +354,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               return GestureDetector(
                 onTap: () => _showPopup(annonce), // Afficher le modal d'annonce lorsque l'élément est tapé
                 child: AnnonceTile(
-                  idAdvertisement: '',
+                  idAdvertisement: annonce.idAdvertisement ?? '0',
                   title: annonce.title ?? 'N/A',
                   city: annonce.city ?? 'N/A', 
                   idPlant:'', 
