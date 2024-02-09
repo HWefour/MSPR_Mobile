@@ -22,7 +22,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
   LocationData? _currentLocation;
-  var _locationService = Location();
   bool _isSearchMode = false;
   Key _mapKey = ValueKey("InitialKey");
   TextEditingController searchController = TextEditingController();
@@ -33,17 +32,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
    String selectedCity = ''; // Pour stocker la ville sélectionnée
   int _selectedIndex = 0;
   final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
-  int _idUserLocal = 0;
-  String _firstName = '';
-  String _lastName = '';
   String _usersName = '';
-  String _email = '';
   String _city = '';
-  String _bio = '';
-  String _siret = '';
-  String _companyName = '';
-  String _companyNumber = '';
-  int _idRole = 0;
+
   
  @override
   void initState() {
@@ -69,50 +60,39 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
       setState(() {
         //Mettez à jour votre état avec les informations de l'utilisateur
-        _idUserLocal = user['idUser'] ?? 0;
-        _firstName = user['firstName'] ?? 'N/A';
-        _lastName = user['lastName'] ?? 'N/A';
         _usersName = user['usersName'] ?? 'N/A';
-        _email = user['email'] ?? 'N/A';
         _city = user['city'] ?? 'N/A';
-        _bio = user['bio'] ?? 'N/A';
-        _siret = user['siret'] ?? 'N/A';
-        _companyName = user['companyName'] ?? 'N/A';
-        _companyNumber = user['companyNumber'] ?? 'N/A';
-        _idRole = user['idRole'];
       });
     }
   }
 
-
+  //determine la localisation de la map à partir de la ville de l'user
   void _determinePosition() async {
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-
-    // Vérifiez si le service de localisation est activé.
-    serviceEnabled = await _locationService.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await _locationService.requestService();
-      if (!serviceEnabled) {
-        return;
+    final coordinates = await searchCity(_city);
+      if (coordinates != null) {
+        setState(() {
+          _currentLocation = LocationData.fromMap({
+            "latitude": coordinates.latitude,
+            "longitude": coordinates.longitude,
+          });
+          _currentMarker = Marker(
+            point: coordinates,
+            width: 80.0,
+            height: 80.0,
+            child: Icon(Icons.location_on, size: 50.0, color: Colors.red),
+          );
+          _isSearchMode = false;
+          // Mettre à jour la clé pour forcer la reconstruction de la carte
+          _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
+          _hasAnnonces = true;
+        });
+      } else {
+        setState(() {
+          _hasAnnonces = false; // Aucune annonce trouvée
+        });
       }
-    }
 
-    // Demandez la permission d'utiliser la localisation.
-    permissionGranted = await _locationService.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _locationService.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
 
-    // Obtenez la localisation actuelle.
-    _currentLocation = await _locationService.getLocation();
-
-    setState(() {
-      // Mettre à jour l'interface utilisateur avec la localisation actuelle.
-    });
   }
 
 
@@ -264,7 +244,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
       Expanded(
         child: FutureBuilder<List<Annonce>>(
-          future: apiAnnoncesVille.fetchAnnoncesVille(searchController.text.isEmpty ? "Montpellier" : searchController.text),
+          future: apiAnnoncesVille.fetchAnnoncesVille(searchController.text.isEmpty ? _city : searchController.text),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();

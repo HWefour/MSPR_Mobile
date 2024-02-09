@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:a_rosa_je/util/footer.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import '../util/annonce_popup_card.dart';
+import '../util/annonce_job_popup_card.dart';
 import '../api/api_service.dart';
 import '../util/annonce.dart';
 import 'create_annonce.dart';
@@ -58,12 +58,12 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
     super.dispose();
   }
 
-  //affiche le popup des annonces
+  //affiche le popup des annonces Jobs
   void _showPopup(Annonce annonce) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AnnoncePopupCard(annonce: annonce);
+        return AnnonceJobPopupCard(annonce: annonce);
       },
     );
   }

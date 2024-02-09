@@ -7,15 +7,15 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import '../util/annonce.dart';
 
-class AnnoncePopupCard extends StatefulWidget {
+class AnnonceJobPopupCard extends StatefulWidget {
   final Annonce annonce;
-  AnnoncePopupCard({Key? key, required this.annonce}) : super(key: key);
+  AnnonceJobPopupCard({Key? key, required this.annonce}) : super(key: key);
 
   @override
   _AnnoncePopupCardState createState() => _AnnoncePopupCardState();
 }
 
-class _AnnoncePopupCardState extends State<AnnoncePopupCard> 
+class _AnnoncePopupCardState extends State<AnnonceJobPopupCard> 
    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   
   DateTime creationDateJob = DateTime.now(); // Ajout de la date de création
@@ -167,51 +167,51 @@ class _AnnoncePopupCardState extends State<AnnoncePopupCard>
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-                child: Visibility (
-                  visible: _idUser.toString() != widget.annonce.idUser,
-                    child: ElevatedButton(
-                    onPressed: () async {
-                      //ici la logique pour créer un job et rediriger vers la page annonce
-                      String formattedDateJob = DateFormat('dd/MM/yyyy').format(creationDateJob);
-                      //Apel à l'API pour créer le job
-                      final response = await ApiCreateJob.createJob(
-                        dateDuJour: formattedDateJob, 
-                        idUserAnnounceur: int.parse(widget.annonce.idUser ??'0'), 
-                        idAdvertisement: int.parse(widget.annonce.idAdvertisement ??'0'), 
-                        idUserGardien: _idUser,// id local de l'utilisateur
-                        );
+            // Align(
+            //   alignment: Alignment.bottomCenter,
+            //   child: Padding(
+            //     padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            //     child: Visibility (
+            //       visible: _idUser.toString() != widget.annonce.idUser,
+            //         child: ElevatedButton(
+            //         onPressed: () async {
+            //           //ici la logique pour créer un job et rediriger vers la page annonce
+            //           String formattedDateJob = DateFormat('dd/MM/yyyy').format(creationDateJob);
+            //           //Apel à l'API pour créer le job
+            //           final response = await ApiCreateJob.createJob(
+            //             dateDuJour: formattedDateJob, 
+            //             idUserAnnounceur: int.parse(widget.annonce.idUser ??'0'), 
+            //             idAdvertisement: int.parse(widget.annonce.idAdvertisement ??'0'), 
+            //             idUserGardien: _idUser,// id local de l'utilisateur
+            //             );
 
-                        // Vérifier la réponse de l'API
-                        if (response.statusCode == 200 || response.statusCode == 201 ) {
-                          // Gestion de la réponse réussie
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Job créé avec succès')),
-                          );
-                          // Retour à la page d'accueil en retirant toutes les routes jusqu'à celle-ci
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (context) => GestionAnnoncesPage()), // Remplacez HomePage() par votre widget de page d'accueil
-                            (Route<dynamic> route) => false,
-                          );
-                        } else {
-                          // Gestion de l'échec de la réponse
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Erreur lors de la création du job ${response.statusCode}')),
-                          );
-                        }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 36), // makes it stretch
-                    ),
-                    child: Text('Contacter ${widget.annonce.usersName}'),
-                  ),
-                ),
+            //             // Vérifier la réponse de l'API
+            //             if (response.statusCode == 200 || response.statusCode == 201 ) {
+            //               // Gestion de la réponse réussie
+            //               ScaffoldMessenger.of(context).showSnackBar(
+            //                 SnackBar(content: Text('Job créé avec succès')),
+            //               );
+            //               // Retour à la page d'accueil en retirant toutes les routes jusqu'à celle-ci
+            //               Navigator.of(context).pushAndRemoveUntil(
+            //                 MaterialPageRoute(builder: (context) => GestionAnnoncesPage()), // Remplacez HomePage() par votre widget de page d'accueil
+            //                 (Route<dynamic> route) => false,
+            //               );
+            //             } else {
+            //               // Gestion de l'échec de la réponse
+            //               ScaffoldMessenger.of(context).showSnackBar(
+            //                 SnackBar(content: Text('Erreur lors de la création du job ${response.statusCode}')),
+            //               );
+            //             }
+            //         },
+            //         style: ElevatedButton.styleFrom(
+            //           minimumSize: Size(double.infinity, 36), // makes it stretch
+            //         ),
+            //         child: Text('Contacter ${widget.annonce.usersName}'),
+            //       ),
+            //     ),
                 
-              ),
-            ),
+            //   ),
+            // ),
           ],
         ),
       ),
