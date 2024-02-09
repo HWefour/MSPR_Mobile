@@ -23,14 +23,15 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final ApiService apiService = ApiService();
+  late UserData userData;
+
   TextEditingController nomController = TextEditingController();
   TextEditingController prenomController = TextEditingController();
   TextEditingController pseudonymeController = TextEditingController();
   TextEditingController villeController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController bioController = TextEditingController();
-
-  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -39,25 +40,28 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> fetchData() async {
-    try {
-      UserData userData = await apiService.getUserData();
-      setState(() {
-        nomController.text = userData.firstName;
-        prenomController.text = userData.lastName;
-        pseudonymeController.text = userData.userName;
-        villeController.text = userData.city;
-        emailController.text = userData.email;
-        bioController.text = userData.bio;
-      });
-    } catch (e) {
-      print('Erreur lors de la récupération des données utilisateur: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Échec de la récupération des données'),
-        ),
-      );
-    }
+  try {
+    // Suppose que vous avez l'ID de l'utilisateur stocké quelque part
+    String userId = "votre_id_utilisateur";
+    userData = await apiService.getUserData(userId);
+    setState(() {
+      nomController.text = userData.firstName;
+      prenomController.text = userData.lastName;
+      pseudonymeController.text = userData.userName;
+      villeController.text = userData.city;
+      emailController.text = userData.email;
+      bioController.text = userData.bio;
+    });
+  } catch (e) {
+    print('Erreur lors de la récupération des données utilisateur: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Échec de la récupération des données'),
+      ),
+    );
   }
+}
+
 
   Future<void> saveChanges() async {
     UserData updatedUserData = UserData(

@@ -44,24 +44,39 @@ class ApiService {
   }
 
   // Méthode pour récupérer les données utilisateur
- Future<UserData> getUserData() async {
-    final response =
-        await http.get(Uri.parse('http://localhost:1212/auth/login/'));
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      return UserData(
-        firstName: jsonData['firstName'],
-        lastName: jsonData['lastName'],
-        userName: jsonData['userName'],
-        city: jsonData['city'],
-        email: jsonData['email'],
-        bio: jsonData['bio'],
-      );
-    } else {
-      throw Exception('Échec de la récupération des données');
-    }
+//  Future<UserData> getUserData() async {
+//     final response =
+//         await http.get(Uri.parse('http://localhost:1212/auth/login/'));
+//     if (response.statusCode == 200) {
+//       final jsonData = json.decode(response.body);
+//       return UserData(
+//         firstName: jsonData['firstName'],
+//         lastName: jsonData['lastName'],
+//         userName: jsonData['userName'],
+//         city: jsonData['city'],
+//         email: jsonData['email'],
+//         bio: jsonData['bio'],
+//       );
+//     } else {
+//       throw Exception('Échec de la récupération des données');
+//     }
+//   }
+Future<UserData> getUserData(String userId) async {
+  final response = await http.get(Uri.parse('http://localhost:1212/user/$userId'));
+  if (response.statusCode == 200) {
+    final jsonData = json.decode(response.body);
+    return UserData(
+      firstName: jsonData['firstName'],
+      lastName: jsonData['lastName'],
+      userName: jsonData['userName'],
+      city: jsonData['city'],
+      email: jsonData['email'],
+      bio: jsonData['bio'],
+    );
+  } else {
+    throw Exception('Failed to load user data from API');
   }
-
+}
   // Méthode pour mettre à jour les données utilisateur
 Future<void> updateUserData(UserData userData) async {
     final url = Uri.parse('http://localhost:1212/auth/updateUser/');

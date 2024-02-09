@@ -9,6 +9,7 @@ import '../util/annonce.dart';
 import 'create_annonce.dart';
 import 'gestion_annonces.dart';
 import 'home.dart';
+import 'parametre_menu.dart';
 
 class ProfilPage extends StatefulWidget {
   @override
@@ -197,6 +198,18 @@ class _ProfilPageState extends State<ProfilPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+            appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              // Mettez ici la logique pour accéder à la page des paramètres
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ParametreMenu()));
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
           SizedBox(height: 10), // Espace au-dessus du Container

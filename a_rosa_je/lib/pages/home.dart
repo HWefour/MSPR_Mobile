@@ -268,7 +268,28 @@ class _HomePageState extends State<HomePage>
         ),
       ),
       Expanded(
-        child: _showAnnonceList(context),
+        child: ListView.builder(
+      itemCount: _currentAnnonces.length,
+      itemBuilder: (context, index) {
+        Annonce annonce = _currentAnnonces[index];
+        return GestureDetector(
+          onTap: () => _showPopup(annonce),
+          child: AnnonceTile(
+            idAdvertisement: annonce.idAdvertisement ?? '0',
+            title: annonce.title ?? 'N/A',
+            city: annonce.city ?? 'N/A',
+            idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
+            name: annonce.name ?? 'N/A',
+            userName: '', // Assurez-vous d'avoir la bonne valeur ici
+            description: annonce.description ?? 'N/A',
+            startDate: annonce.startDate ?? 'N/A',
+            endDate: annonce.endDate ?? 'N/A',
+            imageUrl: 'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
+            createdAt: '', // Assurez-vous d'avoir la bonne valeur ici
+          ),
+        );
+      },
+    ),
       ),
     ],
   );  
@@ -307,32 +328,6 @@ class _HomePageState extends State<HomePage>
           "Erreur lors de la récupération des annonces ou de la localisation : $e");
     }
     return null;
-  }
-
-  Widget _showAnnonceList(BuildContext context) {
-  // Utilisez un Container, ListView.builder, ou tout autre widget approprié ici
-    return ListView.builder(
-      itemCount: _currentAnnonces.length,
-      itemBuilder: (context, index) {
-        Annonce annonce = _currentAnnonces[index];
-        return GestureDetector(
-          onTap: () => _showPopup(annonce),
-          child: AnnonceTile(
-            idAdvertisement: annonce.idAdvertisement ?? '0',
-            title: annonce.title ?? 'N/A',
-            city: annonce.city ?? 'N/A',
-            idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
-            name: annonce.name ?? 'N/A',
-            userName: '', // Assurez-vous d'avoir la bonne valeur ici
-            description: annonce.description ?? 'N/A',
-            startDate: annonce.startDate ?? 'N/A',
-            endDate: annonce.endDate ?? 'N/A',
-            imageUrl: 'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
-            createdAt: '', // Assurez-vous d'avoir la bonne valeur ici
-          ),
-        );
-      },
-    );
   }
 
   Widget _showAnnonceList(BuildContext context) {
