@@ -5,10 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'login_page.dart';
 import 'profil_info.dart';
-
-void main() {
-  runApp(ParametreMenu());
-}
+import 'home.dart';
 
 class ParametreMenu extends StatelessWidget {
   @override
@@ -26,19 +23,27 @@ class ParametreMenu extends StatelessWidget {
 class MySettingsPage extends StatelessWidget {
   Future<void> deleteUserAccount(BuildContext context) async {
     try {
-      final response = await http.delete(Uri.parse('http://localhost:1212/settings/delete/:id'));
+      var box = await Hive.openBox('userBox');
+      var userJson = box.get('userDetails');
+      if (userJson != null) {
+        Map<String, dynamic> user = jsonDecode(userJson);
+        var userId = user['idUser']; // Assurez-vous d'avoir l'ID de l'utilisateur
+        final response = await http.delete(Uri.parse('http://localhost:1212/settings/delete/$userId'));
+        
+        if (response.statusCode == 200) {
+          // Suppression réussie, effacer les données utilisateur locales
+          await box.delete('userDetails');
 
-      if (response.statusCode == 200) {
-        // Si la suppression réussit, naviguer vers la page de connexion
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-          (Route<dynamic> route) => false,
-        );
-      } else {
-        // Gérer l'échec de la suppression
-        // Afficher un message d'erreur ou prendre d'autres mesures appropriées
-        print('Échec de la suppression du compte');
+          // Naviguer vers la page de connexion
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+            (Route<dynamic> route) => false,
+          );
+        } else {
+          // Gérer l'échec de la suppression
+          print('Échec de la suppression du compte');
+        }
       }
     } catch (e) {
       // Gérer les erreurs de connexion ou d'autres erreurs possibles
@@ -46,19 +51,21 @@ class MySettingsPage extends StatelessWidget {
     }
   }
 
-
-  Future<void> _loadUserProfile() async {
-    var box = await Hive.openBox('userBox');
-    var userJson = box.get('userDetails');
-    if (userJson != null) {
-      // Assume userJson is a JSON string that needs to be decoded
-      Map<String, dynamic> user = jsonDecode(userJson);
-      // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
-      // setState(() {
-      //   //Mettez à jour votre état avec les informations de l'utilisateur
-      //   _usersName = user['usersName'] ?? 'N/A';
-      //   _city = user['city'] ?? 'N/A';
-      // });
+  Future<void> logout(BuildContext context) async {
+    try {
+      var box = await Hive.openBox('userBox');
+      // Effacer les données utilisateur locales
+      await box.delete('userDetails');
+      
+      // Réinitialiser l'état d'authentification et naviguer vers la page de connexion
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      // Gérer les erreurs possibles
+      print('Erreur lors de la déconnexion: $e');
     }
   }
 
@@ -116,11 +123,7 @@ class MySettingsPage extends StatelessWidget {
             ListTile(
               title: Text('Se déconnecter'),
               onTap: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                  (Route<dynamic> route) => false,
-                );
+                logout(context); // Appeler la fonction logout pour déconnecter l'utilisateur
               },
             ),
             ListTile(
