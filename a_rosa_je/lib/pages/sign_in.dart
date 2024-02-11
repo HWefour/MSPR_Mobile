@@ -131,9 +131,14 @@ if (response.statusCode == 201) {
     }
   }
 } else {
+  Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text('Échec de la création de l\'utilisateur'),
+      
+      content: Text('Votre compte utilisateur est bien créer vous pouvez vous connecter'),
     ),
   );
 }
@@ -141,21 +146,22 @@ if (response.statusCode == 201) {
   }
 
   Future<void> fetchCities(String cityName) async {
-    final response = await http.get(Uri.parse(
-        'https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      List<String> cityNames = [];
-      for (var cityData in jsonData) {
-        cityNames.add(cityData['nom']);
-      }
-      setState(() {
-        cities = cityNames;
-      });
-    } else {
-      throw Exception('Échec de la récupération des données');
+  final response = await http.get(Uri.parse(
+      'https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
+  if (response.statusCode == 200) {
+    final jsonData = json.decode(response.body);
+    List<String> cityNames = [];
+    for (var cityData in jsonData) {
+      cityNames.add(cityData['nom']);
     }
+    setState(() {
+      cities = cityNames;
+    });
+  } else {
+    throw Exception('Échec de la récupération des données');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

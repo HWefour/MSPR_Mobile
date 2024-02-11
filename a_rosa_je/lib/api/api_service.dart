@@ -1,7 +1,8 @@
-import 'package:a_rosa_je/pages/profil_info.dart';
 import 'package:a_rosa_je/util/annonce.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import '../pages/profil_info.dart';
 
 
 //ip machine gros ordi lucas 192.168.56.1
@@ -27,7 +28,7 @@ class ApiService {
         "usersName": userName,
         "email": email,
         "city": city,
-        "bio": "", // Vous pouvez modifier cela si nécessaire
+        "bio": "bio", // Vous pouvez modifier cela si nécessaire
         "password": password,
         "idRole": idRole, // Vous pouvez modifier cela si nécessaire
       }),
@@ -42,57 +43,27 @@ class ApiService {
       return {'success': false, 'error': errorMessage};
     }
   }
-  Future<void> deleteUser(String userId) async {
-    try {
-      
-      final response = await http.delete(Uri.parse('http://localhost:1212/settings/delete/$userId'));
+  Future<UserData> getUserData(String userId) async {
+    final url = Uri.parse('http://localhost:1212/profile/$userId');
+    final response = await http.get(url);
 
-      if (response.statusCode == 200) {
-        print('Utilisateur supprimé avec succès');
-      } else {
-        print('Échec de la suppression de l\'utilisateur');
-      }
-    } catch (e) {
-      print('Erreur lors de la suppression de l\'utilisateur: $e');
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      return UserData(
+        firstName: jsonData['firstName'],
+        lastName: jsonData['lastName'],
+        userName: jsonData['userName'],
+        city: jsonData['city'],
+        email: jsonData['email'],
+        bio: jsonData['bio'],
+      );
+    } else {
+      throw Exception('Failed to load user data');
     }
   }
-  // Méthode pour récupérer les données utilisateur
-//  Future<UserData> getUserData() async {
-//     final response =
-//         await http.get(Uri.parse('http://localhost:1212/auth/login/'));
-//     if (response.statusCode == 200) {
-//       final jsonData = json.decode(response.body);
-//       return UserData(
-//         firstName: jsonData['firstName'],
-//         lastName: jsonData['lastName'],
-//         userName: jsonData['userName'],
-//         city: jsonData['city'],
-//         email: jsonData['email'],
-//         bio: jsonData['bio'],
-//       );
-//     } else {
-//       throw Exception('Échec de la récupération des données');
-//     }
-//   }
-Future<UserData> getUserData(String userId) async {
-  final response = await http.get(Uri.parse('http://localhost:1212/user/$userId'));
-  if (response.statusCode == 200) {
-    final jsonData = json.decode(response.body);
-    return UserData(
-      firstName: jsonData['firstName'],
-      lastName: jsonData['lastName'],
-      userName: jsonData['userName'],
-      city: jsonData['city'],
-      email: jsonData['email'],
-      bio: jsonData['bio'],
-    );
-  } else {
-    throw Exception('Failed to load user data from API');
-  }
-}
-  // Méthode pour mettre à jour les données utilisateur
-Future<void> updateUserData(UserData userData) async {
-    final url = Uri.parse('http://localhost:1212/auth/updateUser/');
+
+  Future<void> updateUserData(UserData userData) async {
+    final url = Uri.parse('http://localhost:1212/profile/$userData');
     final response = await http.put(
       url,
       headers: <String, String>{
@@ -107,11 +78,32 @@ Future<void> updateUserData(UserData userData) async {
         'bio': userData.bio,
       }),
     );
+
     if (response.statusCode != 200) {
-      throw Exception('Échec de la mise à jour des données utilisateur');
+      throw Exception('Failed to update user data');
     }
   }
+
 }
+
+class UserData {
+  final String firstName;
+  final String lastName;
+  final String userName;
+  final String city;
+  final String email;
+  final String bio;
+
+  UserData({
+    required this.firstName,
+    required this.lastName,
+    required this.userName,
+    required this.city,
+    required this.email,
+    required this.bio,
+  });
+}
+
 
 class ApiAnnoncesVille {
   Future<List<Annonce>> fetchAnnoncesVille(String city) async {

@@ -1,22 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../api/api_service.dart';
-import 'home.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      home: SettingsPage(),
-    );
-  }
-}
+import 'parametre_menu.dart'; // Importez votre page ParametreMenu pour la navigation
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -24,77 +10,72 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final ApiService apiService = ApiService();
-  late UserData userData;
+  String _usersName = '';
+  String _city = '';
+  String _email = '';
+  String _bio = '';
+  List<String> cities = [];
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
-  TextEditingController nomController = TextEditingController();
-  TextEditingController prenomController = TextEditingController();
-  TextEditingController pseudonymeController = TextEditingController();
-  TextEditingController villeController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController bioController = TextEditingController();
+  // Fonction pour récupérer les données de l'utilisateur depuis le stockage
+  Future<void> _loadUserProfile() async {
+    var box = await Hive.openBox('userBox');
+    var userJson = box.get('userDetails');
+    if (userJson != null) {
+      Map<String, dynamic> user = jsonDecode(userJson);
+      setState(() {
+        _usersName = user['usersName'] ?? 'N/A';
+        _city = user['city'] ?? 'N/A';
+        _email = user['email'] ?? 'N/A';
+        _bio = user['bio'] ?? 'N/A';
+        // Mettre à jour les contrôleurs des champs de texte
+        _userNameController.text = _usersName;
+        _cityController.text = _city;
+        _emailController.text = _email;
+        _bioController.text = _bio;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+    _loadUserProfile();
   }
 
-  Future<void> fetchData() async {
-  try {
-    // Suppose que vous avez l'ID de l'utilisateur stocké quelque part
-    String userId = "votre_id_utilisateur";
-    userData = await apiService.getUserData(userId);
-    setState(() {
-      nomController.text = userData.firstName;
-      prenomController.text = userData.lastName;
-      pseudonymeController.text = userData.userName;
-      villeController.text = userData.city;
-      emailController.text = userData.email;
-      bioController.text = userData.bio;
-    });
-  } catch (e) {
-    print('Erreur lors de la récupération des données utilisateur: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Échec de la récupération des données'),
-      ),
-    );
+  // Fonction pour enregistrer les modifications
+Future<void> _saveChanges() async {
+  var box = await Hive.openBox('userBox');
+  var userJson = box.get('userDetails');
+  if (userJson != null) {
+    Map<String, dynamic> user = jsonDecode(userJson);
+    var userId = user['idUser'];
+    var updatedUserData = {
+      'usersName': _userNameController.text,
+      'city': _cityController.text,
+      'email': _emailController.text,
+      'bio': _bioController.text,
+    };
+    final response = await http.put(Uri.parse('http://localhost:1212/settings/update/$userId'), body: jsonEncode(updatedUserData), headers: {"Content-Type": "application/json"});
+    if (response.statusCode == 200) {
+      // Afficher un message pour indiquer que les modifications ont été enregistrées
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Modifications enregistrées avec succès')));
+      // Recharger les données de l'utilisateur
+      await _loadUserProfile();
+    } else {
+      // Gérer l'échec de la sauvegarde
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Échec de la sauvegarde des modifications')));
+    }
   }
 }
 
-
-  Future<void> saveChanges() async {
-    UserData updatedUserData = UserData(
-      firstName: nomController.text,
-      lastName: prenomController.text,
-      userName: pseudonymeController.text,
-      city: villeController.text,
-      email: emailController.text,
-      bio: bioController.text,
-    );
-    try {
-      await apiService.updateUserData(updatedUserData);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Modifications enregistrées avec succès'),
-        ),
-      );
-    } catch (e) {
-      print('Erreur lors de la sauvegarde des modifications: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Échec de la sauvegarde des modifications'),
-        ),
-      );
-    }
-  }
-
-  Future<void> fetchCities(String cityName) async {
-    final response = await http.get(
-      Uri.parse(
-          'https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'),
-    );
+  // Fonction pour récupérer les données de la ville depuis l'API
+  Future<void> _fetchCities(String cityName) async {
+    final response = await http.get(Uri.parse(
+        'https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       List<String> cityNames = [];
@@ -102,7 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
         cityNames.add(cityData['nom']);
       }
       setState(() {
-        villeController.text = cityNames.isNotEmpty ? cityNames[0] : '';
+        cities = cityNames;
       });
     } else {
       throw Exception('Échec de la récupération des données');
@@ -113,56 +94,87 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Informations du compte'),
+        title: Text('Informations du profil'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: ListView(
           children: <Widget>[
-            TextField(
-              controller: nomController,
-              decoration: InputDecoration(
-                labelText: 'Nom',
-              ),
+            Text(
+              'Nom d\'utilisateur : $_usersName',
+              style: TextStyle(fontSize: 18.0),
             ),
+            SizedBox(height: 16.0),
             TextField(
-              controller: prenomController,
-              decoration: InputDecoration(
-                labelText: 'Prénom',
-              ),
-            ),
-            TextField(
-              controller: pseudonymeController,
+              controller: _userNameController,
               decoration: InputDecoration(
                 labelText: 'Pseudonyme',
               ),
             ),
-            TextField(
-              controller: villeController,
-              decoration: InputDecoration(
-                labelText: 'Ville de résidence',
-              ),
-              onChanged: (cityName) {
-                if (cityName.isNotEmpty) {
-                  fetchCities(cityName);
-                }
-              },
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ville',
+                  style: TextStyle(color: Colors.black),
+                ),
+                SizedBox(height: 8.0),
+                TextField(
+                  controller: _cityController,
+                  onChanged: (cityName) {
+                    if (cityName.isNotEmpty) {
+                      _fetchCities(cityName);
+                    }
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                if (cities.isNotEmpty)
+                  Container(
+                    height: 100.0,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: ListView.builder(
+                      itemCount: cities.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          title: Text(cities[index]),
+                          onTap: () {
+                            setState(() {
+                              _cityController.text = cities[index];
+                              cities.clear();
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+              ],
             ),
             TextField(
-              controller: emailController,
+              controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
               ),
             ),
             TextField(
-              controller: bioController,
+              controller: _bioController,
               decoration: InputDecoration(
                 labelText: 'Bio',
               ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: saveChanges,
+              onPressed: _saveChanges,
               child: Text('Appliquer mes changements'),
             ),
           ],
@@ -170,22 +182,4 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-}
-
-class UserData {
-  final String firstName;
-  final String lastName;
-  final String userName;
-  final String city;
-  final String email;
-  final String bio;
-
-  UserData({
-    required this.firstName,
-    required this.lastName,
-    required this.userName,
-    required this.city,
-    required this.email,
-    required this.bio,
-  });
 }
