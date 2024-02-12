@@ -28,17 +28,9 @@ class _CreateAnnonceState extends State<CreateAnnonce>
   TextEditingController plantSearchController = TextEditingController();
   List<Map<String, dynamic>> plants = [];
   int _idUserLocal = 0;
-  String _firstName = '';
-  String _lastName = '';
-  String _usersName = '';
-  String _email = '';
   String _city = '';
-  String _bio = '';
-  String _siret = '';
-  String _companyName = '';
-  String _companyNumber = '';
-  int _idRole = 0;
   List<XFile>? imageFiles = [];
+  File? _image;
 
    @override
   void initState() {
@@ -57,16 +49,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
       setState(() {
         //Mettez à jour votre état avec les informations de l'utilisateur
         _idUserLocal = user['idUser'] ?? 0;
-        _firstName = user['firstName'] ?? 'N/A';
-        _lastName = user['lastName'] ?? 'N/A';
-        _usersName = user['usersName'] ?? 'N/A';
-        _email = user['email'] ?? 'N/A';
         _city = user['city'] ?? 'N/A';
-        _bio = user['bio'] ?? 'N/A';
-        _siret = user['siret'] ?? 'N/A';
-        _companyName = user['companyName'] ?? 'N/A';
-        _companyNumber = user['companyNumber'] ?? 'N/A';
-        _idRole = user['idRole'];
       });
     }
   }
@@ -138,6 +121,40 @@ class _CreateAnnonceState extends State<CreateAnnonce>
     }
   }
 
+  Future<void> _getImageAndUpload() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      await _uploadImage();
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    if (_image == null) return;
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('http://localhost:1212/images/upload'));
+    request.files.add(await http.MultipartFile.fromPath('image', _image!.path));
+    request.fields['idAdvertisement'] =
+        'YOUR_ADVERTISEMENT_ID'; // Replace with your advertisement ID
+
+    try {
+      var response = await request.send();
+      if (response.statusCode == 201) {
+        // Image uploaded successfully
+        print('Image uploaded successfully');
+      } else {
+        // Error uploading image
+        print('Error uploading image. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Exception while uploading image
+      print('Exception uploading image: $e');
+    }
+  }
 
   //api pour chercher une plante
   Future<void> fetchNamePlant(String namePlant) async {
@@ -363,6 +380,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
               Center(
                 child: ElevatedButton(
                   onPressed: () async {
+                    
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
                       // Conversion des dates au format String dd/MM/yyyy
@@ -380,7 +398,8 @@ class _CreateAnnonceState extends State<CreateAnnonce>
                         startDate: formattedStartDate,
                         endDate: formattedEndDate,
                       );
-                      
+                      //ajout de l'image
+                      _getImageAndUpload();
                       // Vérifier la réponse de l'API
                       if (response.statusCode == 200 || response.statusCode == 201 ) {
                         // Gestion de la réponse réussie

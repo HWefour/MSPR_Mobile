@@ -304,7 +304,7 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
                     height:
                         10), // Espace entre le nom de l'utilisateur et la biographie
                 Text(
-                  'Mes annonces et gardiennage en cours',
+                  'Mes annonces et gardiennages en cours',
                   textAlign: TextAlign.center,
                 ),
               ],
