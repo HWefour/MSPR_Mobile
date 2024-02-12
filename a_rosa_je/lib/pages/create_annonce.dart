@@ -121,25 +121,24 @@ class _CreateAnnonceState extends State<CreateAnnonce>
     }
   }
 
-  Future<void> _getImageAndUpload() async {
+  Future<void> _getImageAndUpload(int idAnnonce) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
-      await _uploadImage();
+      await _uploadImage(idAnnonce);
     }
   }
 
-  Future<void> _uploadImage() async {
+  Future<void> _uploadImage(int idAnnonce) async {
     if (_image == null) return;
 
-    var request = http.MultipartRequest(
+    dynamic request = http.MultipartRequest(
         'POST', Uri.parse('http://localhost:1212/images/upload'));
     request.files.add(await http.MultipartFile.fromPath('image', _image!.path));
-    request.fields['idAdvertisement'] =
-        'YOUR_ADVERTISEMENT_ID'; // Replace with your advertisement ID
+    request.fields['idAdvertisement'] = idAnnonce; // Replace with your advertisement ID
 
     try {
       var response = await request.send();
@@ -398,11 +397,27 @@ class _CreateAnnonceState extends State<CreateAnnonce>
                         startDate: formattedStartDate,
                         endDate: formattedEndDate,
                       );
-                      //ajout de l'image
-                      _getImageAndUpload();
                       // Vérifier la réponse de l'API
                       if (response.statusCode == 200 || response.statusCode == 201 ) {
                         // Gestion de la réponse réussie
+                        // Convertissez la réponse en un objet pour récupérer l'ID
+                        final responseData = json.decode(response.body);
+
+                        int idOfCreatedAd;
+
+// Vérifiez si la réponse est une liste
+                        if (responseData is List) {
+                          // Prenez le premier élément de la liste comme ID de l'annonce créée
+                          idOfCreatedAd = responseData[0];
+                          //ajout de l'image
+                          await _getImageAndUpload(idOfCreatedAd); // Passez l'ID à la méthode d'upload
+                          print('ID of the created ad: $idOfCreatedAd');
+                          
+                        } else {
+                          print(
+                              'Le format de la réponse n\'est pas celui attendu.');
+                        }
+                        
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Annonce créée avec succès')),
                         );
