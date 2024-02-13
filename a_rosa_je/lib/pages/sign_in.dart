@@ -1,5 +1,6 @@
 import 'package:a_rosa_je/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../api/api_service.dart';
@@ -34,6 +35,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   bool isChecked = false;
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
 
   // Validation de l'email
   bool isEmailValid(String email) {
@@ -90,7 +92,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       return;
     }
 
-final url = Uri.parse('http://localhost:1212/auth/signup');
+final url = Uri.parse('$baseUrl/auth/signup');
 final response = await http.post(
   url,
   headers: <String, String>{

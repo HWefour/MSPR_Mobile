@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
@@ -31,6 +32,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
   String _city = '';
   List<XFile>? imageFiles = [];
   File? _image;
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
 
    @override
   void initState() {
@@ -136,7 +138,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
     if (_image == null) return;
 
     dynamic request = http.MultipartRequest(
-        'POST', Uri.parse('http://localhost:1212/images/upload'));
+        'POST', Uri.parse('$baseUrl/images/upload'));
     request.files.add(await http.MultipartFile.fromPath('image', _image!.path));
     request.fields['idAdvertisement'] = idAnnonce; // Replace with your advertisement ID
 
@@ -158,7 +160,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
   //api pour chercher une plante
   Future<void> fetchNamePlant(String namePlant) async {
     final response = await http.get(
-      Uri.parse('http://localhost:1212/plant/'),
+      Uri.parse('$baseUrl/plant/'),
     );
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);

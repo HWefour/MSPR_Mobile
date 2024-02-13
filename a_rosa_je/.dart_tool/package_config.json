@@ -189,9 +189,15 @@
     },
     {
       "name": "flutter",
-      "rootUri": "file:///E:/Dev/flutter/packages/flutter",
+      "rootUri": "file:///D:/flutter/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "flutter_dotenv",
+      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_dotenv-5.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "flutter_lints",
@@ -219,13 +225,13 @@
     },
     {
       "name": "flutter_test",
-      "rootUri": "file:///E:/Dev/flutter/packages/flutter_test",
+      "rootUri": "file:///D:/flutter/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "flutter_web_plugins",
-      "rootUri": "file:///E:/Dev/flutter/packages/flutter_web_plugins",
+      "rootUri": "file:///D:/flutter/packages/flutter_web_plugins",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -549,7 +555,7 @@
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///E:/Dev/flutter/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///D:/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -704,7 +710,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-02-12T08:36:49.255041Z",
+  "generated": "2024-02-13T08:38:27.347567Z",
   "generator": "pub",
   "generatorVersion": "3.2.3"
 }
