@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
@@ -28,17 +29,10 @@ class _CreateAnnonceState extends State<CreateAnnonce>
   TextEditingController plantSearchController = TextEditingController();
   List<Map<String, dynamic>> plants = [];
   int _idUserLocal = 0;
-  String _firstName = '';
-  String _lastName = '';
-  String _usersName = '';
-  String _email = '';
   String _city = '';
-  String _bio = '';
-  String _siret = '';
-  String _companyName = '';
-  String _companyNumber = '';
-  int _idRole = 0;
   List<XFile>? imageFiles = [];
+  File? _image;
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
 
    @override
   void initState() {
@@ -57,16 +51,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
       setState(() {
         //Mettez à jour votre état avec les informations de l'utilisateur
         _idUserLocal = user['idUser'] ?? 0;
-        _firstName = user['firstName'] ?? 'N/A';
-        _lastName = user['lastName'] ?? 'N/A';
-        _usersName = user['usersName'] ?? 'N/A';
-        _email = user['email'] ?? 'N/A';
         _city = user['city'] ?? 'N/A';
-        _bio = user['bio'] ?? 'N/A';
-        _siret = user['siret'] ?? 'N/A';
-        _companyName = user['companyName'] ?? 'N/A';
-        _companyNumber = user['companyNumber'] ?? 'N/A';
-        _idRole = user['idRole'];
       });
     }
   }
@@ -138,11 +123,47 @@ class _CreateAnnonceState extends State<CreateAnnonce>
     }
   }
 
+  // Future<void> _getImageAndUpload(int idAnnonce) async {
+  //   final picker = ImagePicker();
+  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _image = File(pickedFile.path);
+  //     });
+  //     await _uploadImage(idAnnonce);
+  //   }
+  // }
+
+  Future<void> _uploadImage(String filePath, int idAnnonce) async {
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/images/upload'));
+    request.files.add(await http.MultipartFile.fromPath('image', filePath));
+    request.fields['idAdvertisement'] = idAnnonce.toString();
+
+    try {
+      var response = await request.send();
+      if (response.statusCode == 201) {
+        print('Image uploaded successfully');
+      } else {
+        print('Error uploading image. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Exception uploading image: $e');
+    }
+  }
+
+  Future<void> _uploadAllImages(int idAnnonce) async {
+    if (imageFiles != null) {
+      for (XFile file in imageFiles!) {
+        await _uploadImage(file.path, idAnnonce);
+      }
+    }
+  }
+
 
   //api pour chercher une plante
   Future<void> fetchNamePlant(String namePlant) async {
     final response = await http.get(
-      Uri.parse('http://localhost:1212/plant/'),
+      Uri.parse('$baseUrl/plant/'),
     );
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
@@ -363,6 +384,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
               Center(
                 child: ElevatedButton(
                   onPressed: () async {
+                    
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
                       // Conversion des dates au format String dd/MM/yyyy
@@ -380,10 +402,27 @@ class _CreateAnnonceState extends State<CreateAnnonce>
                         startDate: formattedStartDate,
                         endDate: formattedEndDate,
                       );
-                      
                       // Vérifier la réponse de l'API
                       if (response.statusCode == 200 || response.statusCode == 201 ) {
                         // Gestion de la réponse réussie
+                        // Convertissez la réponse en un objet pour récupérer l'ID
+                        final responseData = json.decode(response.body);
+
+                        int idOfCreatedAd;
+
+                        // Vérifiez si la réponse est une liste
+                        if (responseData is List) {
+                          // Prenez le premier élément de la liste comme ID de l'annonce créée
+                          idOfCreatedAd = responseData[0];
+                          //ajout de l'image
+                          await _uploadAllImages(idOfCreatedAd); // Passez l'ID à la méthode d'upload
+                          print('ID of the created ad: $idOfCreatedAd');
+                          
+                        } else {
+                          print(
+                              'Le format de la réponse n\'est pas celui attendu.');
+                        }
+                        
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Annonce créée avec succès')),
                         );

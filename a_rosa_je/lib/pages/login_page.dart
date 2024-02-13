@@ -178,6 +178,7 @@
 import 'package:a_rosa_je/pages/home.dart';
 import 'package:a_rosa_je/pages/sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -190,11 +191,12 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
 
 
   //fonction loginUser
   Future<void> loginUser(BuildContext context) async {
-    final url = Uri.parse('http://localhost:1212/auth/login');
+    final url = Uri.parse('$baseUrl/auth/login');
 
     try {
       final response = await http.post(
@@ -230,7 +232,7 @@ class _LoginPageState extends State<LoginPage> {
 
   
   Future<void> fetchUsersAndCompareEmail(BuildContext context) async {
-    final url = Uri.parse('http://localhost:1212/backoffice/users/');
+    final url = Uri.parse('$baseUrl/backoffice/users/');
     print('je suis ici');
     try {
       final response = await http.get(url);

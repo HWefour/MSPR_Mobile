@@ -8,12 +8,12 @@ import 'pages/parametre_menu.dart';
 import 'pages/profil_info.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart'; //pour le stockage en local
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-// ignore: duplicate_import
-import 'pages/profil.dart';
 
 void main() async {
   await Hive.initFlutter();
+  await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
 Future<bool> _checkUserLoggedIn() async {

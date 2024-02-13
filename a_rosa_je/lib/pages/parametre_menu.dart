@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'gestion_annonces.dart';
@@ -59,6 +60,7 @@ class _ParametreMenuState extends State<ParametreMenu> {
 }
 
 class MySettingsPage extends StatelessWidget {
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
   Future<void> deleteUserAccount(BuildContext context) async {
     try {
       var box = await Hive.openBox('userBox');
@@ -66,7 +68,7 @@ class MySettingsPage extends StatelessWidget {
       if (userJson != null) {
         Map<String, dynamic> user = jsonDecode(userJson);
         var userId = user['idUser'];
-        final response = await http.delete(Uri.parse('http://localhost:1212/settings/delete/$userId'));
+        final response = await http.delete(Uri.parse('$baseUrl/settings/delete/$userId'));
         
         if (response.statusCode == 200) {
           await box.delete('userDetails');

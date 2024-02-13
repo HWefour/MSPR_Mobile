@@ -4,6 +4,7 @@ import 'package:a_rosa_je/util/mes_gardiennage_tile_job.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:a_rosa_je/util/footer.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import '../util/annonce_job_popup_card.dart';
@@ -26,6 +27,7 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
 
   List<Map<String, dynamic>> listMesAnnoncesJobs = [];
   List<Map<String, dynamic>> listMesGardiennagesJobs = [];
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
 
   @override
   void initState() {
@@ -71,7 +73,7 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
   //gestion du filtrage des jobs par _idUser (userLocal) 
   //pour afficher mes annonces avec job
   Future<void> fetchAllJobMesAnnonces() async {
-    final response = await http.get(Uri.parse('http://localhost:1212/job/'));
+    final response = await http.get(Uri.parse('$baseUrl/job/'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       List<Map<String, dynamic>> jobsMesAnnoncesData = [];
@@ -96,7 +98,7 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
   //gestion du filtrage des jobs par _idUser (userLocal) 
   //pour afficher mes gardiennages avec job
   Future<void> fetchAllJobMesGardiennages() async {
-    final response = await http.get(Uri.parse('http://localhost:1212/job/'));
+    final response = await http.get(Uri.parse('$baseUrl/job/'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       List<Map<String, dynamic>> jobsMesGardiennagesData = [];
@@ -304,7 +306,7 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
                     height:
                         10), // Espace entre le nom de l'utilisateur et la biographie
                 Text(
-                  'Mes annonces et gardiennage en cours',
+                  'Mes annonces et gardiennages en cours',
                   textAlign: TextAlign.center,
                 ),
               ],

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'parametre_menu.dart'; // Importez votre page ParametreMenu pour la navigation
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -19,6 +19,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
 
   // Fonction pour récupérer les données de l'utilisateur depuis le stockage
   Future<void> _loadUserProfile() async {
@@ -59,7 +60,7 @@ Future<void> _saveChanges() async {
       'email': _emailController.text,
       'bio': _bioController.text,
     };
-    final response = await http.put(Uri.parse('http://localhost:1212/settings/update/$userId'), body: jsonEncode(updatedUserData), headers: {"Content-Type": "application/json"});
+    final response = await http.put(Uri.parse('$baseUrl/settings/update/$userId'), body: jsonEncode(updatedUserData), headers: {"Content-Type": "application/json"});
     if (response.statusCode == 200) {
       // Afficher un message pour indiquer que les modifications ont été enregistrées
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Modifications enregistrées avec succès')));
