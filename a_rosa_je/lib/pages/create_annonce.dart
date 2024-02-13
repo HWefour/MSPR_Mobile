@@ -123,39 +123,42 @@ class _CreateAnnonceState extends State<CreateAnnonce>
     }
   }
 
-  Future<void> _getImageAndUpload(int idAnnonce) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-      await _uploadImage(idAnnonce);
-    }
-  }
+  // Future<void> _getImageAndUpload(int idAnnonce) async {
+  //   final picker = ImagePicker();
+  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _image = File(pickedFile.path);
+  //     });
+  //     await _uploadImage(idAnnonce);
+  //   }
+  // }
 
-  Future<void> _uploadImage(int idAnnonce) async {
-    if (_image == null) return;
-
-    dynamic request = http.MultipartRequest(
-        'POST', Uri.parse('$baseUrl/images/upload'));
-    request.files.add(await http.MultipartFile.fromPath('image', _image!.path));
-    request.fields['idAdvertisement'] = idAnnonce; // Replace with your advertisement ID
+  Future<void> _uploadImage(String filePath, int idAnnonce) async {
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/images/upload'));
+    request.files.add(await http.MultipartFile.fromPath('image', filePath));
+    request.fields['idAdvertisement'] = idAnnonce.toString();
 
     try {
       var response = await request.send();
       if (response.statusCode == 201) {
-        // Image uploaded successfully
         print('Image uploaded successfully');
       } else {
-        // Error uploading image
         print('Error uploading image. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      // Exception while uploading image
       print('Exception uploading image: $e');
     }
   }
+
+  Future<void> _uploadAllImages(int idAnnonce) async {
+    if (imageFiles != null) {
+      for (XFile file in imageFiles!) {
+        await _uploadImage(file.path, idAnnonce);
+      }
+    }
+  }
+
 
   //api pour chercher une plante
   Future<void> fetchNamePlant(String namePlant) async {
@@ -407,12 +410,12 @@ class _CreateAnnonceState extends State<CreateAnnonce>
 
                         int idOfCreatedAd;
 
-// Vérifiez si la réponse est une liste
+                        // Vérifiez si la réponse est une liste
                         if (responseData is List) {
                           // Prenez le premier élément de la liste comme ID de l'annonce créée
                           idOfCreatedAd = responseData[0];
                           //ajout de l'image
-                          await _getImageAndUpload(idOfCreatedAd); // Passez l'ID à la méthode d'upload
+                          await _uploadAllImages(idOfCreatedAd); // Passez l'ID à la méthode d'upload
                           print('ID of the created ad: $idOfCreatedAd');
                           
                         } else {
