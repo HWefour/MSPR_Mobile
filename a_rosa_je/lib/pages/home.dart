@@ -1,5 +1,6 @@
 import 'package:a_rosa_je/pages/gestion_annonces.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:hive/hive.dart';
@@ -37,6 +38,7 @@ class _HomePageState extends State<HomePage>
   final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
   String _usersName = '';
   String _city = '';
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
 
   
  @override
@@ -202,7 +204,7 @@ class _HomePageState extends State<HomePage>
                         searchController.text = selectedCity;
                         cities.clear();
                       });
-                      final coordinates = await searchCity(searchController.text);
+                      final coordinates = await searchCity(searchController.text); //connexion vers la fonction qui va gérer l'api
                       if (coordinates != null) {
                         setState(() {
                           _currentLocation = LocationData.fromMap({
@@ -297,12 +299,18 @@ class _HomePageState extends State<HomePage>
 
 
 
-  //gestion de la localisation pour la map
+  //gestion de la recherche des annonces par ville
   Future<LatLng?> searchCity(String city) async {
     try {
       // Tentative de récupérer les annonces pour la ville spécifiée
       List<Annonce> annonces = await apiAnnoncesVille.fetchAnnoncesVille(city);
       if (annonces.isNotEmpty) {
+        for (var annonce in annonces) {
+          // Récupération des URLs d'images pour chaque annonce
+          List<String> imageUrls = await fetchImageUrlsForAnnonce(int.parse(annonce.idAdvertisement!));
+          // Mise à jour de l'annonce avec les URLs d'images
+          annonce = annonce.copyWith(imageUrls: imageUrls);
+        }
         setState(() {
           _currentAnnonces = annonces;
         });
@@ -330,6 +338,22 @@ class _HomePageState extends State<HomePage>
     return null;
   }
 
+  //pour récupérer les images des annonces
+  Future<List<String>> fetchImageUrlsForAnnonce(int idAnnonce) async {
+    final url = Uri.parse('$baseUrl/images/show/$idAnnonce');
+    final response = await http.get(url, headers: {'User-Agent': 'a_rosa_je'});
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      // Supposons que chaque élément de la liste a une clé "url" pour l'URL de l'image
+      return data.map((item) => item["url"] as String).toList();
+    } else {
+      throw Exception('Failed to load image URLs');
+    }
+  }
+
+
+
   Widget _showAnnonceList(BuildContext context) {
   // Utilisez un Container, ListView.builder, ou tout autre widget approprié ici
     return ListView.builder(
@@ -348,7 +372,7 @@ class _HomePageState extends State<HomePage>
             description: annonce.description ?? 'N/A',
             startDate: annonce.startDate ?? 'N/A',
             endDate: annonce.endDate ?? 'N/A',
-            imageUrl: 'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
+            imageUrl: annonce.imageUrls[0] ??'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
             createdAt: '', // Assurez-vous d'avoir la bonne valeur ici
           ),
         );

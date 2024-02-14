@@ -13,6 +13,7 @@ class Annonce {
   final String? bio;
   final String? startDate;
   final String? endDate;
+  final List<String> imageUrls;
 
   Annonce({
     required this.idAdvertisement,
@@ -29,7 +30,30 @@ class Annonce {
     required this.bio,
     this.startDate,
     this.endDate,
+    required this.imageUrls,
   });
+
+  // Ajoutez également une méthode `copyWith` si nécessaire pour la mise à jour
+  Annonce copyWith({
+  List<String>? imageUrls, }) {
+    return Annonce(
+      idAdvertisement: this.idAdvertisement,
+      title: this.title,
+      createdAt: this.createdAt,
+      city: this.city,
+      idPlant: this.idPlant,
+      name: this.name,
+      idUser: this.idUser,
+      description: this.description,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      usersName: this.usersName,
+      bio: this.bio,
+      startDate: this.startDate,
+      endDate: this.endDate,
+      imageUrls: imageUrls ?? this.imageUrls,
+    );
+}
 
   factory Annonce.fromJson(Map<String, dynamic> json) {
     return Annonce(
@@ -47,6 +71,7 @@ class Annonce {
       bio: json['bio'] as String,
       startDate: json['start_date'] as String?,
       endDate: json['end_date'] as String?,
+      imageUrls:[],
     );
   }
 }

@@ -104,14 +104,21 @@ class _CreateAnnonceState extends State<CreateAnnonce>
   }
 
   Future<void> _pickImageFromGallery() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? selectedImage = await _picker.pickImage(source: ImageSource.gallery);
-    if (selectedImage != null) {
-      setState(() {
-        imageFiles?.add(selectedImage);
-      });
-    }
+  final ImagePicker _picker = ImagePicker();
+  final XFile? selectedImage = await _picker.pickImage(source: ImageSource.gallery);
+  if (selectedImage != null) {
+    String selectedImagePath = selectedImage.path;
+    String fileName = selectedImagePath.split('/').last; // Obtenir le nom de fichier à partir du chemin
+
+    // Supprimer la partie inattendue ".undefined" s'il est présent dans le nom de fichier
+    fileName = fileName.replaceAll('.undefined', '');
+
+    setState(() {
+      imageFiles?.add(XFile(selectedImagePath));
+    });
   }
+}
+
 
   Future<void> _takePhotoWithCamera() async {
     final ImagePicker _picker = ImagePicker();
@@ -135,21 +142,42 @@ class _CreateAnnonceState extends State<CreateAnnonce>
   // }
 
   Future<void> _uploadImage(String filePath, int idAnnonce) async {
-    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/images/upload'));
-    request.files.add(await http.MultipartFile.fromPath('image', filePath));
-    request.fields['idAdvertisement'] = idAnnonce.toString();
-
-    try {
-      var response = await request.send();
-      if (response.statusCode == 201) {
-        print('Image uploaded successfully');
-      } else {
-        print('Error uploading image. Status code: ${response.statusCode}');
+    // Recherche de la première occurrence d'une extension parmi celles autorisées
+    List<String> allowedExtensions = ['.jpg', '.jpeg', '.png', '.svg'];
+    String fileName = filePath.split('/').last;
+    int index = -1;
+    for (String extension in allowedExtensions) {
+      int extensionIndex = fileName.indexOf(extension);
+      if (extensionIndex != -1) {
+        index = extensionIndex + extension.length;
+        break;
       }
-    } catch (e) {
-      print('Exception uploading image: $e');
+    }
+
+    if (index != -1) {
+      // Tronquer le nom de fichier à l'index trouvé
+      String truncatedFileName = fileName.substring(0, index);
+      String truncatedFilePath = filePath.replaceAll(fileName, truncatedFileName);
+
+      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/images/upload'));
+      request.files.add(await http.MultipartFile.fromPath('image', truncatedFilePath));
+      request.fields['idAdvertisement'] = idAnnonce.toString();
+
+      try {
+        var response = await request.send();
+        if (response.statusCode == 201) {
+          print('Image uploaded successfully');
+        } else {
+          print('Error uploading image. Status code: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Exception uploading image: $e');
+      }
+    } else {
+      print('Aucune extension autorisée trouvée dans le nom de fichier.');
     }
   }
+
 
   Future<void> _uploadAllImages(int idAnnonce) async {
     if (imageFiles != null) {
