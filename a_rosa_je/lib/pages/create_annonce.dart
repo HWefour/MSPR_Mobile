@@ -135,8 +135,16 @@ class _CreateAnnonceState extends State<CreateAnnonce>
   // }
 
   Future<void> _uploadImage(String filePath, int idAnnonce) async {
+    // Extraire le nom de base du fichier sans les numéros supplémentaires
+    String baseFileName = filePath.split('/').last; // Récupérer le nom de fichier à partir du chemin complet
+    int extensionIndex = baseFileName.lastIndexOf("."); // Trouver l'index de l'extension du fichier
+    if (extensionIndex != -1) {
+      // S'il y a une extension, tronquer le nom de fichier à cet index
+      baseFileName = baseFileName.substring(0, extensionIndex);
+    }
+
     var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/images/upload'));
-    request.files.add(await http.MultipartFile.fromPath('image', filePath));
+    request.files.add(await http.MultipartFile.fromPath('image', baseFileName));
     request.fields['idAdvertisement'] = idAnnonce.toString();
 
     try {
@@ -150,6 +158,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
       print('Exception uploading image: $e');
     }
   }
+
 
   Future<void> _uploadAllImages(int idAnnonce) async {
     if (imageFiles != null) {
