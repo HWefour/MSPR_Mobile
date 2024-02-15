@@ -162,158 +162,20 @@ class _HomePageState extends State<HomePage>
     }
   }
 
-  Widget _buildAnnoncesList() {
-  return Column(
-    children: [
-      if (_isSearchMode) 
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            controller: searchController,
-            decoration: InputDecoration(
-              labelText: "Rechercher...",
-              hintText: "Entrez une ville",
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              ),
-            ),
-            onChanged: (cityName) {
-              if (cityName.isNotEmpty) {
-                fetchCities(cityName);
-              }
-            },
-          ),
-        ),
-      SizedBox(height: 8.0),
-      if (cities.isNotEmpty) ...[ // Ajout de ... pour étendre la liste de widgets
-        Container(
-          height: 100.0,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: ListView.builder(
-            itemCount: cities.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                    title: Text(cities[index]),
-                    onTap: () async {
-                      setState(() {
-                        selectedCity = cities[index];
-                        searchController.text = selectedCity;
-                        cities.clear();
-                      });
-                      final coordinates = await searchCity(searchController.text); //connexion vers la fonction qui va gérer l'api
-                      if (coordinates != null) {
-                        setState(() {
-                          _currentLocation = LocationData.fromMap({
-                            "latitude": coordinates.latitude,
-                            "longitude": coordinates.longitude,
-                          });
-                          _currentMarker = Marker(
-                            point: coordinates,
-                            width: 80.0,
-                            height: 80.0,
-                            child: Icon(Icons.location_on, size: 50.0, color: Colors.red),
-                          );
-                          _isSearchMode = false;
-                          // Mettre à jour la clé pour forcer la reconstruction de la carte
-                          _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
-                          _hasAnnonces = true;
-                        });
-                      } else {
-                        setState(() {
-                          _hasAnnonces = false; // Aucune annonce trouvée
-                        });
-                      }
-                    },
-                  );
-            },
-          ),
-        ),
-      ],
-      if (!_hasAnnonces)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text(
-            "Pas d'annonces dans cette ville",
-            style: TextStyle(
-              fontSize: 16.0,
-              color: Colors.red,
-            ),
-          ),
-        ),
-      if (!_hasAnnonces) // Ajout d'un espace uniquement si _hasAnnonces est false
-        SizedBox(height: 10.0),
-      Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Filtrer les annonces",
-              style: TextStyle(fontSize: 16.0),
-            ),
-            IconButton(
-              icon: Icon(_isSearchMode ? Icons.close : Icons.search),
-              onPressed: () {
-                _hasAnnonces = true;
-                searchController.clear();
-                setState(() {
-                  _isSearchMode = !_isSearchMode;
-                  
-                });
-              },
-            ),
-          ],
-        ),
-      ),
-      Expanded(
-        child: ListView.builder(
-      itemCount: _currentAnnonces.length,
-      itemBuilder: (context, index) {
-        Annonce annonce = _currentAnnonces[index];
-        return GestureDetector(
-          onTap: () => _showPopup(annonce),
-          child: AnnonceTile(
-            idAdvertisement: annonce.idAdvertisement ?? '0',
-            title: annonce.title ?? 'N/A',
-            city: annonce.city ?? 'N/A',
-            idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
-            name: annonce.name ?? 'N/A',
-            userName: '', // Assurez-vous d'avoir la bonne valeur ici
-            description: annonce.description ?? 'N/A',
-            startDate: annonce.startDate ?? 'N/A',
-            endDate: annonce.endDate ?? 'N/A',
-            imageUrl: 'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
-            createdAt: '', // Assurez-vous d'avoir la bonne valeur ici
-          ),
-        );
-      },
-    ),
-      ),
-    ],
-  );  
-}
-
-
-
+  
   //gestion de la recherche des annonces par ville
   Future<LatLng?> searchCity(String city) async {
     try {
       // Tentative de récupérer les annonces pour la ville spécifiée
       List<Annonce> annonces = await apiAnnoncesVille.fetchAnnoncesVille(city);
       if (annonces.isNotEmpty) {
-        for (var annonce in annonces) {
-          // Récupération des URLs d'images pour chaque annonce
-          List<String> imageUrls = await fetchImageUrlsForAnnonce(int.parse(annonce.idAdvertisement!));
-          // Mise à jour de l'annonce avec les URLs d'images
-          annonce = annonce.copyWith(imageUrls: imageUrls);
-        }
-        setState(() {
-          _currentAnnonces = annonces;
-        });
+        List<Annonce> annoncesMisesAJour = await Future.wait(annonces.map((annonce) async {
+        List<String> imageUrls = await fetchImageUrlsForAnnonce(int.parse(annonce.idAdvertisement!));
+        return annonce.copyWith(imageUrls: imageUrls);
+      }));
+      setState(() {
+        _currentAnnonces = annoncesMisesAJour;
+      });
 
         // Si des annonces existent pour la ville, procéder à la recherche de la localisation
         final url = Uri.parse(
@@ -338,47 +200,57 @@ class _HomePageState extends State<HomePage>
     return null;
   }
 
-  //pour récupérer les images des annonces
   Future<List<String>> fetchImageUrlsForAnnonce(int idAnnonce) async {
     final url = Uri.parse('$baseUrl/images/show/$idAnnonce');
     final response = await http.get(url, headers: {'User-Agent': 'a_rosa_je'});
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      // Supposons que chaque élément de la liste a une clé "url" pour l'URL de l'image
-      return data.map((item) => item["url"] as String).toList();
+      if (data.isNotEmpty) {
+        List<String> urls = data.map((item) => item["url"] as String).toList();
+        // Affichage des URLs
+        return urls;
+      } else {
+        // Si les données sont vides, retourner une liste contenant uniquement l'image par défaut
+        return ['images/plant_default.png'];
+      }
     } else {
-      throw Exception('Failed to load image URLs');
+      // Si la requête échoue, retourner une liste contenant uniquement l'image par défaut
+      return ['images/plant_default.png'];
     }
   }
 
 
 
-  Widget _showAnnonceList(BuildContext context) {
-  // Utilisez un Container, ListView.builder, ou tout autre widget approprié ici
-    return ListView.builder(
-      itemCount: _currentAnnonces.length,
-      itemBuilder: (context, index) {
-        Annonce annonce = _currentAnnonces[index];
-        return GestureDetector(
-          onTap: () => _showPopup(annonce),
-          child: AnnonceTile(
-            idAdvertisement: annonce.idAdvertisement ?? '0',
-            title: annonce.title ?? 'N/A',
-            city: annonce.city ?? 'N/A',
-            idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
-            name: annonce.name ?? 'N/A',
-            userName: '', // Assurez-vous d'avoir la bonne valeur ici
-            description: annonce.description ?? 'N/A',
-            startDate: annonce.startDate ?? 'N/A',
-            endDate: annonce.endDate ?? 'N/A',
-            imageUrl: annonce.imageUrls[0] ??'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
-            createdAt: '', // Assurez-vous d'avoir la bonne valeur ici
-          ),
-        );
-      },
-    );
-  }
+
+  // Widget _showAnnonceList(BuildContext context) {
+  // // Utilisez un Container, ListView.builder, ou tout autre widget approprié ici
+  //   return ListView.builder(
+  //     itemCount: _currentAnnonces.length,
+  //     itemBuilder: (context, index) {
+        
+  //       Annonce annonce = _currentAnnonces[index];
+  //       print('url de image : ${annonce.imageUrls[0]}');
+  //       return GestureDetector(
+  //         onTap: () => _showPopup(annonce),
+          
+  //         child: AnnonceTile(
+  //           idAdvertisement: annonce.idAdvertisement ?? '0',
+  //           title: annonce.imageUrls ?? 'N/A',
+  //           city: annonce.city ?? 'N/A',
+  //           idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
+  //           name: annonce.name ?? 'N/A',
+  //           userName: '', // Assurez-vous d'avoir la bonne valeur ici
+  //           description: annonce.description ?? 'N/A',
+  //           startDate: annonce.startDate ?? 'N/A',
+  //           endDate: annonce.endDate ?? 'N/A',
+  //           imageUrl: annonce.imageUrls[0] ??'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
+  //           createdAt: '', // Assurez-vous d'avoir la bonne valeur ici
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   void _showAnnoncesModal(BuildContext context) {
     showModalBottomSheet(
@@ -413,6 +285,140 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  Widget _buildAnnoncesList() {
+    return Column(
+      children: [
+        if (_isSearchMode) 
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                labelText: "Rechercher...",
+                hintText: "Entrez une ville",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                ),
+              ),
+              onChanged: (cityName) {
+                if (cityName.isNotEmpty) {
+                  fetchCities(cityName);
+                }
+              },
+            ),
+          ),
+        SizedBox(height: 8.0),
+        if (cities.isNotEmpty) ...[ // Ajout de ... pour étendre la liste de widgets
+          Container(
+            height: 100.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: ListView.builder(
+              itemCount: cities.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                      title: Text(cities[index]),
+                      onTap: () async {
+                        setState(() {
+                          selectedCity = cities[index];
+                          searchController.text = selectedCity;
+                          cities.clear();
+                        });
+                        final coordinates = await searchCity(searchController.text); //connexion vers la fonction qui va gérer l'api
+                        if (coordinates != null) {
+                          setState(() {
+                            _currentLocation = LocationData.fromMap({
+                              "latitude": coordinates.latitude,
+                              "longitude": coordinates.longitude,
+                            });
+                            _currentMarker = Marker(
+                              point: coordinates,
+                              width: 80.0,
+                              height: 80.0,
+                              child: Icon(Icons.location_on, size: 50.0, color: Colors.red),
+                            );
+                            _isSearchMode = false;
+                            // Mettre à jour la clé pour forcer la reconstruction de la carte
+                            _mapKey = ValueKey("${coordinates.latitude}_${coordinates.longitude}");
+                            _hasAnnonces = true;
+                          });
+                        } else {
+                          setState(() {
+                            _hasAnnonces = false; // Aucune annonce trouvée
+                          });
+                        }
+                      },
+                    );
+              },
+            ),
+          ),
+        ],
+        if (!_hasAnnonces)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              "Pas d'annonces dans cette ville",
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Colors.red,
+              ),
+            ),
+          ),
+        if (!_hasAnnonces) // Ajout d'un espace uniquement si _hasAnnonces est false
+          SizedBox(height: 10.0),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Filtrer les annonces",
+                style: TextStyle(fontSize: 16.0),
+              ),
+              IconButton(
+                icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+                onPressed: () {
+                  _hasAnnonces = true;
+                  searchController.clear();
+                  setState(() {
+                    _isSearchMode = !_isSearchMode;
+                    
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+        itemCount: _currentAnnonces.length,
+        itemBuilder: (context, index) {
+          Annonce annonce = _currentAnnonces[index];
+          return GestureDetector(
+            onTap: () => _showPopup(annonce),
+            child: AnnonceTile(
+              idAdvertisement: annonce.idAdvertisement ?? '0',
+              title: annonce.title ?? 'N/A',
+              city: annonce.city ?? 'N/A',
+              idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
+              name: annonce.name ?? 'N/A',
+              userName: '', // Assurez-vous d'avoir la bonne valeur ici
+              description: annonce.description ?? 'N/A',
+              startDate: annonce.startDate ?? 'N/A',
+              endDate: annonce.endDate ?? 'N/A',
+              imageUrl: annonce.imageUrls![0] ??'images/plant_default.png' , // Idéalement, utilisez l'URL de l'image de l'annonce
+              createdAt: '', // Assurez-vous d'avoir la bonne valeur ici
+            ),
+          );
+        },
+      ),
+        ),
+      ],
+    );  
+  }
   //gestion de la carte
   Widget _buildMap() {
     return Column(

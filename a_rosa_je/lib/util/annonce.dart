@@ -13,7 +13,7 @@ class Annonce {
   final String? bio;
   final String? startDate;
   final String? endDate;
-  final List<String> imageUrls;
+  final List<String>? imageUrls;
 
   Annonce({
     required this.idAdvertisement,

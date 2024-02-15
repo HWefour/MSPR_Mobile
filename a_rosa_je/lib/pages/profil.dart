@@ -140,8 +140,7 @@ class _ProfilPageState extends State<ProfilPage>
                         description: annonce.description ?? 'N/A',
                         startDate: annonce.startDate ?? 'N/A',
                         endDate: annonce.endDate ?? 'N/A',
-                        imageUrl:
-                            'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
+                        imageUrl:'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
                         createdAt: annonce.createdAt ?? 'N/A',
                       ),
                     );
