@@ -195,40 +195,42 @@ class _LoginPageState extends State<LoginPage> {
 
 
   //fonction loginUser
-  Future<void> loginUser(BuildContext context) async {
-    final url = Uri.parse('$baseUrl/auth/login');
+Future<void> loginUser(BuildContext context) async {
+  final url = Uri.parse('$baseUrl/auth/login');
 
-    try {
-      final response = await http.post(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({
-          "email": _emailController.text,
-          "password": _passwordController.text,
-        }),
-      );
-      print('premier ${response.statusCode}');
-      if (response.statusCode == 200) {
-        // L'authentification a réussi. Vous pouvez afficher un message de succès ou effectuer d'autres actions ici.
-        //ajout test lucas
-        //connexion avec l'api pour trouver l'utilisateur correspondant
-        print('je suis la');
-        fetchUsersAndCompareEmail(context);
-      } else {
-        // L'authentification a échoué.
-        // Vous pouvez afficher un message d'erreur ou effectuer d'autres actions ici.
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Échec de l\'authentification. Veuillez vérifier vos informations.'),
-          ),
-        );
-      }
-    } catch (e) {
-      print('Erreur lors de la connexion : $e');
+  try {
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        "email": _emailController.text,
+        "password": _passwordController.text,
+      }),
+    );
+    print('premier ${response.statusCode}');
+    if (response.statusCode == 200) {
+      // L'authentification a réussi. Vous pouvez afficher un message de succès ou effectuer d'autres actions ici.
+      //ajout test lucas
+      //connexion avec l'api pour trouver l'utilisateur correspondant
+      print('je suis la');
+      fetchUsersAndCompareEmail(context);
+    } else if (response.statusCode == 401) {
+      // 401 Unauthorized - L'authentification a échoué.
+      // Vous pouvez afficher un message d'erreur ou effectuer d'autres actions ici.
+      print('Erreur d\'authentification : ${response.statusCode}');
+    } else {
+      // Autres cas de code de statut HTTP non gérés.
+      // Vous pouvez afficher un message d'erreur ou effectuer d'autres actions ici.
+      print('Erreur HTTP non gérée : ${response.statusCode}');
     }
+  } catch (e) {
+    // Erreur lors de la requête HTTP.
+    print('Erreur lors de la connexion : $e');
   }
+}
+
 
   
   Future<void> fetchUsersAndCompareEmail(BuildContext context) async {

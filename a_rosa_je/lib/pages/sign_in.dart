@@ -46,12 +46,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   // Validation du mot de passe
-  bool isPasswordValid(String password) {
-    String pattern =
-        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
-    RegExp regex = RegExp(pattern);
-    return regex.hasMatch(password);
-  }
+bool isPasswordValid(String password) {
+  String pattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~`^(){}\[\]:";\<>?,./\\\-_=+]).{8,}$';
+  RegExp regex = RegExp(pattern);
+  return regex.hasMatch(password);
+}
+
 
   Future<void> createUserAndNavigate() async {
     if (!isEmailValid(_emailController.text)) {
