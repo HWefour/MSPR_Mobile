@@ -54,98 +54,101 @@ bool isPasswordValid(String password) {
 
 
   Future<void> createUserAndNavigate() async {
-    if (!isEmailValid(_emailController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Veuillez entrer une adresse e-mail valide.'),
-        ),
-      );
-      return;
-    }
-
-    if (!isPasswordValid(_passwordController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre, un caractère spécial et au moins 8 caractères.'),
-        ),
-      );
-      return;
-    }
-
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Les mots de passe ne correspondent pas.'),
-        ),
-      );
-      return;
-    }
-
-    if (!isChecked) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              'Veuillez accepter les conditions générales et la politique de confidentialité.'),
-        ),
-      );
-      return;
-    }
-
-final url = Uri.parse('$baseUrl/auth/signup');
-final response = await http.post(
-  url,
-  headers: <String, String>{
-    'Content-Type': 'application/json; charset=UTF-8',
-  },
-  body: jsonEncode({
-    "firstName": _firstNameController.text,
-    "lastName": _lastNameController.text,
-    "usersName": _userNameController.text,
-    "email": _emailController.text,
-    "city": selectedCity,
-    "bio": "bio", // Vous pouvez modifier cela si nécessaire
-    "password": _passwordController.text,
-    "idRole": "2" // Vous pouvez modifier cela si nécessaire
-  }),
-);
-
-if (response.statusCode == 201) {
-  final responseData = json.decode(response.body);
-  if (responseData['success'] == true) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+  if (!isEmailValid(_emailController.text)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Veuillez entrer une adresse e-mail valide.'),
+      ),
     );
-  } else {
+    return;
+  }
+
+  if (!isPasswordValid(_passwordController.text)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre, un caractère spécial et au moins 8 caractères.'),
+      ),
+    );
+    return;
+  }
+
+  if (_passwordController.text != _confirmPasswordController.text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Les mots de passe ne correspondent pas.'),
+      ),
+    );
+    return;
+  }
+
+  if (!isChecked) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            'Veuillez accepter les conditions générales et la politique de confidentialité.'),
+      ),
+    );
+    return;
+  }
+
+  final url = Uri.parse('$baseUrl/auth/signup');
+  final response = await http.post(
+    url,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode({
+      "firstName": _firstNameController.text,
+      "lastName": _lastNameController.text,
+      "usersName": _userNameController.text,
+      "email": _emailController.text,
+      "city": selectedCity,
+      "bio": "bio", // Vous pouvez modifier cela si nécessaire
+      "password": _passwordController.text,
+      "idRole": "2" // Vous pouvez modifier cela si nécessaire
+    }),
+  );
+
+  if (response.statusCode == 201) {
+    final responseData = json.decode(response.body);
+    if (responseData['success'] == true) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+      return;
+    }
+  } 
+  else if (response.statusCode == 400) {
+    final responseData = json.decode(response.body);
     if (responseData['error'] == 'email_exists') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Un utilisateur existe déjà avec cette adresse e-mail.'),
         ),
       );
-    } else {
+    }
+     else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Échec de la création de l\'utilisateur'),
+          content: Text('Une erreur s\'est produite lors de la création de l\'utilisateur.'),
         ),
       );
     }
+    return;
   }
-} else {
-  Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
+
+  // S'il y a eu une erreur autre que 400 ou si le succès n'était pas vrai dans le cas 201
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      
-      content: Text('Votre compte utilisateur est bien créer vous pouvez vous connecter'),
+      content: Text('Une erreur s\'est produite lors de la création de l\'utilisateur. Réessayez plus tard.'),
     ),
   );
 }
 
-  }
+
+
 
   Future<void> fetchCities(String cityName) async {
   final response = await http.get(Uri.parse(
