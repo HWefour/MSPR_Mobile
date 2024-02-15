@@ -35,7 +35,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   bool isChecked = false;
-  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
+  final baseUrl = dotenv
+      .env['API_BASE_URL']; // pour récupérer l'url de base dans le fichier .env
 
   // Validation de l'email
   bool isEmailValid(String email) {
@@ -46,12 +47,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   // Validation du mot de passe
-bool isPasswordValid(String password) {
-  String pattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~`^(){}\[\]:";\<>?,./\\\-_=+]).{8,}$';
-  RegExp regex = RegExp(pattern);
-  return regex.hasMatch(password);
-}
-
+  bool isPasswordValid(String password) {
+    String pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~`^(){}\[\]:";\<>?,./\\\-_=+]).{8,}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(password);
+  }
 
   Future<void> createUserAndNavigate() async {
     if (!isEmailValid(_emailController.text)) {
@@ -92,55 +93,56 @@ bool isPasswordValid(String password) {
       return;
     }
 
-final url = Uri.parse('$baseUrl/auth/signup');
-final response = await http.post(
-  url,
-  headers: <String, String>{
-    'Content-Type': 'application/json; charset=UTF-8',
-  },
-  body: jsonEncode({
-    "firstName": _firstNameController.text,
-    "lastName": _lastNameController.text,
-    "usersName": _userNameController.text,
-    "email": _emailController.text,
-    "city": selectedCity,
-    "bio": "bio", // Vous pouvez modifier cela si nécessaire
-    "password": _passwordController.text,
-    "idRole": "2" // Vous pouvez modifier cela si nécessaire
-  }),
-);
+    final url = Uri.parse('$baseUrl/auth/signup');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        "firstName": _firstNameController.text,
+        "lastName": _lastNameController.text,
+        "usersName": _userNameController.text,
+        "email": _emailController.text,
+        "city": selectedCity,
+        "bio": "bio", // Vous pouvez modifier cela si nécessaire
+        "password": _passwordController.text,
+        "idRole": "2" // Vous pouvez modifier cela si nécessaire
+      }),
+    );
 
-if (response.statusCode == 201) {
-  final responseData = json.decode(response.body);
-  if (responseData['success'] == true) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
-  } else {
-    if (responseData['error'] == 'email_exists') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Un utilisateur existe déjà avec cette adresse e-mail.'),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Échec de la création de l\'utilisateur'),
-        ),
-      );
-    }
-  }
-} else {
-  Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
+if (response.statusCode == 200 || response.statusCode == 201) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      
-      content: Text('Votre compte utilisateur est bien créer vous pouvez vous connecter'),
+      content: Text('Votre compte utilisateur a bien été créé'),
+    ),
+  );
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => LoginPage()),
+  );
+  return;
+} else if (response.statusCode == 400) {
+  final responseData = json.decode(response.body);
+  if (responseData['error'] == 'email_exists') {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Un utilisateur existe déjà avec cette adresse e-mail.'),
+      ),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Une erreur s\'est produite lors de la création de l\'utilisateur.'),
+      ),
+    );
+  }
+  return;
+} else {
+  // Gestion des autres codes d'état HTTP
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Une erreur s\'est produite lors de la création de l\'utilisateur. Réessayez plus tard.'),
     ),
   );
 }
@@ -148,22 +150,21 @@ if (response.statusCode == 201) {
   }
 
   Future<void> fetchCities(String cityName) async {
-  final response = await http.get(Uri.parse(
-      'https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
-  if (response.statusCode == 200) {
-    final jsonData = json.decode(response.body);
-    List<String> cityNames = [];
-    for (var cityData in jsonData) {
-      cityNames.add(cityData['nom']);
+    final response = await http.get(Uri.parse(
+        'https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      List<String> cityNames = [];
+      for (var cityData in jsonData) {
+        cityNames.add(cityData['nom']);
+      }
+      setState(() {
+        cities = cityNames;
+      });
+    } else {
+      throw Exception('Échec de la récupération des données');
     }
-    setState(() {
-      cities = cityNames;
-    });
-  } else {
-    throw Exception('Échec de la récupération des données');
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
