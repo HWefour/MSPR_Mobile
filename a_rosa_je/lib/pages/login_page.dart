@@ -231,8 +231,6 @@ Future<void> loginUser(BuildContext context) async {
   }
 }
 
-
-  
   Future<void> fetchUsersAndCompareEmail(BuildContext context) async {
     final url = Uri.parse('$baseUrl/backoffice/users/');
     print('je suis ici');
