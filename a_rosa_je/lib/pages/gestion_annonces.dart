@@ -89,7 +89,6 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
             'idAdvertisement': jobMesAnnoncesData['idAdvertisement'].toString(),
             'idUserGardien': jobMesAnnoncesData['idUserGardien'].toString(),
           });
-          print(jobMesAnnoncesData['idUser'].toString());
           searchMonAnnonceParId(jobMesAnnoncesData['idAdvertisement'].toString());
         }
       }
@@ -101,6 +100,33 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
     }
   }
 
+  //gestion du filtrage des jobs par _idUser (userLocal)
+  //pour afficher mes gardiennages avec job
+  Future<void> fetchAllJobMesGardiennages() async {
+    final response = await http.get(Uri.parse('$baseUrl/job/'));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      List<Map<String, dynamic>> jobsMesGardiennagesData = [];
+      for (var jobMesGardiennagesData in jsonData) {
+        if ((jobMesGardiennagesData['idUserGardien'] ?? '').toString() ==
+            _idUserLocal.toString()) {
+          jobsMesGardiennagesData.add({
+            'idUser': jobMesGardiennagesData['idUser'].toString(),
+            'idAdvertisement':
+                jobMesGardiennagesData['idAdvertisement'].toString(),
+            'idUserGardien': jobMesGardiennagesData['idUserGardien'].toString(),
+          });
+          searchAnnonceGardiennageParId(
+              jobMesGardiennagesData['idAdvertisement'].toString());
+        }
+      }
+      setState(() {
+        listMesGardiennagesJobs = jobsMesGardiennagesData;
+      });
+    } else {
+      throw Exception('Failed to load jobs');
+    }
+  }
   //récupération par Api de d'une annonce par son id et de ses images
   Future<void> searchMonAnnonceParId(dynamic idAdvertisement) async {
     try {
@@ -116,6 +142,29 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
         }));
         setState(() {
           _currentMesAnnoncesJobs = annoncesMisesAJour;
+        });
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des annonces : $e");
+    }
+    return null;
+  }
+
+  //récupération par Api d'une annonce que je vais garder par son id et de ses images
+  Future<void> searchAnnonceGardiennageParId(dynamic idAdvertisement) async {
+    try {
+      // Tentative de récupérer une annonce par son id
+      List<Annonce> annonces = await apiAnnoncesIdAdvertisement
+          .fetchAnnoncesIdAdvertisement(idAdvertisement);
+      if (annonces.isNotEmpty) {
+        List<Annonce> annoncesMisesAJour =
+            await Future.wait(annonces.map((annonce) async {
+          List<String> imageUrls = await fetchImageUrlsForAnnonce(
+              int.parse(annonce.idAdvertisement!));
+          return annonce.copyWith(imageUrls: imageUrls);
+        }));
+        setState(() {
+          _currentMesGardiennagesJobs = annoncesMisesAJour;
         });
       }
     } catch (e) {
@@ -144,31 +193,7 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
     }
   }
 
-  //gestion du filtrage des jobs par _idUser (userLocal)
-  //pour afficher mes gardiennages avec job
-  Future<void> fetchAllJobMesGardiennages() async {
-    final response = await http.get(Uri.parse('$baseUrl/job/'));
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      List<Map<String, dynamic>> jobsMesGardiennagesData = [];
-      for (var jobMesGardiennagesData in jsonData) {
-        if ((jobMesGardiennagesData['idUserGardien'] ?? '').toString() ==
-            _idUserLocal.toString()) {
-          jobsMesGardiennagesData.add({
-            'idUser': jobMesGardiennagesData['idUser'].toString(),
-            'idAdvertisement':
-                jobMesGardiennagesData['idAdvertisement'].toString(),
-            'idUserGardien': jobMesGardiennagesData['idUserGardien'].toString(),
-          });
-        }
-      }
-      setState(() {
-        listMesGardiennagesJobs = jobsMesGardiennagesData;
-      });
-    } else {
-      throw Exception('Failed to load jobs');
-    }
-  }
+  
 
   // Méthode pour afficher les informations d'erreur sous forme de dialogue
   Widget _buildErrorDialog(BuildContext context, dynamic error) {
@@ -237,45 +262,26 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
       children: [
         Expanded(
           child: ListView.builder(
-            itemCount: listMesGardiennagesJobs.length,
+            itemCount: _currentMesGardiennagesJobs.length,
             itemBuilder: (context, index) {
-              var jobMesGardiennages = listMesGardiennagesJobs[index];
-              return FutureBuilder<List<Annonce>>(
-                future: apiAnnoncesIdAdvertisement.fetchAnnoncesIdAdvertisement(
-                    jobMesGardiennages['idAdvertisement']),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text("Error: ${snapshot.error}");
-                  } else if (snapshot.hasData) {
-                    return Column(
-                      children: snapshot.data!.map<Widget>((annonce) {
-                        return GestureDetector(
-                          onTap: () => _showPopup(annonce),
-                          child: MesGardiennageTileJob(
-                            idAdvertisement: annonce.idAdvertisement ?? '0',
-                            title: annonce.title ?? 'N/A',
-                            city: annonce.city ?? 'N/A',
-                            idPlant: annonce.name ??
-                                'N/A', // Vérifiez ce champ, idPlant ou name?
-                            name: annonce.name ?? 'N/A',
-                            userName: annonce.usersName ?? 'N/A',
-                            description: annonce.description ?? 'N/A',
-                            startDate: annonce.startDate ?? 'N/A',
-                            endDate: annonce.endDate ?? 'N/A',
-                            imageUrl: annonce.imageUrls![0] ??
-                                'images/plant_default.png', // Supposé être un placeholder
-                            createdAt: annonce.createdAt ?? 'N/A',
-                          ),
-                        );
-                      }).toList(),
-                    );
-                  } else {
-                    return Text(
-                        "No data available for job ID: ${jobMesGardiennages['idAdvertisement']}");
-                  }
-                },
+              Annonce annonce = _currentMesGardiennagesJobs[index];
+              return GestureDetector(
+                onTap: () => _showPopup(annonce),
+                child: MesGardiennageTileJob(
+                  idAdvertisement: annonce.idAdvertisement ?? '0',
+                  title: annonce.title ?? 'N/A',
+                  city: annonce.city ?? 'N/A',
+                  idPlant: annonce.name ??
+                      'N/A', // Vérifiez ce champ, idPlant ou name?
+                  name: annonce.name ?? 'N/A',
+                  userName: annonce.usersName ?? 'N/A',
+                  description: annonce.description ?? 'N/A',
+                  startDate: annonce.startDate ?? 'N/A',
+                  endDate: annonce.endDate ?? 'N/A',
+                  imageUrl: annonce.imageUrls![0] ??
+                      'images/plant_default.png', // Supposé être un placeholder
+                  createdAt: annonce.createdAt ?? 'N/A',
+                ),
               );
             },
           ),
