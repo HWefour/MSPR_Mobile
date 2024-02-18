@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:a_rosa_je/pages/demande_botaniste.dart';
 import 'package:a_rosa_je/pages/politique.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -128,7 +129,10 @@ class MySettingsPage extends StatelessWidget {
           ListTile(
             title: Text('Demander le compte Botaniste'),
             onTap: () {
-              // Handle tap
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DemandeBotanistePage()),
+              );
             },
           ),
           // ListTile(
