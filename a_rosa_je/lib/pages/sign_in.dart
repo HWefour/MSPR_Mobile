@@ -1,4 +1,5 @@
 import 'package:a_rosa_je/pages/login_page.dart';
+import 'package:a_rosa_je/pages/politique.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -111,42 +112,44 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       }),
     );
 
-if (response.statusCode == 200 || response.statusCode == 201) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('Votre compte utilisateur a bien été créé'),
-    ),
-  );
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => LoginPage()),
-  );
-  return;
-} else if (response.statusCode == 400) {
-  final responseData = json.decode(response.body);
-  if (responseData['error'] == 'email_exists') {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Un utilisateur existe déjà avec cette adresse e-mail.'),
-      ),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Une erreur s\'est produite lors de la création de l\'utilisateur.'),
-      ),
-    );
-  }
-  return;
-} else {
-  // Gestion des autres codes d'état HTTP
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('Une erreur s\'est produite lors de la création de l\'utilisateur. Réessayez plus tard.'),
-    ),
-  );
-}
-
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Votre compte utilisateur a bien été créé'),
+        ),
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+      return;
+    } else if (response.statusCode == 400) {
+      final responseData = json.decode(response.body);
+      if (responseData['error'] == 'email_exists') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Un utilisateur existe déjà avec cette adresse e-mail.'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Une erreur s\'est produite lors de la création de l\'utilisateur.'),
+          ),
+        );
+      }
+      return;
+    } else {
+      // Gestion des autres codes d'état HTTP
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Une erreur s\'est produite lors de la création de l\'utilisateur. Réessayez plus tard.'),
+        ),
+      );
+    }
   }
 
   Future<void> fetchCities(String cityName) async {
@@ -258,25 +261,51 @@ if (response.statusCode == 200 || response.statusCode == 201) {
             controller: _confirmPasswordController,
           ),
           SizedBox(height: 24.0),
-          Row(
-            children: [
-              Checkbox(
-                value: isChecked,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isChecked = value ?? false;
-                  });
-                },
-              ),
-              SizedBox(width: 8.0),
-              Expanded(
-                child: Text(
-                  'J\'accepte les conditions générales et la politique de confidentialité',
-                  style: TextStyle(color: Colors.white),
+Row(
+  children: [
+    Checkbox(
+      value: isChecked,
+      onChanged: (bool? value) {
+        setState(() {
+          isChecked = value ?? false;
+        });
+      },
+    ),
+    SizedBox(width: 8.0),
+    Expanded(
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Politique de Confidentialité'),
+                content: SingleChildScrollView(
+                  child: Text(
+                    'Chez A\'rosa_je, nous nous engageons à protéger votre vie privée. Cette politique de confidentialité explique comment nous recueillons, utilisons et protégeons vos informations personnelles lorsque vous utilisez notre site web ou nos services.',
+                  ),
                 ),
-              ),
-            ],
-          ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Fermer'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: Text(
+          'J\'accepte les conditions générales et la politique de confidentialité',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    ),
+  ],
+),
+
           SizedBox(height: 24.0),
           Row(
             children: [
