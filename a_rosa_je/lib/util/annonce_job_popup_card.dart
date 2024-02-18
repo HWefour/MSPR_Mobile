@@ -146,6 +146,25 @@ class _AnnoncePopupCardState extends State<AnnonceJobPopupCard>
                         // Multiplie par 2 et soustrait 1 pour alterner image et espace
                         if (index % 2 == 0) {
                           // Image
+                          if (widget.annonce.imageUrls != null &&
+                              widget.annonce.imageUrls!.isNotEmpty) {
+                            // S'il y a au moins une image dans imageUrls
+                            if (index ~/ 2 < widget.annonce.imageUrls!.length) {
+                              // S'il y a une image correspondante dans imageUrls
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  widget.annonce.imageUrls![index ~/ 2],
+                                  width: MediaQuery.of(context).size.width -
+                                      32, // Ajustez selon le padding/margin global
+                                  height: 400.0, // Ajustez selon vos besoins
+                                  fit: BoxFit.cover,
+                                ),
+                              );
+                            }
+                          }
+                          // S'il n'y a pas d'image dans imageUrls ou si l'image correspondante n'existe pas
+                          // Utilisation de l'image par défaut
                           return ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.asset(
@@ -159,7 +178,8 @@ class _AnnoncePopupCardState extends State<AnnonceJobPopupCard>
                         } else {
                           // Espace
                           return SizedBox(
-                              height:10.0); // Hauteur de l'espace entre les images
+                            height: 10.0,
+                          ); // Hauteur de l'espace entre les images
                         }
                       }),
                     ),

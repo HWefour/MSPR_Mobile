@@ -274,7 +274,7 @@ class _HomePageState extends State<HomePage>
                   description: annonce.description ?? 'N/A',
                   startDate: annonce.startDate ?? 'N/A',
                   endDate: annonce.endDate ?? 'N/A',
-                  imageUrl: 'images/plant_default.png',
+                  imageUrl: annonce.imageUrls![0] ?? 'images/plant_default.png',
                   createdAt: '',
                 ),
               );
