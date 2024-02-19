@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:a_rosa_je/util/footer.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
 import '../util/annonce_popup_card.dart';
 import '../util/annonce_tile.dart';
 import '../api/api_service.dart';
@@ -32,6 +34,7 @@ class _ProfilPageState extends State<ProfilPage>
   String _companyName = '';
   String _companyNumber = '';
   int _idRole = 0;
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
 
   @override
   void initState() {
@@ -158,13 +161,60 @@ class _ProfilPageState extends State<ProfilPage>
   }
 
   //widget d'affichage des images du User
-  Widget _buildImageProfil() {
-    return Column(
-      children: [
-        // affichage des images
-      ],
-    );
+Widget _buildImageProfil() {
+  return FutureBuilder<List<String>>(
+    future: _fetchUserImages(), // Méthode pour récupérer les images du profil de l'utilisateur
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Erreur: ${snapshot.error}'));
+      } else if (snapshot.hasData) {
+        List<String>? images = snapshot.data;
+        if (images != null && images.isNotEmpty) {
+          // Affichage des images dans une grille avec deux images par ligne
+          return GridView.count(
+            crossAxisCount: 2, // Nombre d'éléments par ligne
+            crossAxisSpacing: 5.0, // Espacement horizontal entre les éléments
+            mainAxisSpacing: 5.0, // Espacement vertical entre les lignes
+            children: images.map((image) {
+              return ClipRect(
+                child: Image.network(
+                  image,
+                  fit: BoxFit.cover, // Assurez-vous que l'image couvre tout l'espace disponible
+                ),
+              );
+            }).toList(),
+          );
+        } else {
+          return Center(child: Text('Aucune image disponible'));
+        }
+      } else {
+        return Center(child: Text('Aucune donnée'));
+      }
+    },
+  );
+}
+
+
+// Méthode pour récupérer les images du profil de l'utilisateur à partir de l'API
+Future<List<String>> _fetchUserImages() async {
+  try {
+    final url = Uri.parse('$baseUrl/profile/profilePlant/$_idUserLocal');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      List<String> imageUrls = data.map((item) => item["url"].toString()).toList();
+      return imageUrls;
+    } else {
+      throw Exception('Failed to load user images');
+    }
+  } catch (e) {
+    throw Exception('Error: $e');
   }
+}
+
 
   //gestion du tap sur le footer
   void _onItemTapped(int index) {
@@ -219,8 +269,7 @@ class _ProfilPageState extends State<ProfilPage>
               children: [
                 CircleAvatar(
                   radius: 50, // Rayon du cercle de la photo de profil
-                  backgroundImage: AssetImage(
-                      'assets/profile_picture.jpg'), // Remplacez par le chemin de votre photo de profil
+                  backgroundImage: AssetImage('images/LOGO.png'),
                 ),
                 SizedBox(
                     height:

@@ -601,6 +601,7 @@ class _HomePageState extends State<HomePage>
           ),
         ],
       ),
+      resizeToAvoidBottomInset: false,
       body: Column(
         children: <Widget>[
           SizedBox(height: 10),
