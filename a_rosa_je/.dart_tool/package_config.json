@@ -75,7 +75,7 @@
     },
     {
       "name": "built_value",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.9.0",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.9.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -758,7 +758,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-02-18T14:39:37.754013Z",
+  "generated": "2024-02-19T10:55:59.503911Z",
   "generator": "pub",
   "generatorVersion": "3.2.3"
 }
