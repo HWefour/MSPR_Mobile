@@ -23,6 +23,7 @@ class _ProfilPageState extends State<ProfilPage>
   TabController? _tabController;
   int _selectedIndex = 4;
   final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
+  List<Annonce> _currentAnnonces = [];
   int _idUserLocal = 0 ;
   String _firstName = '';
   String _lastName = '';
@@ -66,6 +67,7 @@ class _ProfilPageState extends State<ProfilPage>
         _idRole = user['idRole'];
       });
     }
+    searchMesAnnoncesParId(_idUserLocal.toString());
   }
   @override
   void dispose() {
@@ -112,52 +114,78 @@ class _ProfilPageState extends State<ProfilPage>
     );
   }
 
+  //récupération par Api de d'une annonce par son id et de ses images
+  Future<void> searchMesAnnoncesParId(dynamic idUser) async {
+    try {
+      // Tentative de récupérer une annonce par son id
+      List<Annonce> annonces = await apiAnnoncesUser.fetchAnnoncesUser(idUser);
+      if (annonces.isNotEmpty) {
+        List<Annonce> annoncesMisesAJour =
+            await Future.wait(annonces.map((annonce) async {
+          List<String> imageUrls = await fetchImageUrlsForAnnonce(
+              int.parse(annonce.idAdvertisement!));
+          return annonce.copyWith(imageUrls: imageUrls);
+        }));
+        setState(() {
+          _currentAnnonces = annoncesMisesAJour;
+        });
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des annonces : $e");
+    }
+    return null;
+  }
+
+  Future<List<String>> fetchImageUrlsForAnnonce(int idAnnonce) async {
+    final url = Uri.parse('$baseUrl/images/show/$idAnnonce');
+    final response = await http.get(url, headers: {'User-Agent': 'a_rosa_je'});
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      if (data.isNotEmpty) {
+        List<String> urls = data.map((item) => item["url"] as String).toList();
+        // Affichage des URLs
+        return urls;
+      } else {
+        // Si les données sont vides, retourner une liste contenant uniquement l'image par défaut
+        return ['images/plant_default.png'];
+      }
+    } else {
+      // Si la requête échoue, retourner une liste contenant uniquement l'image par défaut
+      return ['images/plant_default.png'];
+    }
+  }
   //widget d'affichage de la list des annonces
   Widget _buildAnnoncesList() {
     return Column(
       children: [
         // affichage des annonces de l'utilisateur
         Expanded(
-          child: FutureBuilder<List<Annonce>>(
-            future: apiAnnoncesUser.fetchAnnoncesUser(_idUserLocal.toString()),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                // Appeler la méthode pour afficher les informations d'erreur
-                return _buildErrorDialog(context, snapshot.error.toString());
-              } else if (snapshot.hasData) {
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    Annonce annonce = snapshot.data![index];
-                    return GestureDetector(
-                      onTap: () => _showPopup(annonce),
-                      child: AnnonceTile(
-                        idAdvertisement: annonce.idAdvertisement ?? '0',
-                        title: annonce.title ?? 'N/A',
-                        city: annonce.city ?? 'N/A',
-                        idPlant: annonce.name ?? 'N/A',
-                        name: annonce.name ?? '',
-                        userName: annonce.usersName ?? 'N/A',
-                        description: annonce.description ?? 'N/A',
-                        startDate: annonce.startDate ?? 'N/A',
-                        endDate: annonce.endDate ?? 'N/A',
-                        imageUrl:'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
-                        createdAt: annonce.createdAt ?? 'N/A',
-                      ),
-                    );
-                  },
-                );
-              } else {
-                setState(() {});
-                return Text("No data");
-              }
+          child: ListView.builder(
+            itemCount: _currentAnnonces.length,
+            itemBuilder: (context, index) {
+            Annonce annonce = _currentAnnonces[index];
+              return GestureDetector(
+                onTap: () => _showPopup(annonce),
+                child: AnnonceTile(
+                  idAdvertisement: annonce.idAdvertisement ?? '0',
+                  title: annonce.title ?? 'N/A',
+                  city: annonce.city ?? 'N/A',
+                  idPlant: annonce.name ?? 'N/A',
+                  name: annonce.name ?? '',
+                  userName: annonce.usersName ?? 'N/A',
+                  description: annonce.description ?? 'N/A',
+                  startDate: annonce.startDate ?? 'N/A',
+                  endDate: annonce.endDate ?? 'N/A',
+                  imageUrl: annonce.imageUrls![0] ??'images/plant_default.png', // Utilisez l'URL réelle de l'image si disponible
+                  createdAt: annonce.createdAt ?? 'N/A',
+                ),
+              );
             },
           ),
         ),
       ],
-    );
+    );  
   }
 
   //widget d'affichage des images du User
