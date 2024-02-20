@@ -1,4 +1,5 @@
 import 'package:a_rosa_je/pages/gestion_annonces.dart';
+import 'package:a_rosa_je/util/plantes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
@@ -9,9 +10,11 @@ import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 import 'package:a_rosa_je/util/footer.dart';
 import '../util/annonce_popup_card.dart';
+import '../util/plante_popup_card.dart';
 import '../util/annonce_tile.dart';
 import '../api/api_service.dart';
 import '../util/annonce.dart';
+import '../util/plante_tile.dart';
 import 'create_annonce.dart';
 import 'parametre_menu.dart';
 import 'profil.dart';
@@ -30,7 +33,7 @@ class _HomePageState extends State<HomePage>
   TextEditingController searchController = TextEditingController();
   Marker? _currentMarker;
   bool _hasAnnonces = true;
-  List<Annonce> _currentAnnonces = []; //pour stocker les annonces de la map
+  List<Annonce> _currentAnnonces = []; //pour stocker les annonces
   List<String> cities =
       []; // Pour stocker les villes en fonction du nom de la ville
   String selectedCity = ''; // Pour stocker la ville sélectionnée
@@ -39,17 +42,21 @@ class _HomePageState extends State<HomePage>
   String _usersName = '';
   String _city = '';
   final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
+  final ApiAllPlants apiAllPlants = ApiAllPlants();
+  int selectedPlantId = 0;
+  List<Map<String, dynamic>> plants = [];
+  TextEditingController plantSearchController = TextEditingController();
+  List<Plante> _currentPlantes = []; //pour stocker les annonces
 
-  
  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _loadUserProfile();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController!.addListener(() {
       searchController.clear();
-      if (_tabController!.index == 1) { // index 1 correspond au deuxième onglet
+      if (_tabController!.index == 2) { // index 2 correspond au deuxième onglet
         _determinePosition();
         
       }
@@ -139,6 +146,15 @@ class _HomePageState extends State<HomePage>
       context: context,
       builder: (BuildContext context) {
         return AnnoncePopupCard(annonce: annonce);
+      },
+    );
+  }
+
+  void _showPopupPlante(Plante plante) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PlantePopupCard(plante: plante);
       },
     );
   }
@@ -285,6 +301,47 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  //api pour chercher une plante
+  Future<void> fetchNamePlant(String namePlant) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/plant/'),
+    );
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      List<Map<String, dynamic>> plantsData =
+          []; // Stockez les noms et IDs des plantes
+      for (var plantData in jsonData) {
+        if (plantData['name'].toLowerCase().contains(namePlant.toLowerCase())) {
+          plantsData.add({
+            'name': plantData['name'],
+            'idPlant': plantData['idPlant'], // Supposons que chaque plante a un champ 'idPlant'
+          });
+        }
+      }
+      setState(() {
+        plants = plantsData;
+      });
+    } else {
+      throw Exception('Échec de la récupération des données');
+    }
+  }
+
+  //api pour chercher toutes les plantes
+  Future<void> fetchAllPlant() async {
+    try {
+      List<Plante> plantes = await apiAllPlants.fetchAllPlants();
+      if (plantes.isNotEmpty) {
+        setState(() {
+          _currentPlantes = plantes;
+        });
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des annonces : $e");
+    }
+    return null;
+  }
+
+  //gestion de la liste des annonces Onglet 1
   Widget _buildAnnoncesList() {
     return Column(
       children: [
@@ -294,7 +351,7 @@ class _HomePageState extends State<HomePage>
             child: TextField(
               controller: searchController,
               decoration: InputDecoration(
-                labelText: "Rechercher...",
+                labelText: "Rechercher par ville...",
                 hintText: "Entrez une ville",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
@@ -419,7 +476,114 @@ class _HomePageState extends State<HomePage>
       ],
     );  
   }
-  //gestion de la carte
+  
+  //gestion de la liste des plantes Onglet 2
+  Widget _buildListPlantes(){
+    return Column(
+      children: [
+        if (_isSearchMode)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: plantSearchController,
+              decoration: InputDecoration(
+                labelText: "Rechercher une plante...",
+                hintText: "Entrez une plante",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                ),
+              ),
+              onChanged: (plantName) {
+                if (plantName.isNotEmpty) {
+                  fetchNamePlant(plantName);
+                }
+              },
+            ),
+          ),
+        SizedBox(height: 8.0),
+        if (plants.isNotEmpty) ...[
+          // Ajout de ... pour étendre la liste de widgets
+          Container(
+            height: 100.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: ListView.builder(
+              itemCount: plants.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(plants[index]['name']),
+                  onTap: () {
+                    setState(() {
+                      selectedPlantId = plants[index]['idPlant'];
+                      plantSearchController.text = plants[index]['name'];
+                      plants.clear();
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+        if (!_hasAnnonces)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              "Pas d'annonces dans cette ville",
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Colors.red,
+              ),
+            ),
+          ),
+        if (!_hasAnnonces) // Ajout d'un espace uniquement si _hasAnnonces est false
+          SizedBox(height: 10.0),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Filtrer par plante",
+                style: TextStyle(fontSize: 16.0),
+              ),
+              IconButton(
+                icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+                onPressed: () {
+                  _hasAnnonces = true;
+                  searchController.clear();
+                  setState(() {
+                    _isSearchMode = !_isSearchMode;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _currentPlantes.length,
+            itemBuilder: (context, index) {
+              Plante plante = _currentPlantes[index];
+              return GestureDetector(
+                onTap: () => _showPopupPlante(plante),
+                child: PlanteTile(
+                  idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
+                  name: plante.name ?? 'N/A',
+                  description: plante.description ?? 'N/A',
+                  imageUrl: plante.imageUrls![0] ??
+                      'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );  
+  }
+  //gestion de la carte onglet 3
   Widget _buildMap() {
     return Column(
       children: [
@@ -429,7 +593,7 @@ class _HomePageState extends State<HomePage>
             child: TextField(
               controller: searchController,
               decoration: InputDecoration(
-                labelText: "Rechercher...",
+                labelText: "Rechercher par ville...",
                 hintText: "Entrez une ville",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
@@ -636,6 +800,7 @@ class _HomePageState extends State<HomePage>
               controller: _tabController,
               tabs: [
                 Tab(icon: Icon(Icons.list), text: "Annonces"),
+                Tab(icon: Icon(Icons.add_task), text: "Listes des plantes"),
                 Tab(icon: Icon(Icons.map), text: "Carte"),
               ],
             ),
@@ -645,6 +810,7 @@ class _HomePageState extends State<HomePage>
               controller: _tabController,
               children: [
                 _buildAnnoncesList(),
+                _buildListPlantes(),
                 _buildMap(),
               ],
             ),

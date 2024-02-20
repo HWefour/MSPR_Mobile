@@ -1,4 +1,5 @@
 import 'package:a_rosa_je/util/annonce.dart';
+import 'package:a_rosa_je/util/plantes.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -201,3 +202,18 @@ class ApiCreateJob {
     return response;
   }
 }
+
+class ApiAllPlants {
+  final baseUrl = dotenv.env['API_BASE_URL']; // pour récupérer l'url de base dans le fichier .env
+  Future<List<Plante>> fetchAllPlants() async {
+    final response = await http.get(Uri.parse('$baseUrl/plant'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => Plante.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load plante from API');
+    }
+  }
+}
+
