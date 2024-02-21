@@ -32,31 +32,6 @@ class _ParametreMenuState extends State<ParametreMenu> {
         ),
       ),
       body: MySettingsPage(),
-      // bottomNavigationBar: Footer(
-      //   selectedIndex: 2, // Index correspondant à ParametreMenu
-      //   onItemSelected: (index) {
-      //     switch (index) {
-      //       case 0:
-      //         Navigator.of(context).pushAndRemoveUntil(
-      //           MaterialPageRoute(builder: (context) => HomePage()),
-      //           (Route<dynamic> route) => false,
-      //         );
-      //         break;
-      //       case 1:
-      //         Navigator.of(context).pushAndRemoveUntil(
-      //           MaterialPageRoute(builder: (context) => GestionAnnoncesPage()),
-      //           (Route<dynamic> route) => false,
-      //         );
-      //         break;
-      //       case 3:
-      //         Navigator.of(context).pushAndRemoveUntil(
-      //           MaterialPageRoute(builder: (context) => ProfilPage()),
-      //           (Route<dynamic> route) => false,
-      //         );
-      //         break;
-      //     }
-      //   },
-      // ),
     );
   }
 }
@@ -113,12 +88,14 @@ class MySettingsPage extends StatelessWidget {
           SizedBox(height: 20),
           ListTile(
             title: Text('Informations du compte'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SettingsPage()),
-              );
-            },
+  onTap: () {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage())).then((reloadData) {
+      if (reloadData == true) {
+        // Recharger les données utilisateur
+        setState(() {});
+      }
+    });
+  },
           ),
           ListTile(
             title: Text('Notifications'),
@@ -190,4 +167,6 @@ class MySettingsPage extends StatelessWidget {
       ).toList(),
     );
   }
+  
+  void setState(Null Function() param0) {}
 }

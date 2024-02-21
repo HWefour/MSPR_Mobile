@@ -90,9 +90,10 @@ class _SettingsPageState extends State<SettingsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Modifications enregistrées avec succès')));
         // Recharger les données de l'utilisateur
-        
-        await _loadUserProfileInfo();
-        await logout(context);
+        box.put('userDetails', jsonEncode(updatedUserData));
+         Navigator.pop(context, true);
+        // await _loadUserProfileInfo();
+        // await logout(context);
       } else {
         // Gérer l'échec de la sauvegarde
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

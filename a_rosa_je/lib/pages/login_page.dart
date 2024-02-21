@@ -37,14 +37,22 @@ Future<void> loginUser(BuildContext context) async {
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('je suis la');
       fetchUsersAndCompareEmail(context);
+       ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Connexion réussi')));
     } 
     else if (response.statusCode == 401) {
       print('Erreur d\'authentification : ${response.statusCode}');
+       ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Adresse mail ou mot de passe incorrect')));
     } else {
       print('Erreur HTTP non gérée : ${response.statusCode}');
+       ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur HTTP non gérée')));
     }
   } catch (e) {
     print('Erreur lors de la connexion : $e');
+     ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur lors de la connexion')));
   }
 }
 
