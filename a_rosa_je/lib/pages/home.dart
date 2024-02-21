@@ -77,6 +77,7 @@ class _HomePageState extends State<HomePage>
       });
     }
     _determinePosition();
+    fetchAllPlant();
   }
 
   //determine la localisation de la map à partir de la ville de l'user
@@ -573,7 +574,7 @@ class _HomePageState extends State<HomePage>
                   idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
                   name: plante.name ?? 'N/A',
                   description: plante.description ?? 'N/A',
-                  imageUrl: plante.imageUrls![0] ??
+                  imageUrl: 'images/plant_default.png' ??
                       'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
                 ),
               );

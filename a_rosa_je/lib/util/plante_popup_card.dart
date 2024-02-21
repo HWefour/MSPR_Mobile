@@ -99,19 +99,19 @@ class _AnnoncePopupCardState extends State<PlantePopupCard>
                     SizedBox(height: 16.0),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(2 * 2 - 1, (index) {
+                      children: List.generate(2 * 1 - 1, (index) {
                         // Multiplie par 2 et soustrait 1 pour alterner image et espace
                         if (index % 2 == 0) {
                           // Image
                           if (widget.plante.imageUrls != null &&
                               widget.plante.imageUrls!.isNotEmpty) {
                             // S'il y a au moins une image dans imageUrls
-                            if (index ~/ 2 < widget.plante.imageUrls!.length) {
+                            if (index ~/ 1 < widget.plante.imageUrls!.length) {
                               // S'il y a une image correspondante dans imageUrls
                               return ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.network(
-                                  widget.plante.imageUrls![index ~/ 2],
+                                  widget.plante.imageUrls![index ~/ 1],
                                   width: MediaQuery.of(context).size.width -
                                       32, // Ajustez selon le padding/margin global
                                   height: 400.0, // Ajustez selon vos besoins
