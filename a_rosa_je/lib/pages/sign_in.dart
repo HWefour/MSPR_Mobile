@@ -326,8 +326,7 @@ Row(
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
+                    foregroundColor: Colors.white, backgroundColor: Colors.blue,
                     shape: StadiumBorder(),
                   ),
                   child: Padding(
@@ -394,8 +393,7 @@ class ElevatedButtonWidget extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        primary: buttonColor,
-        onPrimary: Colors.white,
+        foregroundColor: Colors.white, backgroundColor: buttonColor,
         shape: StadiumBorder(),
       ),
       child: Padding(

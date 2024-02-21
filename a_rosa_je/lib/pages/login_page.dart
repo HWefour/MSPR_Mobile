@@ -34,23 +34,16 @@ Future<void> loginUser(BuildContext context) async {
       }),
     );
     print('premier ${response.statusCode}');
-    if (response.statusCode == 200) {
-      // L'authentification a réussi. Vous pouvez afficher un message de succès ou effectuer d'autres actions ici.
-      //ajout test lucas
-      //connexion avec l'api pour trouver l'utilisateur correspondant
+    if (response.statusCode == 200 || response.statusCode == 201) {
       print('je suis la');
       fetchUsersAndCompareEmail(context);
-    } else if (response.statusCode == 401) {
-      // 401 Unauthorized - L'authentification a échoué.
-      // Vous pouvez afficher un message d'erreur ou effectuer d'autres actions ici.
+    } 
+    else if (response.statusCode == 401) {
       print('Erreur d\'authentification : ${response.statusCode}');
     } else {
-      // Autres cas de code de statut HTTP non gérés.
-      // Vous pouvez afficher un message d'erreur ou effectuer d'autres actions ici.
       print('Erreur HTTP non gérée : ${response.statusCode}');
     }
   } catch (e) {
-    // Erreur lors de la requête HTTP.
     print('Erreur lors de la connexion : $e');
   }
 }
@@ -72,8 +65,6 @@ Future<void> loginUser(BuildContext context) async {
         );
 
         if (user != null) {
-          // Utilisateur trouvé, vous pouvez maintenant utiliser les données de l'utilisateur
-          // Convertir l'utilisateur en chaîne JSON
           String userJson = jsonEncode(user);
           print("Détails de l'utilisateur trouvé : $userJson");
 
@@ -86,7 +77,8 @@ Future<void> loginUser(BuildContext context) async {
             context,
             MaterialPageRoute(builder: (context) => HomePage()),
           );
-        } else {
+        } 
+        else {
           // Aucun utilisateur trouvé avec cet email
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -139,7 +131,7 @@ Future<void> loginUser(BuildContext context) async {
                 TextButton(
                   child: Text(
                     'Pas encore de compte ? Inscrivez-vous !',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white,decoration: TextDecoration.underline),
                   ),
                   onPressed: () {
                     Navigator.push(

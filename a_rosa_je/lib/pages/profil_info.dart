@@ -91,11 +91,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SnackBar(content: Text('Modifications enregistrées avec succès')));
         // Recharger les données de l'utilisateur
         
-        // await _loadUserProfileInfo();
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => ParametreMenu()),
-        // );
+        await _loadUserProfileInfo();
         await logout(context);
       } else {
         // Gérer l'échec de la sauvegarde
