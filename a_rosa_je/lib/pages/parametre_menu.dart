@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:a_rosa_je/pages/demande_botaniste.dart';
+import 'package:a_rosa_je/pages/politique.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
@@ -30,37 +32,38 @@ class _ParametreMenuState extends State<ParametreMenu> {
         ),
       ),
       body: MySettingsPage(),
-      bottomNavigationBar: Footer(
-        selectedIndex: 2, // Index correspondant à ParametreMenu
-        onItemSelected: (index) {
-          switch (index) {
-            case 0:
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => HomePage()),
-                (Route<dynamic> route) => false,
-              );
-              break;
-            case 1:
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => GestionAnnoncesPage()),
-                (Route<dynamic> route) => false,
-              );
-              break;
-            case 3:
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => ProfilPage()),
-                (Route<dynamic> route) => false,
-              );
-              break;
-          }
-        },
-      ),
+      // bottomNavigationBar: Footer(
+      //   selectedIndex: 2, // Index correspondant à ParametreMenu
+      //   onItemSelected: (index) {
+      //     switch (index) {
+      //       case 0:
+      //         Navigator.of(context).pushAndRemoveUntil(
+      //           MaterialPageRoute(builder: (context) => HomePage()),
+      //           (Route<dynamic> route) => false,
+      //         );
+      //         break;
+      //       case 1:
+      //         Navigator.of(context).pushAndRemoveUntil(
+      //           MaterialPageRoute(builder: (context) => GestionAnnoncesPage()),
+      //           (Route<dynamic> route) => false,
+      //         );
+      //         break;
+      //       case 3:
+      //         Navigator.of(context).pushAndRemoveUntil(
+      //           MaterialPageRoute(builder: (context) => ProfilPage()),
+      //           (Route<dynamic> route) => false,
+      //         );
+      //         break;
+      //     }
+      //   },
+      // ),
     );
   }
 }
 
 class MySettingsPage extends StatelessWidget {
-  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
+  final baseUrl = dotenv
+      .env['API_BASE_URL']; // pour récupérer l'url de base dans le fichier .env
   Future<void> deleteUserAccount(BuildContext context) async {
     try {
       var box = await Hive.openBox('userBox');
@@ -68,8 +71,9 @@ class MySettingsPage extends StatelessWidget {
       if (userJson != null) {
         Map<String, dynamic> user = jsonDecode(userJson);
         var userId = user['idUser'];
-        final response = await http.delete(Uri.parse('$baseUrl/settings/delete/$userId'));
-        
+        final response =
+            await http.delete(Uri.parse('$baseUrl/settings/delete/$userId'));
+
         if (response.statusCode == 200) {
           await box.delete('userDetails');
           Navigator.pushAndRemoveUntil(
@@ -125,19 +129,25 @@ class MySettingsPage extends StatelessWidget {
           ListTile(
             title: Text('Demander le compte Botaniste'),
             onTap: () {
-              // Handle tap
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DemandeBotanistePage()),
+              );
             },
           ),
-          ListTile(
-            title: Text('Télécharger les données'),
-            onTap: () {
-              // Handle tap
-            },
-          ),
+          // ListTile(
+          //   title: Text('Télécharger les données'),
+          //   onTap: () {
+          //     // Handle tap
+          //   },
+          // ),
           ListTile(
             title: Text('Politique de confidentialité'),
             onTap: () {
-              // Handle tap
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PolitiquePage()),
+              );
             },
           ),
           ListTile(
