@@ -30,6 +30,15 @@ class _ParametreMenuState extends State<ParametreMenu> {
             Text('Paramètres'),
           ],
         ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // Navigation vers la page Home lors du clic sur la flèche gauche
+            Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => HomePage()));
+          },
+        ),
+        
       ),
       body: MySettingsPage(),
     );
@@ -88,14 +97,16 @@ class MySettingsPage extends StatelessWidget {
           SizedBox(height: 20),
           ListTile(
             title: Text('Informations du compte'),
-  onTap: () {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage())).then((reloadData) {
-      if (reloadData == true) {
-        // Recharger les données utilisateur
-        setState(() {});
-      }
-    });
-  },
+            onTap: () {
+              Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SettingsPage()))
+                  .then((reloadData) {
+                if (reloadData == true) {
+                  // Recharger les données utilisateur
+                  setState(() {});
+                }
+              });
+            },
           ),
           ListTile(
             title: Text('Notifications'),
@@ -112,12 +123,6 @@ class MySettingsPage extends StatelessWidget {
               );
             },
           ),
-          // ListTile(
-          //   title: Text('Télécharger les données'),
-          //   onTap: () {
-          //     // Handle tap
-          //   },
-          // ),
           ListTile(
             title: Text('Politique de confidentialité'),
             onTap: () {
@@ -167,6 +172,6 @@ class MySettingsPage extends StatelessWidget {
       ).toList(),
     );
   }
-  
+
   void setState(Null Function() param0) {}
 }

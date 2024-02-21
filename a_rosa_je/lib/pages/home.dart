@@ -590,7 +590,7 @@ class _HomePageState extends State<HomePage>
             icon: Icon(Icons.settings),
             onPressed: () {
               // Mettez ici la logique pour accéder à la page des paramètres
-              Navigator.push(context,
+              Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => ParametreMenu()));
             },
           ),
