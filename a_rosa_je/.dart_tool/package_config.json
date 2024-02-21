@@ -117,9 +117,9 @@
     },
     {
       "name": "cross_file",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/cross_file-0.3.3+7",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/cross_file-0.3.4",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.3"
     },
     {
       "name": "crypto",
@@ -219,7 +219,7 @@
     },
     {
       "name": "flutter_svg",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_svg-2.0.9",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_svg-2.0.10+1",
       "packageUri": "lib/",
       "languageVersion": "2.19"
     },
@@ -687,9 +687,9 @@
     },
     {
       "name": "url_launcher_web",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_web-2.2.0",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_web-2.3.0",
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "3.3"
     },
     {
       "name": "url_launcher_windows",
@@ -699,19 +699,19 @@
     },
     {
       "name": "vector_graphics",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics-1.1.10+1",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics-1.1.11+1",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
     {
       "name": "vector_graphics_codec",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_codec-1.1.10+1",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_codec-1.1.11+1",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
     {
       "name": "vector_graphics_compiler",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_compiler-1.1.10+1",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_compiler-1.1.11+1",
       "packageUri": "lib/",
       "languageVersion": "2.19"
     },
@@ -782,7 +782,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-02-20T11:26:39.373521Z",
+  "generated": "2024-02-21T09:09:58.420267Z",
   "generator": "pub",
   "generatorVersion": "3.3.0"
 }

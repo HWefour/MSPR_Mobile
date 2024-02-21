@@ -37,7 +37,6 @@ class _HomePageState extends State<HomePage>
   final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
   String _usersName = '';
   String _city = '';
-
   
  @override
   void initState() {
@@ -62,6 +61,7 @@ class _HomePageState extends State<HomePage>
       Map<String, dynamic> user = jsonDecode(userJson);
       // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
       setState(() {
+        
         //Mettez à jour votre état avec les informations de l'utilisateur
         _usersName = user['usersName'] ?? 'N/A';
         _city = user['city'] ?? 'N/A';
