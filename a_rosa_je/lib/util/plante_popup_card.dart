@@ -152,7 +152,7 @@ class _AnnoncePopupCardState extends State<PlantePopupCard>
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => CreateCommentaire()),
+                      MaterialPageRoute(builder: (context) => CreateCommentaire(idPlant: int.parse(widget.plante.idPlant!))),
                     );
                   },
                   style: ElevatedButton.styleFrom(

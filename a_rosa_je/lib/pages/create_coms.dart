@@ -11,20 +11,18 @@ import 'home.dart';
 
 
 class CreateCommentaire extends StatefulWidget {
+  final int idPlant;
+   CreateCommentaire({Key? key, required this.idPlant}) : super(key: key);
+
   @override
   _CreateCommentaireState createState() => _CreateCommentaireState();
 }
 
 class _CreateCommentaireState extends State<CreateCommentaire> 
    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  DateTime selectedStartDate = DateTime.now();
-  DateTime selectedEndDate = DateTime.now().add(Duration(days: 7));
-  DateTime creationDate = DateTime.now(); // Ajout de la date de création
   final _formKey = GlobalKey<FormState>();
-  String title = ''; // Variable pour stocker le titre de l'annonced
-  String description = '';
+  String _commentaire = '';
   int _idUserLocal = 0;
-  String _city = '';
   final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
 
    @override
@@ -44,16 +42,9 @@ class _CreateCommentaireState extends State<CreateCommentaire>
       setState(() {
         //Mettez à jour votre état avec les informations de l'utilisateur
         _idUserLocal = user['idUser'] ?? 0;
-        _city = user['city'] ?? 'N/A';
       });
     }
   }
-
-  
-
-
-  
-
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +72,7 @@ class _CreateCommentaireState extends State<CreateCommentaire>
                   maxLines: 4, // Set to your preference
                   keyboardType: TextInputType.multiline,
                   onSaved: (value) {
-                    description = value!;
+                    _commentaire = value!;
                   },
                 ),
               ),
@@ -97,8 +88,8 @@ class _CreateCommentaireState extends State<CreateCommentaire>
                       // Appel à l'API pour créer l'annonce
                       final response = await ApiCreateCommentaire.createCommentaire(
                         idUser: _idUserLocal,
-                        idPlant: 1,
-                        commentaire: description,
+                        idPlant: widget.idPlant,
+                        commentaire: _commentaire,
 
                       );
                       // Vérifier la réponse de l'API
