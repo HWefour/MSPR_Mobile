@@ -1,4 +1,3 @@
-
 import 'package:a_rosa_je/pages/home.dart';
 import 'package:a_rosa_je/pages/sign_in.dart';
 import 'package:flutter/material.dart';
@@ -15,52 +14,58 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
-
+  final baseUrl = dotenv.env['API_BASE_URL']; // pour récupérer l'url de base dans le fichier .env
 
   //fonction loginUser
-Future<void> loginUser(BuildContext context) async {
-  final url = Uri.parse('$baseUrl/auth/login');
+  Future<void> loginUser(BuildContext context) async {
+    final url = Uri.parse('$baseUrl/auth/login');
 
-  try {
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({
-        "email": _emailController.text,
-        "password": _passwordController.text,
-      }),
-    );
-    print('premier ${response.statusCode}');
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      print('je suis la');
-      fetchUsersAndCompareEmail(context);
-       ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Connexion réussi')));
-    } 
-    else if (response.statusCode == 401) {
-      print('Erreur d\'authentification : ${response.statusCode}');
-       ScaffoldMessenger.of(context).showSnackBar(
+    try {
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          "email": _emailController.text,
+          "password": _passwordController.text,
+        }),
+      );
+      print('premier ${response.statusCode}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('succès');
+        final token = jsonDecode(response.body)['token'];
+        print('Token: $token'); // Afficher le token dans le terminal
+        await storeToken(token);
+        fetchUsersAndCompareEmail(context);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Connexion réussie')));
+      } else if (response.statusCode == 401) {
+        print('Erreur d\'authentification : ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Adresse mail ou mot de passe incorrect')));
-    } else {
-      print('Erreur HTTP non gérée : ${response.statusCode}');
-       ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur HTTP non gérée')));
+      } else {
+        print('Erreur HTTP non gérée : ${response.statusCode}');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Erreur HTTP non gérée')));
+      }
+    } catch (e) {
+      print('Erreur lors de la connexion : $e');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Erreur lors de la connexion')));
     }
-  } catch (e) {
-    print('Erreur lors de la connexion : $e');
-     ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur lors de la connexion')));
   }
-}
+
+  Future<void> storeToken(String token) async {
+    var box = await Hive.openBox('userBox');
+    await box.put('token', token);
+  }
 
   Future<void> fetchUsersAndCompareEmail(BuildContext context) async {
     final url = Uri.parse('$baseUrl/backoffice/users/');
     print('je suis ici');
     try {
-      final response = await http.get(url);
+      final response = await http.get(url, headers: await _getHeaders());
       print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> users = jsonDecode(response.body);
@@ -85,8 +90,7 @@ Future<void> loginUser(BuildContext context) async {
             context,
             MaterialPageRoute(builder: (context) => HomePage()),
           );
-        } 
-        else {
+        } else {
           // Aucun utilisateur trouvé avec cet email
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -96,13 +100,22 @@ Future<void> loginUser(BuildContext context) async {
         }
       } else {
         // Gestion des erreurs de réponse
-        print("Erreur lors de la récupération des utilisateurs: ${response.statusCode}");
+        print(
+            "Erreur lors de la récupération des utilisateurs: ${response.statusCode}");
       }
     } catch (e) {
       print('Erreur lors de la connexion : $e');
     }
   }
-        
+
+  Future<Map<String, String>> _getHeaders() async {
+    var box = await Hive.openBox('userBox');
+    var token = await box.get('token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +152,9 @@ Future<void> loginUser(BuildContext context) async {
                 TextButton(
                   child: Text(
                     'Pas encore de compte ? Inscrivez-vous !',
-                    style: TextStyle(color: Colors.white,decoration: TextDecoration.underline),
+                    style: TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.underline),
                   ),
                   onPressed: () {
                     Navigator.push(
