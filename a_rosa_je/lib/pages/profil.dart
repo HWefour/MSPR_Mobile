@@ -171,7 +171,7 @@ class _ProfilPageState extends State<ProfilPage>
                   idAdvertisement: annonce.idAdvertisement ?? '0',
                   title: annonce.title ?? 'N/A',
                   city: annonce.city ?? 'N/A',
-                  idPlant: annonce.name ?? 'N/A',
+                  idPlant: '',
                   name: annonce.name ?? '',
                   userName: annonce.usersName ?? 'N/A',
                   description: annonce.description ?? 'N/A',
