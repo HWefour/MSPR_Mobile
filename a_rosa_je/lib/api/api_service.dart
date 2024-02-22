@@ -8,7 +8,7 @@ import 'dart:convert';
 
 class ApiService {
   final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
-  Future<Map<String, dynamic>> createUser({
+  Future<Map<String, dynamic>> createUserAndNavigate({
     required String firstName,
     required String lastName,
     required String userName,

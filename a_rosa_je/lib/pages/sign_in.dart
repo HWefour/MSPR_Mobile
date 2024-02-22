@@ -1,4 +1,5 @@
 import 'package:a_rosa_je/pages/login_page.dart';
+import 'package:a_rosa_je/pages/politique.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -35,7 +36,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   bool isChecked = false;
-  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
+  final baseUrl = dotenv
+      .env['API_BASE_URL']; // pour récupérer l'url de base dans le fichier .env
 
   // Validation de l'email
   bool isEmailValid(String email) {
@@ -46,12 +48,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   // Validation du mot de passe
-bool isPasswordValid(String password) {
-  String pattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~`^(){}\[\]:";\<>?,./\\\-_=+]).{8,}$';
-  RegExp regex = RegExp(pattern);
-  return regex.hasMatch(password);
-}
-
+  bool isPasswordValid(String password) {
+    String pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~`^(){}\[\]:";\<>?,./\\\-_=+]).{8,}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(password);
+  }
 
   Future<void> createUserAndNavigate() async {
     if (!isEmailValid(_emailController.text)) {
@@ -92,78 +94,80 @@ bool isPasswordValid(String password) {
       return;
     }
 
-final url = Uri.parse('$baseUrl/auth/signup');
-final response = await http.post(
-  url,
-  headers: <String, String>{
-    'Content-Type': 'application/json; charset=UTF-8',
-  },
-  body: jsonEncode({
-    "firstName": _firstNameController.text,
-    "lastName": _lastNameController.text,
-    "usersName": _userNameController.text,
-    "email": _emailController.text,
-    "city": selectedCity,
-    "bio": "bio", // Vous pouvez modifier cela si nécessaire
-    "password": _passwordController.text,
-    "idRole": "2" // Vous pouvez modifier cela si nécessaire
-  }),
-);
-
-if (response.statusCode == 201) {
-  final responseData = json.decode(response.body);
-  if (responseData['success'] == true) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+    final url = Uri.parse('$baseUrl/auth/signup');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        "firstName": _firstNameController.text,
+        "lastName": _lastNameController.text,
+        "usersName": _userNameController.text,
+        "email": _emailController.text,
+        "city": selectedCity,
+        "bio": "bio", // Vous pouvez modifier cela si nécessaire
+        "password": _passwordController.text,
+        "idRole": "2" // Vous pouvez modifier cela si nécessaire
+      }),
     );
-  } else {
-    if (responseData['error'] == 'email_exists') {
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Un utilisateur existe déjà avec cette adresse e-mail.'),
+          content: Text('Votre compte utilisateur a bien été créé'),
         ),
       );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+      return;
+    } else if (response.statusCode == 400) {
+      final responseData = json.decode(response.body);
+      if (responseData['error'] == 'email_exists') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Un utilisateur existe déjà avec cette adresse e-mail.'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Une erreur s\'est produite lors de la création de l\'utilisateur.'),
+          ),
+        );
+      }
+      return;
     } else {
+      // Gestion des autres codes d'état HTTP
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Échec de la création de l\'utilisateur'),
+          content: Text(
+              'Une erreur s\'est produite lors de la création de l\'utilisateur. Réessayez plus tard.'),
         ),
       );
     }
-  }
-} else {
-  Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      
-      content: Text('Votre compte utilisateur est bien créer vous pouvez vous connecter'),
-    ),
-  );
-}
-
   }
 
   Future<void> fetchCities(String cityName) async {
-  final response = await http.get(Uri.parse(
-      'https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
-  if (response.statusCode == 200) {
-    final jsonData = json.decode(response.body);
-    List<String> cityNames = [];
-    for (var cityData in jsonData) {
-      cityNames.add(cityData['nom']);
+    final response = await http.get(Uri.parse(
+        'https://geo.api.gouv.fr/communes?nom=$cityName&fields=departement&boost=population&limit=5'));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      List<String> cityNames = [];
+      for (var cityData in jsonData) {
+        cityNames.add(cityData['nom']);
+      }
+      setState(() {
+        cities = cityNames;
+      });
+    } else {
+      throw Exception('Échec de la récupération des données');
     }
-    setState(() {
-      cities = cityNames;
-    });
-  } else {
-    throw Exception('Échec de la récupération des données');
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -257,25 +261,51 @@ if (response.statusCode == 201) {
             controller: _confirmPasswordController,
           ),
           SizedBox(height: 24.0),
-          Row(
-            children: [
-              Checkbox(
-                value: isChecked,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isChecked = value ?? false;
-                  });
-                },
-              ),
-              SizedBox(width: 8.0),
-              Expanded(
-                child: Text(
-                  'J\'accepte les conditions générales et la politique de confidentialité',
-                  style: TextStyle(color: Colors.white),
+Row(
+  children: [
+    Checkbox(
+      value: isChecked,
+      onChanged: (bool? value) {
+        setState(() {
+          isChecked = value ?? false;
+        });
+      },
+    ),
+    SizedBox(width: 8.0),
+    Expanded(
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Politique de Confidentialité'),
+                content: SingleChildScrollView(
+                  child: Text(
+                    'Chez A\'rosa_je, nous nous engageons à protéger votre vie privée. Cette politique de confidentialité explique comment nous recueillons, utilisons et protégeons vos informations personnelles lorsque vous utilisez notre site web ou nos services.',
+                  ),
                 ),
-              ),
-            ],
-          ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Fermer'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: Text(
+          'J\'accepte les conditions générales et la politique de confidentialité',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    ),
+  ],
+),
+
           SizedBox(height: 24.0),
           Row(
             children: [
@@ -296,8 +326,7 @@ if (response.statusCode == 201) {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
+                    foregroundColor: Colors.white, backgroundColor: Colors.blue,
                     shape: StadiumBorder(),
                   ),
                   child: Padding(
@@ -364,8 +393,7 @@ class ElevatedButtonWidget extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        primary: buttonColor,
-        onPrimary: Colors.white,
+        foregroundColor: Colors.white, backgroundColor: buttonColor,
         shape: StadiumBorder(),
       ),
       child: Padding(

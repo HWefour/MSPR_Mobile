@@ -1,8 +1,11 @@
+import 'package:a_rosa_je/pages/home.dart';
+import 'package:a_rosa_je/pages/parametre_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:a_rosa_je/pages/login_page.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -11,6 +14,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   String _usersName = '';
+  String _lastName = ''; // Ajout du champ lastName
   String _city = '';
   String _email = '';
   String _bio = '';
@@ -19,16 +23,19 @@ class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
+  final baseUrl = dotenv
+      .env['API_BASE_URL']; // pour récupérer l'url de base dans le fichier .env
 
   // Fonction pour récupérer les données de l'utilisateur depuis le stockage
-  Future<void> _loadUserProfile() async {
+  Future<void> _loadUserProfileInfo() async {
     var box = await Hive.openBox('userBox');
     var userJson = box.get('userDetails');
     if (userJson != null) {
       Map<String, dynamic> user = jsonDecode(userJson);
       setState(() {
         _usersName = user['usersName'] ?? 'N/A';
+        _lastName =
+            user['lastName'] ?? 'N/A'; // Charger lastName depuis le stockage
         _city = user['city'] ?? 'N/A';
         _email = user['email'] ?? 'N/A';
         _bio = user['bio'] ?? 'N/A';
@@ -40,38 +47,60 @@ class _SettingsPageState extends State<SettingsPage> {
       });
     }
   }
-
+    Future<void> logout(BuildContext context) async {
+    try {
+      var box = await Hive.openBox('userBox');
+      await box.delete('userDetails');
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      print('Erreur lors de la déconnexion: $e');
+    }
+  }
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
+    _loadUserProfileInfo();
   }
 
   // Fonction pour enregistrer les modifications
-Future<void> _saveChanges() async {
-  var box = await Hive.openBox('userBox');
-  var userJson = box.get('userDetails');
-  if (userJson != null) {
-    Map<String, dynamic> user = jsonDecode(userJson);
-    var userId = user['idUser'];
-    var updatedUserData = {
-      'usersName': _userNameController.text,
-      'city': _cityController.text,
-      'email': _emailController.text,
-      'bio': _bioController.text,
-    };
-    final response = await http.put(Uri.parse('$baseUrl/settings/update/$userId'), body: jsonEncode(updatedUserData), headers: {"Content-Type": "application/json"});
-    if (response.statusCode == 200) {
-      // Afficher un message pour indiquer que les modifications ont été enregistrées
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Modifications enregistrées avec succès')));
-      // Recharger les données de l'utilisateur
-      await _loadUserProfile();
-    } else {
-      // Gérer l'échec de la sauvegarde
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Échec de la sauvegarde des modifications')));
+  Future<void> _saveChanges() async {
+    var box = await Hive.openBox('userBox');
+    var userJson = box.get('userDetails');
+    if (userJson != null) {
+      Map<String, dynamic> user = jsonDecode(userJson);
+      var userId = user['idUser'];
+      var updatedUserData = {
+        'usersName': _userNameController.text,
+        'lastName':
+            _lastName, // Ne pas modifier lastName lors de l'enregistrement
+        'city': _cityController.text,
+        'email': _emailController.text,
+        'bio': _bioController.text,
+      };
+      final response = await http.put(
+          Uri.parse('$baseUrl/settings/update/$userId'),
+          body: jsonEncode(updatedUserData),
+          headers: {"Content-Type": "application/json"});
+      if (response.statusCode == 200) {
+        // Afficher un message pour indiquer que les modifications ont été enregistrées
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Modifications enregistrées avec succès')));
+        // Recharger les données de l'utilisateur
+        box.put('userDetails', jsonEncode(updatedUserData));
+         Navigator.pop(context, true);
+        // await _loadUserProfileInfo();
+        // await logout(context);
+      } else {
+        // Gérer l'échec de la sauvegarde
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Échec de la sauvegarde des modifications')));
+      }
     }
   }
-}
 
   // Fonction pour récupérer les données de la ville depuis l'API
   Future<void> _fetchCities(String cityName) async {
@@ -176,7 +205,7 @@ Future<void> _saveChanges() async {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _saveChanges,
-              child: Text('Appliquer mes changements'),
+              child: Text('Appliquer mes changements et se déconnecter'),
             ),
           ],
         ),
