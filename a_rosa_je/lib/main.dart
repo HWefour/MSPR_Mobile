@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:a_rosa_je/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
@@ -33,17 +35,13 @@ class MyApp extends StatelessWidget {
       home: FutureBuilder<bool>(
         future: _checkUserLoggedIn(),
         builder: (context, snapshot) {
-          // Vérifier si la future est terminée et si l'utilisateur est connecté
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.data == true) {
-              // Les données utilisateur existent, donc diriger vers HomePage
               return HomePage();
             } else {
-              // Pas de données utilisateur, donc diriger vers LoginPage
               return LoginPage();
             }
           } else {
-            // Afficher un indicateur de chargement pendant que la vérification est en cours
             return Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),

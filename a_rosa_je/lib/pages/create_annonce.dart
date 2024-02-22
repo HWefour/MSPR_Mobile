@@ -1,3 +1,5 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
@@ -45,11 +47,8 @@ class _CreateAnnonceState extends State<CreateAnnonce>
     var box = await Hive.openBox('userBox');
     var userJson = box.get('userDetails');
     if (userJson != null) {
-      // Assume userJson is a JSON string that needs to be decoded
       Map<String, dynamic> user = jsonDecode(userJson);
-      // Utilisez `user` pour mettre à jour l'état de l'interface utilisateur si nécessaire
       setState(() {
-        //Mettez à jour votre état avec les informations de l'utilisateur
         _idUserLocal = user['idUser'] ?? 0;
         _city = user['city'] ?? 'N/A';
       });
@@ -130,16 +129,6 @@ class _CreateAnnonceState extends State<CreateAnnonce>
     }
   }
 
-  // Future<void> _getImageAndUpload(int idAnnonce) async {
-  //   final picker = ImagePicker();
-  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-  //   if (pickedFile != null) {
-  //     setState(() {
-  //       _image = File(pickedFile.path);
-  //     });
-  //     await _uploadImage(idAnnonce);
-  //   }
-  // }
 
   Future<void> _uploadImage(String filePath, int idAnnonce) async {
     // Recherche de la première occurrence d'une extension parmi celles autorisées
@@ -153,7 +142,6 @@ class _CreateAnnonceState extends State<CreateAnnonce>
         break;
       }
     }
-
     if (index != -1) {
       // Tronquer le nom de fichier à l'index trouvé
       String truncatedFileName = fileName.substring(0, index);
