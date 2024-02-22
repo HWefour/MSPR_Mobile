@@ -186,10 +186,18 @@ class _AnnoncePopupCardState extends State<AnnoncePopupCard>
                     SizedBox(height: 40.0),
                       Text('Commentaires des botanistes sur la plante : '),
                     SizedBox(height: 1.0),
-                    Text(
-                      widget.annonce.description ?? 'N/A',
-                      textAlign: TextAlign.justify,
-                      style: TextStyle(fontSize: 16.0),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: widget.annonce.commentaires != null && widget.annonce.commentaires!.isNotEmpty
+                          ? widget.annonce.commentaires!
+                              .take(3) // Prend les 3 premiers éléments de la liste
+                              .map((commentaire) => Text(
+                                    '"' +commentaire+'"',
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(fontSize: 16.0),
+                                  ))
+                              .toList() // Convertit l'itérable résultant en une liste
+                          : [Text('N/A', textAlign: TextAlign.justify, style: TextStyle(fontSize: 16.0))],
                     ),
                   ],
                 ),

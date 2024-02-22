@@ -239,52 +239,24 @@ class _HomePageState extends State<HomePage>
 
   //récupère les commentaires des annonces
   Future<List<String>> fetchCommentairesForAnnonce(int idPlant) async {
-    final url = Uri.parse('$baseUrl/images/show/$idPlant');
-    final response = await http.get(url, headers: {'User-Agent': 'a_rosa_je'});
+    final commentaire = Uri.parse('$baseUrl/tips/postplant/$idPlant');
+    final response = await http.get(commentaire, headers: {'User-Agent': 'a_rosa_je'});
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       if (data.isNotEmpty) {
-        List<String> urls = data.map((item) => item["url"] as String).toList();
+        List<String> commentaires = data.map((item) => item["comment"] as String).toList();
         // Affichage des URLs
-        return urls;
+        return commentaires;
       } else {
-        // Si les données sont vides, retourner une liste contenant uniquement l'image par défaut
-        return ['images/plant_default.png'];
+        // Si les données sont vides, retourner une liste contenant un commentaire par défaut
+        return ['pas de commentaire'];
       }
     } else {
-      // Si la requête échoue, retourner une liste contenant uniquement l'image par défaut
-      return ['images/plant_default.png'];
+      // Si la requête échoue, retourner une liste contenant un commentaire par défaut
+      return ['pas de commentaire'];
     }
   }
 
-  // Widget _showAnnonceList(BuildContext context) {
-  // // Utilisez un Container, ListView.builder, ou tout autre widget approprié ici
-  //   return ListView.builder(
-  //     itemCount: _currentAnnonces.length,
-  //     itemBuilder: (context, index) {
-        
-  //       Annonce annonce = _currentAnnonces[index];
-  //       print('url de image : ${annonce.imageUrls[0]}');
-  //       return GestureDetector(
-  //         onTap: () => _showPopup(annonce),
-          
-  //         child: AnnonceTile(
-  //           idAdvertisement: annonce.idAdvertisement ?? '0',
-  //           title: annonce.imageUrls ?? 'N/A',
-  //           city: annonce.city ?? 'N/A',
-  //           idPlant: '', // Assurez-vous d'avoir la bonne propriété ici
-  //           name: annonce.name ?? 'N/A',
-  //           userName: '', // Assurez-vous d'avoir la bonne valeur ici
-  //           description: annonce.description ?? 'N/A',
-  //           startDate: annonce.startDate ?? 'N/A',
-  //           endDate: annonce.endDate ?? 'N/A',
-  //           imageUrl: annonce.imageUrls[0] ??'images/plant_default.png', // Idéalement, utilisez l'URL de l'image de l'annonce
-  //           createdAt: '', // Assurez-vous d'avoir la bonne valeur ici
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   void _showAnnoncesModal(BuildContext context) {
     showModalBottomSheet(
