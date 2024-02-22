@@ -1,12 +1,6 @@
-import 'package:a_rosa_je/pages/create_annonce.dart';
 import 'package:a_rosa_je/pages/home.dart';
-import 'package:a_rosa_je/pages/profil.dart';
 import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
-import 'pages/sign_in.dart';
-import 'pages/parametre_menu.dart';
-import 'pages/profil_info.dart';
-import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart'; //pour le stockage en local
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -16,14 +10,16 @@ void main() async {
   await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
+
 Future<bool> _checkUserLoggedIn() async {
   await Hive.initFlutter();
   var box = await Hive.openBox('userBox');
   var userJson = box.get('userDetails');
   await box
-      .close(); // Fermer la boîte après l'accès pour libérer des ressources
+      .close(); // Fermer la boîte 
   return userJson != null;
 }
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
