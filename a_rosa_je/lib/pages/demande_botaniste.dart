@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class DemandeBotanistePage extends StatelessWidget {
-  final String adresseMail = "arosaje@admin.fr";
+class DemandeBotanistePage extends StatefulWidget {
+  get emailSent => null;
 
-  void envoyerEmail(BuildContext context) async {
+  @override
+  _DemandeBotanistePageState createState() => _DemandeBotanistePageState();
+}
+
+class _DemandeBotanistePageState extends State<DemandeBotanistePage> {
+  final String adresseMail = "arosaje@admin.fr";
+  bool emailSent = false;
+
+  Future<void> envoyerEmail(BuildContext context) async {
     final Uri params = Uri(
       scheme: 'mailto',
       path: adresseMail,
@@ -13,13 +21,17 @@ class DemandeBotanistePage extends StatelessWidget {
     String url = params.toString();
     if (await canLaunch(url)) {
       await launch(url);
+      setState(() {
+        emailSent = true; // Mise à jour de la variable emailSent après l'envoi de l'e-mail
+      });
     } else {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Aucune application de messagerie trouvée'),
-            content: Text('Veuillez installer une application de messagerie pour envoyer un e-mail.'),
+            content: Text(
+                'Veuillez installer une application de messagerie pour envoyer un e-mail.'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),

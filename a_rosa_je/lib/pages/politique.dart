@@ -13,7 +13,7 @@ class PolitiquePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Politique de Confidentialité',
+              'Politique de Confidentialité et gestion des données',
               style: TextStyle(
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
