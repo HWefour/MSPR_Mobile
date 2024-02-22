@@ -187,8 +187,9 @@ class _HomePageState extends State<HomePage>
       List<Annonce> annonces = await apiAnnoncesVille.fetchAnnoncesVille(city);
       if (annonces.isNotEmpty) {
         List<Annonce> annoncesMisesAJour = await Future.wait(annonces.map((annonce) async {
-        List<String> imageUrls = await fetchImageUrlsForAnnonce(int.parse(annonce.idAdvertisement!));
-        return annonce.copyWith(imageUrls: imageUrls);
+        List<String> imageUrls = await fetchImageUrlsForAnnonce(int.parse(annonce.idAdvertisement!)); //ajout des images
+        List<String> commentaires = await fetchCommentairesForAnnonce(int.parse(annonce.idPlant!)); //ajout des images
+        return annonce.copyWith(imageUrls: imageUrls, commentaires: commentaires);
       }));
       setState(() {
         _currentAnnonces = annoncesMisesAJour;
@@ -220,7 +221,6 @@ class _HomePageState extends State<HomePage>
   Future<List<String>> fetchImageUrlsForAnnonce(int idAnnonce) async {
     final url = Uri.parse('$baseUrl/images/show/$idAnnonce');
     final response = await http.get(url, headers: {'User-Agent': 'a_rosa_je'});
-
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       if (data.isNotEmpty) {
@@ -237,8 +237,25 @@ class _HomePageState extends State<HomePage>
     }
   }
 
-
-
+  //récupère les commentaires des annonces
+  Future<List<String>> fetchCommentairesForAnnonce(int idPlant) async {
+    final url = Uri.parse('$baseUrl/images/show/$idPlant');
+    final response = await http.get(url, headers: {'User-Agent': 'a_rosa_je'});
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      if (data.isNotEmpty) {
+        List<String> urls = data.map((item) => item["url"] as String).toList();
+        // Affichage des URLs
+        return urls;
+      } else {
+        // Si les données sont vides, retourner une liste contenant uniquement l'image par défaut
+        return ['images/plant_default.png'];
+      }
+    } else {
+      // Si la requête échoue, retourner une liste contenant uniquement l'image par défaut
+      return ['images/plant_default.png'];
+    }
+  }
 
   // Widget _showAnnonceList(BuildContext context) {
   // // Utilisez un Container, ListView.builder, ou tout autre widget approprié ici

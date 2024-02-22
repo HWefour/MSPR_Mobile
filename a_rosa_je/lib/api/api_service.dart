@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/create_coms.dart';
 import 'package:a_rosa_je/util/annonce.dart';
 import 'package:a_rosa_je/util/plantes.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -174,6 +175,27 @@ class ApiCreateAnnounce {
           "description": description,
           "start_date": startDate,
           "end_date": endDate,
+        }));
+
+    return response;
+  }
+}
+
+class ApiCreateCommentaire {
+  final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
+  static Future<http.Response> createCommentaire({
+    required int idPlant,
+    required int idUser,
+    required String commentaire
+  }) async {
+    final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
+    final url = Uri.parse('$baseUrl/tips/post');
+    final response = await http.post(url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "idPlant": idPlant,
+          "idUser": idUser,
+          "comment": commentaire,
         }));
 
     return response;

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:a_rosa_je/api/api_service.dart';
+import 'package:a_rosa_je/pages/create_coms.dart';
 import 'package:a_rosa_je/pages/gestion_annonces.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -144,51 +145,23 @@ class _AnnoncePopupCardState extends State<PlantePopupCard>
                 ),
               ),
             ),
-            // Align(
-            //   alignment: Alignment.bottomCenter,
-            //   child: Padding(
-            //     padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-            //     child: Visibility (
-            //       visible: _idUser.toString() != widget.annonce.idUser,
-            //         child: ElevatedButton(
-            //         onPressed: () async {
-            //           //ici la logique pour créer un job et rediriger vers la page annonce
-            //           String formattedDateJob = DateFormat('dd/MM/yyyy').format(creationDateJob);
-            //           //Apel à l'API pour créer le job
-            //           final response = await ApiCreateJob.createJob(
-            //             dateDuJour: formattedDateJob, 
-            //             idUserAnnounceur: int.parse(widget.annonce.idUser ??'0'), 
-            //             idAdvertisement: int.parse(widget.annonce.idAdvertisement ??'0'), 
-            //             idUserGardien: _idUser,// id local de l'utilisateur
-            //             );
-
-            //             // Vérifier la réponse de l'API
-            //             if (response.statusCode == 200 || response.statusCode == 201 ) {
-            //               // Gestion de la réponse réussie
-            //               ScaffoldMessenger.of(context).showSnackBar(
-            //                 SnackBar(content: Text('Job créé avec succès')),
-            //               );
-            //               // Retour à la page d'accueil en retirant toutes les routes jusqu'à celle-ci
-            //               Navigator.of(context).pushAndRemoveUntil(
-            //                 MaterialPageRoute(builder: (context) => GestionAnnoncesPage()), // Remplacez HomePage() par votre widget de page d'accueil
-            //                 (Route<dynamic> route) => false,
-            //               );
-            //             } else {
-            //               // Gestion de l'échec de la réponse
-            //               ScaffoldMessenger.of(context).showSnackBar(
-            //                 SnackBar(content: Text('Erreur lors de la création du job ${response.statusCode}')),
-            //               );
-            //             }
-            //         },
-            //         style: ElevatedButton.styleFrom(
-            //           minimumSize: Size(double.infinity, 36), // makes it stretch
-            //         ),
-            //         child: Text('Contacter ${widget.annonce.usersName}'),
-            //       ),
-            //     ),
-                
-            //   ),
-            // ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => CreateCommentaire()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 36), // makes it stretch
+                  ),
+                  child: Text('Ajouter un commentaire'),
+                ),  
+              ),
+            ),
           ],
         ),
       ),

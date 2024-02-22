@@ -183,6 +183,14 @@ class _AnnoncePopupCardState extends State<AnnoncePopupCard>
                         }
                       }),
                     ),
+                    SizedBox(height: 40.0),
+                      Text('Commentaires des botanistes sur la plante : '),
+                    SizedBox(height: 1.0),
+                    Text(
+                      widget.annonce.description ?? 'N/A',
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
                   ],
                 ),
               ),
