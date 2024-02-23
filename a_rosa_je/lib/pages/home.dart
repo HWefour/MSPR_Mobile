@@ -106,8 +106,6 @@ class _HomePageState extends State<HomePage>
           _hasAnnonces = false; // Aucune annonce trouvée
         });
       }
-
-
   }
 
   @override
