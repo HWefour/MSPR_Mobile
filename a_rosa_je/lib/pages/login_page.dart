@@ -1,4 +1,5 @@
 import 'package:a_rosa_je/pages/home.dart';
+import 'package:a_rosa_je/pages/parametre_menu.dart';
 import 'package:a_rosa_je/pages/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -35,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('succès');
         final token = jsonDecode(response.body)['token'];
-        print('Token: $token'); // Afficher le token dans le terminal
+        print('Token: $token'); 
         await storeToken(token);
         fetchUsersAndCompareEmail(context);
         ScaffoldMessenger.of(context)
@@ -88,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
           // Redirigez l'utilisateur vers la page d'accueil
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => ParametreMenu()),
           );
         } else {
           // Aucun utilisateur trouvé avec cet email
