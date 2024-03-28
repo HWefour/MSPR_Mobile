@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
           // Redirigez l'utilisateur vers la page d'accueil
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => ParametreMenu()),
+            MaterialPageRoute(builder: (context) => HomePage()),
           );
         } else {
           // Aucun utilisateur trouvé avec cet email

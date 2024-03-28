@@ -14,7 +14,6 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   String _usersName = '';
-  String _lastName = ''; // Ajout du champ lastName
   String _city = '';
   String _email = '';
   String _bio = '';
@@ -30,12 +29,17 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _loadUserProfileInfo() async {
     var box = await Hive.openBox('userBox');
     var userJson = box.get('userDetails');
-    if (userJson != null) {
+    var storedToken = box.get('token'); // Récupérer le token stocké
+    var currentToken = await _getCurrentToken(); // Récupérer le token actuel
+
+    print('Stored Token: $storedToken');
+    print('Current Token: $currentToken');
+
+    if (userJson != null && storedToken != null && storedToken == currentToken) {
+      print('Le token est le même que celui utilisé lors de la connexion.');
       Map<String, dynamic> user = jsonDecode(userJson);
       setState(() {
         _usersName = user['usersName'] ?? 'N/A';
-        _lastName =
-            user['lastName'] ?? 'N/A'; 
         _city = user['city'] ?? 'N/A';
         _email = user['email'] ?? 'N/A';
         _bio = user['bio'] ?? 'N/A';
@@ -44,7 +48,19 @@ class _SettingsPageState extends State<SettingsPage> {
         _emailController.text = _email;
         _bioController.text = _bio;
       });
+    } else {
+      // Si le token est différent ou inexistant, redirigez vers la page de connexion
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
     }
+  }
+
+  // Fonction pour récupérer le token actuel
+  Future<String> _getCurrentToken() async {
+    var box = await Hive.openBox('userBox');
+    return box.get('token');
   }
     Future<void> logout(BuildContext context) async {
     try {
@@ -74,8 +90,6 @@ class _SettingsPageState extends State<SettingsPage> {
       var userId = user['idUser'];
       var updatedUserData = {
         'usersName': _userNameController.text,
-        'lastName':
-            _lastName, 
         'city': _cityController.text,
         'email': _emailController.text,
         'bio': _bioController.text,
