@@ -98,7 +98,7 @@ class MySettingsPage extends StatelessWidget {
     // Vérifier si le token stocké est le même que celui actuellement utilisé
     // pour l'authentification
     if (storedToken != null) {
-      print('Token vérifié avec succès. Même token que lors de la connexion.');
+      print('Token vérifié avec succès. Identique au token généré lors de la connexion.');
     } else {
       print('Le token est différent que celui utilisé lors de la connexion.');
       // Rediriger vers la page de connexion si le token n'est pas valide

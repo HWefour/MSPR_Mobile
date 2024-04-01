@@ -57,7 +57,7 @@
     },
     {
       "name": "build_runner",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.4.8",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.4.9",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -842,7 +842,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-03-28T17:16:30.353133Z",
+  "generated": "2024-03-28T20:44:46.759130Z",
   "generator": "pub",
-  "generatorVersion": "3.3.0"
+  "generatorVersion": "3.3.3"
 }

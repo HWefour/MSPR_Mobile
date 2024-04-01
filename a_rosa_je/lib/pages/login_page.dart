@@ -20,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
   //fonction loginUser
   Future<void> loginUser(BuildContext context) async {
     final url = Uri.parse('$baseUrl/auth/login');
-
     try {
       final response = await http.post(
         url,
@@ -64,7 +63,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> fetchUsersAndCompareEmail(BuildContext context) async {
     final url = Uri.parse('$baseUrl/backoffice/users/');
-    print('je suis ici');
     try {
       final response = await http.get(url, headers: await _getHeaders());
       print(response.statusCode);
