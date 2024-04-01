@@ -5,12 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'gestion_annonces.dart';
 import 'login_page.dart';
-import 'profil.dart';
 import 'profil_info.dart';
 import 'home.dart';
-import '../util/footer.dart'; // Importez votre widget Footer depuis son emplacement
 
 class ParametreMenu extends StatefulWidget {
   @override
@@ -48,6 +45,7 @@ class _ParametreMenuState extends State<ParametreMenu> {
 class MySettingsPage extends StatelessWidget {
   final baseUrl = dotenv
       .env['API_BASE_URL']; // pour récupérer l'url de base dans le fichier .env
+
   Future<void> deleteUserAccount(BuildContext context) async {
     try {
       var box = await Hive.openBox('userBox');
@@ -88,8 +86,34 @@ class MySettingsPage extends StatelessWidget {
     }
   }
 
+  Future<String> _getCurrentToken() async {
+    var box = await Hive.openBox('userBox');
+    return box.get('token');
+  }
+
+  Future<void> _verifyToken(BuildContext context) async {
+    var storedToken = await _getCurrentToken();
+    print('Stored Token: $storedToken');
+
+    // Vérifier si le token stocké est le même que celui actuellement utilisé
+    // pour l'authentification
+    if (storedToken != null) {
+      print('Token vérifié avec succès. Identique au token généré lors de la connexion.');
+    } else {
+      print('Le token est différent que celui utilisé lors de la connexion.');
+      // Rediriger vers la page de connexion si le token n'est pas valide
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Vérifier le token au chargement de la page
+    _verifyToken(context);
+
     return ListView(
       children: ListTile.divideTiles(
         context: context,

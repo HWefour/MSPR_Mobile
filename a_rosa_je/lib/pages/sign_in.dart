@@ -261,51 +261,50 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             controller: _confirmPasswordController,
           ),
           SizedBox(height: 24.0),
-Row(
-  children: [
-    Checkbox(
-      value: isChecked,
-      onChanged: (bool? value) {
-        setState(() {
-          isChecked = value ?? false;
-        });
-      },
-    ),
-    SizedBox(width: 8.0),
-    Expanded(
-      child: GestureDetector(
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Politique de Confidentialité'),
-                content: SingleChildScrollView(
+          Row(
+            children: [
+              Checkbox(
+                value: isChecked,
+                onChanged: (bool? value) {
+                  setState(() {
+                    isChecked = value ?? false;
+                  });
+                },
+              ),
+              SizedBox(width: 8.0),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Politique de Confidentialité'),
+                          content: SingleChildScrollView(
+                            child: Text(
+                              'Chez A\'rosa_je, nous nous engageons à protéger votre vie privée. Cette politique de confidentialité explique comment nous recueillons, utilisons et protégeons vos informations personnelles lorsque vous utilisez notre site web ou nos services.',
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Fermer'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                   child: Text(
-                    'Chez A\'rosa_je, nous nous engageons à protéger votre vie privée. Cette politique de confidentialité explique comment nous recueillons, utilisons et protégeons vos informations personnelles lorsque vous utilisez notre site web ou nos services.',
+                    'J\'accepte les conditions générales et la politique de confidentialité',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('Fermer'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        child: Text(
-          'J\'accepte les conditions générales et la politique de confidentialité',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-    ),
-  ],
-),
-
+              ),
+            ],
+          ),
           SizedBox(height: 24.0),
           Row(
             children: [
@@ -326,7 +325,8 @@ Row(
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue,
                     shape: StadiumBorder(),
                   ),
                   child: Padding(
@@ -393,7 +393,8 @@ class ElevatedButtonWidget extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white, backgroundColor: buttonColor,
+        foregroundColor: Colors.white,
+        backgroundColor: buttonColor,
         shape: StadiumBorder(),
       ),
       child: Padding(

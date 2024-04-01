@@ -1,4 +1,5 @@
 import 'package:a_rosa_je/pages/home.dart';
+import 'package:a_rosa_je/pages/parametre_menu.dart';
 import 'package:a_rosa_je/pages/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
   //fonction loginUser
   Future<void> loginUser(BuildContext context) async {
     final url = Uri.parse('$baseUrl/auth/login');
-
     try {
       final response = await http.post(
         url,
@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('succès');
         final token = jsonDecode(response.body)['token'];
-        print('Token: $token'); // Afficher le token dans le terminal
+        print('Token: $token'); 
         await storeToken(token);
         fetchUsersAndCompareEmail(context);
         ScaffoldMessenger.of(context)
@@ -63,7 +63,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> fetchUsersAndCompareEmail(BuildContext context) async {
     final url = Uri.parse('$baseUrl/backoffice/users/');
-    print('je suis ici');
     try {
       final response = await http.get(url, headers: await _getHeaders());
       print(response.statusCode);

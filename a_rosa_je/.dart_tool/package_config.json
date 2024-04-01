@@ -57,7 +57,7 @@
     },
     {
       "name": "build_runner",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.4.8",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.4.9",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -123,7 +123,7 @@
     },
     {
       "name": "cross_file",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/cross_file-0.3.3+8",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/cross_file-0.3.4",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -141,7 +141,7 @@
     },
     {
       "name": "dart_style",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/dart_style-2.3.4",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/dart_style-2.3.6",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -207,9 +207,9 @@
     },
     {
       "name": "flutter_lints",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-3.0.1",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-3.0.2",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.1"
     },
     {
       "name": "flutter_map",
@@ -309,15 +309,15 @@
     },
     {
       "name": "image_picker_for_web",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_for_web-3.0.2",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_for_web-3.0.3",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.3"
     },
     {
       "name": "image_picker_ios",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_ios-0.8.9+1",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_ios-0.8.9+2",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.2"
     },
     {
       "name": "image_picker_linux",
@@ -333,9 +333,9 @@
     },
     {
       "name": "image_picker_platform_interface",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.9.3",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.9.4",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.3"
     },
     {
       "name": "image_picker_windows",
@@ -369,7 +369,7 @@
     },
     {
       "name": "latlong2",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/latlong2-0.9.0",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/latlong2-0.9.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -423,7 +423,7 @@
     },
     {
       "name": "logger",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/logger-2.0.2+1",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/logger-2.2.0",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
@@ -717,9 +717,9 @@
     },
     {
       "name": "url_launcher_ios",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_ios-6.2.4",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_ios-6.2.5",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.2"
     },
     {
       "name": "url_launcher_linux",
@@ -789,7 +789,7 @@
     },
     {
       "name": "web",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web-0.3.0",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web-0.5.0",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -807,9 +807,9 @@
     },
     {
       "name": "win32",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.2.0",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.3.0",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.3"
     },
     {
       "name": "wkt_parser",
@@ -842,7 +842,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-04-01T08:42:02.735618Z",
+  "generated": "2024-02-22T14:51:54.768227Z",
   "generator": "pub",
   "generatorVersion": "3.3.3"
 }
