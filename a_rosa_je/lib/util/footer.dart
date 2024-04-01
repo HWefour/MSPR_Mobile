@@ -27,7 +27,7 @@ class Footer extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.announcement),
-          label: 'Annonces',
+          label: 'gestion des \nAnnonces',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.post_add), // Icône placeholder invisible

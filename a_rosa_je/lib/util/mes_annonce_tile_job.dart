@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AnnonceTile extends StatelessWidget {
+class MesAnnonceTileJob extends StatelessWidget {
  final String idAdvertisement;
   final String title;
   final String city;
@@ -12,8 +12,9 @@ class AnnonceTile extends StatelessWidget {
   final String endDate;
   final String imageUrl; 
   final String createdAt;
+  final String userNameGardien;
 
-  AnnonceTile({
+  MesAnnonceTileJob({
     Key? key,
     required this.idAdvertisement,
     required this.title,
@@ -26,6 +27,7 @@ class AnnonceTile extends StatelessWidget {
     required this.endDate,
     required this.imageUrl,
     required this.createdAt,
+    required this.userNameGardien,
   }) : super(key: key);
 
   @override
@@ -114,6 +116,14 @@ class AnnonceTile extends StatelessWidget {
                     Expanded(
                       child: Text(
                         '"' + description + '"',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 3,
+                      ),
+                    ),
+                    SizedBox(height: 10.0), // Ajoute un espace
+                    Expanded(
+                      child: Text(
+                        'Plantes gardées par ' + userNameGardien,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 3,
                       ),
