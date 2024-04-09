@@ -1,5 +1,6 @@
 import 'package:a_rosa_je/pages/create_annonce.dart';
 import 'package:a_rosa_je/pages/home.dart';
+import 'package:a_rosa_je/pages/politique.dart';
 import 'package:a_rosa_je/pages/profil.dart';
 import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
