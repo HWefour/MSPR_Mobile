@@ -1,11 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:a_rosa_je/pages/home.dart';
-<<<<<<< HEAD
-=======
-import 'package:a_rosa_je/pages/politique.dart';
-import 'package:a_rosa_je/pages/profil.dart';
->>>>>>> main
 import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
 import 'package:hive_flutter/hive_flutter.dart'; //pour le stockage en local

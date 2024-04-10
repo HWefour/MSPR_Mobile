@@ -119,13 +119,22 @@ class MesGardiennageTileJob extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 10.0), // Ajoute un espace
+                    //statut en cours
                     Expanded(
                       child: Text(
-                        'Je garde les plantes de ' + userName,
+                        'Statut : ' + userName,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 3,
                       ),
                     ),
+                    // a garder si gardiennage validé
+                    // Expanded(
+                    //   child: Text(
+                    //     'Je garde les plantes de ' + userName,
+                    //     overflow: TextOverflow.ellipsis,
+                    //     maxLines: 3,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
