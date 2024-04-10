@@ -139,9 +139,9 @@ flutter_map
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_map-6.1.0/
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_map-6.1.0/lib/
 flutter_plugin_android_lifecycle
-2.19
-file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.17/
-file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.17/lib/
+3.1
+file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.18/
+file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.18/lib/
 flutter_svg
 2.19
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_svg-2.0.10+1/
@@ -208,8 +208,8 @@ file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_macos-0.2.1+1/lib/
 image_picker_platform_interface
 3.3
-file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.9.4/
-file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.9.4/lib/
+file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.10.0/
+file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.10.0/lib/
 image_picker_windows
 2.19
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_windows-0.2.1+1/
@@ -319,9 +319,9 @@ path_provider
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider-2.1.2/
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider-2.1.2/lib/
 path_provider_android
-3.0
-file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.2/
-file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.2/lib/
+3.1
+file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.3/
+file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.3/lib/
 path_provider_foundation
 3.0
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_foundation-2.3.2/
@@ -512,8 +512,8 @@ file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web-0.5.1/
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web-0.5.1/lib/
 web_socket_channel
 3.3
-file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket_channel-2.4.4/
-file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket_channel-2.4.4/lib/
+file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket_channel-2.4.5/
+file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket_channel-2.4.5/lib/
 webkit_inspection_protocol
 3.0
 file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/webkit_inspection_protocol-1.2.1/

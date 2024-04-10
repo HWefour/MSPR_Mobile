@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/conversation_menu.dart';
 import 'package:a_rosa_je/pages/gestion_annonces.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -567,6 +568,13 @@ class _HomePageState extends State<HomePage>
               builder: (context) =>
                   GestionAnnoncesPage()), // permet d'aller vers la page sans conserver les routes
           (Route<dynamic> route) => false,
+        );
+        break;
+      case 3:
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) =>
+                  MessagingScreen()), // permet d'aller vers la page sans conserver les routes
         );
         break;
       case 4: 

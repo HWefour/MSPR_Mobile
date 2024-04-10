@@ -14,6 +14,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   String _usersName = '';
+  String _firstName = '';
   String _city = '';
   String _email = '';
   String _bio = '';
@@ -39,6 +40,7 @@ class _SettingsPageState extends State<SettingsPage> {
       print('Le token est le même que celui utilisé lors de la connexion.');
       Map<String, dynamic> user = jsonDecode(userJson);
       setState(() {
+        _firstName = user['firstName'] ?? 'N/A';
         _usersName = user['usersName'] ?? 'N/A';
         _city = user['city'] ?? 'N/A';
         _email = user['email'] ?? 'N/A';
@@ -89,6 +91,7 @@ class _SettingsPageState extends State<SettingsPage> {
       Map<String, dynamic> user = jsonDecode(userJson);
       var userId = user['idUser'];
       var updatedUserData = {
+        'firstName' : _firstName,
         'usersName': _userNameController.text,
         'city': _cityController.text,
         'email': _emailController.text,

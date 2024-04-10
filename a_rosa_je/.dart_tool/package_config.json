@@ -219,9 +219,9 @@
     },
     {
       "name": "flutter_plugin_android_lifecycle",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.17",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.18",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.1"
     },
     {
       "name": "flutter_svg",
@@ -333,7 +333,7 @@
     },
     {
       "name": "image_picker_platform_interface",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.9.4",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_platform_interface-2.10.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -501,9 +501,9 @@
     },
     {
       "name": "path_provider_android",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.2",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.3",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.1"
     },
     {
       "name": "path_provider_foundation",
@@ -795,7 +795,7 @@
     },
     {
       "name": "web_socket_channel",
-      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket_channel-2.4.4",
+      "rootUri": "file:///C:/Users/Utilisateur/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket_channel-2.4.5",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -842,7 +842,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-04-05T19:44:56.391786Z",
+  "generated": "2024-04-10T09:01:04.579887Z",
   "generator": "pub",
   "generatorVersion": "3.3.3"
 }

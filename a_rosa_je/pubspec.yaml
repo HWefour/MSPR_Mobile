@@ -41,6 +41,7 @@ dependencies:
   hive: ^2.0.4
   hive_flutter: ^1.1.0
   flutter_dotenv: ^5.1.0
+  web_socket_channel: ^2.1.0
 
   # http: ^1.13.3
   # geocoder: ^1.38.1
