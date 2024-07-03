@@ -22,12 +22,21 @@ class MessagingScreen extends StatefulWidget {
 class _MessagingScreenState extends State<MessagingScreen> {
   List<Map<String, String>> messages = [
     {
-      'name': 'MonsteraLover',
+      'name': 'Alex34',
       'message': 'Vous: Oh super! Je désespérais de...',
       'time': '12:55'
     },
     {
-      'name': 'PlantyDaddy89',
+      'name': 'Lucas10',
+      'message': 'Merci beaucoup d\'avoir gardé mes pla...',
+      'time': '02/01'
+    },    {
+      'name': 'Haitam83',
+      'message': 'Vous: Oh super! Je désespérais de...',
+      'time': '12:55'
+    },
+    {
+      'name': 'Marine06',
       'message': 'Merci beaucoup d\'avoir gardé mes pla...',
       'time': '02/01'
     },
