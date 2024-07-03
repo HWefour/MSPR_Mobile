@@ -29,16 +29,16 @@ class _MessagingScreenState extends State<MessagingScreen> {
     {
       'name': 'Lucas10',
       'message': 'Merci beaucoup d\'avoir gardé mes pla...',
-      'time': '02/01'
+      'time': '02/01/2024'
     },    {
       'name': 'Haitam83',
       'message': 'Vous: Oh super! Je désespérais de...',
-      'time': '12:55'
+      'time': '12/06/2024'
     },
     {
       'name': 'Marine06',
       'message': 'Merci beaucoup d\'avoir gardé mes pla...',
-      'time': '02/01'
+      'time': '05/09/2023'
     },
   ];
 

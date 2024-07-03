@@ -1,8 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ConversationScreen extends StatefulWidget {
   final String name;
@@ -18,58 +19,33 @@ class ConversationScreen extends StatefulWidget {
 
 class _ConversationScreenState extends State<ConversationScreen> {
   final TextEditingController _controller = TextEditingController();
-  final List<Map<String, dynamic>> _messages = [
-    {
-      'isMe': true,
-      'text': 'Salut, pourrais-tu garder mon cactus pendant mon absence?',
-      'time': '10:00',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Bien sûr! Aucun problème.',
-      'time': '10:05',
-      'image': null,
-    },
-    {
-      'isMe': true,
-      'text': 'Merci! Voici quelques conseils: arrose-le une fois par semaine et assure-toi qu\'il reçoive beaucoup de lumière.',
-      'time': '10:10',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Parfait, je prendrai bien soin de lui.',
-      'time': '10:15',
-      'image': null,
-    },
-    {
-      'isMe': true,
-      'text': 'Super! On peut se rencontrer ce vendredi pour que je te le remette?',
-      'time': '10:20',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Vendredi ça marche pour moi. Disons 18h devant la bibliothèque?',
-      'time': '10:25',
-      'image': null,
-    },
-    {
-      'isMe': true,
-      'text': 'Parfait! À vendredi alors.',
-      'time': '10:30',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'À vendredi!',
-      'time': '10:35',
-      'image': null,
-    },
-  ];
-
+  List<Map<String, dynamic>> _messages = [];
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages();
+  }
+
+  Future<void> _loadMessages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedMessages = prefs.getString('messages_${widget.name}');
+    if (storedMessages != null) {
+      setState(() {
+        _messages = List<Map<String, dynamic>>.from(json.decode(storedMessages));
+      });
+    } else {
+      setState(() {
+        _messages = allConversations[widget.name] ?? [];
+      });
+    }
+  }
+
+  Future<void> _saveMessages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('messages_${widget.name}', json.encode(_messages));
+  }
 
   void _sendMessage(String text) {
     if (text.isEmpty) return;
@@ -81,6 +57,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         'image': null,
       });
       _controller.clear();
+      _saveMessages();
     });
   }
 
@@ -90,8 +67,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
         'isMe': true,
         'text': '',
         'time': 'Now',
-        'image': image,
+        'image': image.path,
       });
+      _saveMessages();
     });
   }
 
@@ -120,7 +98,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   isMe: message['isMe'],
                   text: message['text'],
                   time: message['time'],
-                  image: message['image'],
+                  image: message['image'] != null ? XFile(message['image']) : null,
                 );
               },
             ),
@@ -212,3 +190,123 @@ class MessageBubble extends StatelessWidget {
     );
   }
 }
+
+// Exemple de données pour toutes les conversations
+final Map<String, List<Map<String, dynamic>>> allConversations = {
+  'Alex34': [
+    {
+      'isMe': true,
+      'text': 'Salut Alex, comment ça va?',
+      'time': '09:00',
+      'image': null,
+    },
+    {
+      'isMe': false,
+      'text': 'Salut! Ça va bien, merci. Et toi?',
+      'time': '09:05',
+      'image': null,
+    },
+    {
+      'isMe': true,
+      'text': 'Ça va aussi. Tu seras disponible ce week-end pour aller courir?',
+      'time': '09:10',
+      'image': null,
+    },
+    {
+      'isMe': false,
+      'text': 'Oui, ça me va! Samedi matin?',
+      'time': '09:15',
+      'image': null,
+    },
+    {
+      'isMe': true,
+      'text': 'Parfait, à samedi alors!',
+      'time': '09:20',
+      'image': null,
+    },
+  ],
+  'Lucas10': [
+    {
+      'isMe': true,
+      'text': 'Salut Lucas, as-tu des nouvelles de notre projet?',
+      'time': '14:00',
+      'image': null,
+    },
+    {
+      'isMe': false,
+      'text': 'Salut, oui j’ai eu des nouvelles. On a le feu vert!',
+      'time': '14:05',
+      'image': null,
+    },
+    {
+      'isMe': true,
+      'text': 'Génial! On commence quand?',
+      'time': '14:10',
+      'image': null,
+    },
+    {
+      'isMe': false,
+      'text': 'On peut commencer dès lundi prochain.',
+      'time': '14:15',
+      'image': null,
+    },
+    {
+      'isMe': true,
+      'text': 'Parfait, je prépare tout pour lundi.',
+      'time': '14:20',
+      'image': null,
+    },
+  ],
+  'Haitam83': [
+    {
+      'isMe': true,
+      'text': 'Hey Haitam, tu viens à la fête demain?',
+      'time': '18:00',
+      'image': null,
+    },
+    {
+      'isMe': false,
+      'text': 'Salut! Oui, je serai là!',
+      'time': '18:05',
+      'image': null,
+    },
+    {
+      'isMe': true,
+      'text': 'Super! Hâte de te voir.',
+      'time': '18:10',
+      'image': null,
+    },
+    {
+      'isMe': false,
+      'text': 'Moi aussi, à demain!',
+      'time': '18:15',
+      'image': null,
+    },
+  ],
+  'Marine06': [
+    {
+      'isMe': true,
+      'text': 'Salut Marine, as-tu terminé le rapport?',
+      'time': '11:00',
+      'image': null,
+    },
+    {
+      'isMe': false,
+      'text': 'Salut, oui je l’ai terminé hier soir.',
+      'time': '11:05',
+      'image': null,
+    },
+    {
+      'isMe': true,
+      'text': 'Super, je vais le relire cet après-midi.',
+      'time': '11:10',
+      'image': null,
+    },
+    {
+      'isMe': false,
+      'text': 'Merci! N’hésite pas à me faire des retours.',
+      'time': '11:15',
+      'image': null,
+    },
+  ],
+};
