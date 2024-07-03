@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'detail_conversation.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,7 +14,42 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MessagingScreen extends StatelessWidget {
+class MessagingScreen extends StatefulWidget {
+  @override
+  _MessagingScreenState createState() => _MessagingScreenState();
+}
+
+class _MessagingScreenState extends State<MessagingScreen> {
+  List<Map<String, String>> messages = [
+    {
+      'name': 'MonsteraLover',
+      'message': 'Vous: Oh super! Je désespérais de...',
+      'time': '12:55'
+    },
+    {
+      'name': 'PlantyDaddy89',
+      'message': 'Merci beaucoup d\'avoir gardé mes pla...',
+      'time': '02/01'
+    },
+  ];
+
+  List<Map<String, String>> filteredMessages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    filteredMessages = messages;
+  }
+
+  void _filterMessages(String query) {
+    final filtered = messages
+        .where((message) => message['name']!.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    setState(() {
+      filteredMessages = filtered;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,18 +57,21 @@ class MessagingScreen extends StatelessWidget {
         title: Text('Messagerie'),
         backgroundColor: Colors.green,
       ),
-      body: ListView(
+      body: Column(
         children: [
-          SearchBar(),
-          MessageTile(
-            name: 'MonsteraLover',
-            message: 'Vous: Oh super! Je désespérais de...',
-            time: '12:55',
-          ),
-          MessageTile(
-            name: 'PlantyDaddy89',
-            message: 'Merci beaucoup d\'avoir gardé mes pla...',
-            time: '02/01',
+          SearchBar(onTextChanged: _filterMessages),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredMessages.length,
+              itemBuilder: (context, index) {
+                final message = filteredMessages[index];
+                return MessageTile(
+                  name: message['name']!,
+                  message: message['message']!,
+                  time: message['time']!,
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -41,11 +80,16 @@ class MessagingScreen extends StatelessWidget {
 }
 
 class SearchBar extends StatelessWidget {
+  final Function(String) onTextChanged;
+
+  const SearchBar({Key? key, required this.onTextChanged}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextField(
+        onChanged: onTextChanged,
         decoration: InputDecoration(
           hintText: 'Rechercher une discussion',
           prefixIcon: Icon(Icons.search),
@@ -81,6 +125,14 @@ class MessageTile extends StatelessWidget {
       title: Text(name),
       subtitle: Text(message),
       trailing: Text(time),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ConversationScreen(name: name),
+          ),
+        );
+      },
     );
   }
 }
