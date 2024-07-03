@@ -52,7 +52,6 @@ class _HomePageState extends State<HomePage>
       searchController.clear();
       if (_tabController!.index == 1) { // index 1 correspond au deuxième onglet
         _determinePosition();
-        
       }
     });
   }
@@ -99,8 +98,6 @@ class _HomePageState extends State<HomePage>
           _hasAnnonces = false; // Aucune annonce trouvée
         });
       }
-
-
   }
 
   @override
