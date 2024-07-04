@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/conversation_menu.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:a_rosa_je/util/footer.dart';
@@ -264,6 +265,13 @@ Future<List<String>> _fetchUserImages() async {
               builder: (context) =>
                   GestionAnnoncesPage()), // permet d'aller vers la page sans conserver les routes
           (Route<dynamic> route) => false,
+        );
+        break;
+              case 3:
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) =>
+                  MessagingScreen()), // permet d'aller vers la page sans conserver les routes
         );
         break;
       default:

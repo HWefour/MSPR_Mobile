@@ -41,6 +41,12 @@ dependencies:
   hive: ^2.0.4
   hive_flutter: ^1.1.0
   flutter_dotenv: ^5.1.0
+<<<<<<< HEAD
+=======
+  web_socket_channel: ^2.1.0
+  shared_preferences: ^2.0.15
+
+>>>>>>> origin/alex
   # http: ^1.13.3
   # geocoder: ^1.38.1
   # The following adds the Cupertino Icons font to your application.

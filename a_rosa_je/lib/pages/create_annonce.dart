@@ -62,7 +62,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
       firstDate: DateTime(2020, 1),
       lastDate: DateTime(2030, 12),
     );
-    if (picked != null && picked != (isStart ? selectedStartDate : selectedEndDate))
+    if (picked != null && picked != (isStart ? selectedStartDate : selectedEndDate)) {
       setState(() {
         if (isStart) {
           selectedStartDate = picked;
@@ -70,6 +70,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
           selectedEndDate = picked;
         }
       });
+    }
   }
 
   Future<void> _openImagePicker(BuildContext context) async {
@@ -375,16 +376,16 @@ class _CreateAnnonceState extends State<CreateAnnonce>
                 ),
               ),
             // Image preview section
-              SizedBox(height: 16), // Add space before displaying images
+              SizedBox(height: 16), 
               imageFiles!.isNotEmpty
                   ? GridView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(), // to disable GridView's scrolling
+                      physics: NeverScrollableScrollPhysics(), 
                       itemCount: imageFiles!.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
-                        crossAxisSpacing: 4, // Spacing between images horizontally
-                        mainAxisSpacing: 4, // Spacing between images vertically
+                        crossAxisSpacing: 4, 
+                        mainAxisSpacing: 4, 
                       ),
                       itemBuilder: (BuildContext context, int index) {
                         return Image.file(
@@ -393,7 +394,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
                         );
                       },
                     )
-                  : Center(child: Text('Pas d\'images sélectionnées.')), // Center the text when no images are selected
+                  : Center(child: Text('Pas d\'images sélectionnées.')), 
               SizedBox(height: 16), // Add space before the submit button
 
               // Submit button
@@ -444,7 +445,7 @@ class _CreateAnnonceState extends State<CreateAnnonce>
                         );
                         // Retour à la page d'accueil en retirant toutes les routes jusqu'à celle-ci
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => HomePage()), // Remplacez HomePage() par votre widget de page d'accueil
+                          MaterialPageRoute(builder: (context) => HomePage()),
                           (Route<dynamic> route) => false,
                         );
                       } else {
