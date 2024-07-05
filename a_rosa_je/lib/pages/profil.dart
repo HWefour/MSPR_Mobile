@@ -23,6 +23,7 @@ class _ProfilPageState extends State<ProfilPage>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
   int _selectedIndex = 4;
+  bool hasNewNotifications = false;
   final ApiAnnoncesUser apiAnnoncesUser = ApiAnnoncesUser();
   List<Annonce> _currentAnnonces = [];
   int _idUserLocal = 0 ;
@@ -245,11 +246,62 @@ Future<List<String>> _fetchUserImages() async {
 }
 
 
+//appel api pour verifier si l'utilisateur a des jobs
+  Future<bool> fetchHasAnnonces() async {
+    try {
+      final responseAnnonces = await http.get(Uri.parse('$baseUrl/job/'));
+      if (responseAnnonces.statusCode == 200) {
+        final jsonData = json.decode(responseAnnonces.body);
+        for (var jobMesAnnoncesData in jsonData) {
+          if ((jobMesAnnoncesData['idUser'] ?? '').toString() == _idUserLocal.toString()) {
+            print('il y a quelque chose');
+            return true;
+          }
+        }
+      } else {
+        print('Échec du chargement des annonces');
+      }
+    } catch (e) {
+      print('Erreur lors de la vérification des annonces: $e');
+    }
+    return false;
+  }
+
+  Future<bool> fetchHasGardiennages() async {
+    try {
+      final responseGardiennages = await http.get(Uri.parse('$baseUrl/job/'));
+      if (responseGardiennages.statusCode == 200) {
+        final jsonData = json.decode(responseGardiennages.body);
+        for (var jobMesGardiennagesData in jsonData) {
+          if ((jobMesGardiennagesData['idUserGardien'] ?? '').toString() == _idUserLocal.toString()) {
+            print('il y a quelque chose');
+            return true;
+          }
+        }
+      } else {
+        print('Échec du chargement des gardiennages');
+      }
+    } catch (e) {
+      print('Erreur lors de la vérification des gardiennages: $e');
+    }
+    return false;
+  }
+
   //gestion du tap sur le footer
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+
+    // Appels API asynchrones
+    fetchHasAnnonces().then((hasAnnonces) {
+      fetchHasGardiennages().then((hasGardiennages) {
+        bool hasNewNotifications = hasAnnonces || hasGardiennages;
+
+        setState(() {
+          this.hasNewNotifications = hasNewNotifications;
+        });
+
     switch (index) {
       case 0:
         Navigator.of(context).pushAndRemoveUntil(
@@ -276,7 +328,9 @@ Future<List<String>> _fetchUserImages() async {
         break;
       default:
         break;
-    }
+        }
+      });
+    });
   }
 
   //build
@@ -352,6 +406,7 @@ Future<List<String>> _fetchUserImages() async {
       bottomNavigationBar: Footer(
         selectedIndex: _selectedIndex,
         onItemSelected: _onItemTapped,
+        hasNewNotifications: hasNewNotifications,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

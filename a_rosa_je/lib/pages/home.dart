@@ -40,6 +40,8 @@ class _HomePageState extends State<HomePage>
   String selectedCity = ''; // Pour stocker la ville sélectionnée
   int _selectedIndex = 0;
   final ApiAnnoncesVille apiAnnoncesVille = ApiAnnoncesVille();
+  int _idUserLocal = 0;
+  bool hasNewNotifications = false;
   String _usersName = '';
   String _city = '';
   final  baseUrl = dotenv.env['API_BASE_URL'] ; // pour récupérer l'url de base dans le fichier .env
@@ -53,6 +55,7 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    //hasNewNotifications = hasNewNotifications;
     _loadUserProfile();
     _tabController = TabController(length: 3, vsync: this);
     _tabController!.addListener(() {
@@ -73,6 +76,7 @@ class _HomePageState extends State<HomePage>
       setState(() {
         
         //Mettez à jour votre état avec les informations de l'utilisateur
+        _idUserLocal = user['idUser'] ?? 0;
         _usersName = user['usersName'] ?? 'N/A';
         _city = user['city'] ?? 'N/A';
       });
@@ -713,37 +717,92 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  //gestion du tap sur le footer
-  void _onItemTapped(int index) {
+
+  //appel api pour verifier si l'utilisateur a des jobs
+  Future<bool> fetchHasAnnonces() async {
+    try {
+      final responseAnnonces = await http.get(Uri.parse('$baseUrl/job/'));
+      if (responseAnnonces.statusCode == 200) {
+        final jsonData = json.decode(responseAnnonces.body);
+        for (var jobMesAnnoncesData in jsonData) {
+          if ((jobMesAnnoncesData['idUser'] ?? '').toString() == _idUserLocal.toString()) {
+            print('il y a quelque chose');
+            return true;
+          }
+        }
+      } else {
+        print('Échec du chargement des annonces');
+      }
+    } catch (e) {
+      print('Erreur lors de la vérification des annonces: $e');
+    }
+    return false;
+  }
+
+  Future<bool> fetchHasGardiennages() async {
+    try {
+      final responseGardiennages = await http.get(Uri.parse('$baseUrl/job/'));
+      if (responseGardiennages.statusCode == 200) {
+        final jsonData = json.decode(responseGardiennages.body);
+        for (var jobMesGardiennagesData in jsonData) {
+          if ((jobMesGardiennagesData['idUserGardien'] ?? '').toString() == _idUserLocal.toString()) {
+            print('il y a quelque chose');
+            return true;
+          }
+        }
+      } else {
+        print('Échec du chargement des gardiennages');
+      }
+    } catch (e) {
+      print('Erreur lors de la vérification des gardiennages: $e');
+    }
+    return false;
+  }
+
+
+    void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    switch (index) {
-      case 1:
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-              builder: (context) =>
-                  GestionAnnoncesPage()), // permet d'aller vers la page sans conserver les routes
-          (Route<dynamic> route) => false,
-        );
-        break;
-      case 3:
-        Navigator.of(context).push(
-          MaterialPageRoute(
-              builder: (context) =>
-                  MessagingScreen()), // permet d'aller vers la page sans conserver les routes
-        );
-        break;
-      case 4: 
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => ProfilPage()),
-          (Route<dynamic> route) => false,
-        );
-        break;
-      default:
-        break;
-    }
+
+    // Appels API asynchrones
+    fetchHasAnnonces().then((hasAnnonces) {
+      fetchHasGardiennages().then((hasGardiennages) {
+        bool hasNewNotifications = hasAnnonces || hasGardiennages;
+
+        setState(() {
+          this.hasNewNotifications = hasNewNotifications;
+        });
+
+        print('hasNewNotifications: $hasNewNotifications');
+
+        // Navigation
+        switch (index) {
+          case 1:
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => GestionAnnoncesPage()),
+              (Route<dynamic> route) => false,
+            );
+            break;
+          case 3:
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => MessagingScreen()),
+            );
+            break;
+          case 4: 
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => ProfilPage()),
+              (Route<dynamic> route) => false,
+            );
+            break;
+          default:
+            break;
+        }
+      });
+    });
   }
+
+
 
   //build affichage
   @override
@@ -816,6 +875,7 @@ class _HomePageState extends State<HomePage>
       bottomNavigationBar: Footer(
         selectedIndex: _selectedIndex,
         onItemSelected: _onItemTapped,
+        hasNewNotifications: hasNewNotifications,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

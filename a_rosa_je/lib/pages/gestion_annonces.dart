@@ -29,6 +29,7 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
   List<Annonce> _currentMesGardiennagesJobs = [];
   List<Map<String, dynamic>> listMesAnnoncesJobs = [];
   List<Map<String, dynamic>> listMesGardiennagesJobs = [];
+  bool hasNewNotifications = false;
   final baseUrl = dotenv
       .env['API_BASE_URL']; // pour récupérer l'url de base dans le fichier .env
 
@@ -290,11 +291,81 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
     );
   }
 
+  // Méthode pour récupérer les images du profil de l'utilisateur à partir de l'API
+Future<List<String>> _fetchUserImages() async {
+  try {
+    final url = Uri.parse('$baseUrl/profile/profilePlant/$_idUserLocal');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      List<String> imageUrls = data.map((item) => item["url"].toString()).toList();
+      return imageUrls;
+    } else {
+      throw Exception('Failed to load user images');
+    }
+  } catch (e) {
+    throw Exception('Error: $e');
+  }
+}
+
+
+//appel api pour verifier si l'utilisateur a des jobs
+  Future<bool> fetchHasAnnonces() async {
+    try {
+      final responseAnnonces = await http.get(Uri.parse('$baseUrl/job/'));
+      if (responseAnnonces.statusCode == 200) {
+        final jsonData = json.decode(responseAnnonces.body);
+        for (var jobMesAnnoncesData in jsonData) {
+          if ((jobMesAnnoncesData['idUser'] ?? '').toString() == _idUserLocal.toString()) {
+            print('il y a quelque chose');
+            return true;
+          }
+        }
+      } else {
+        print('Échec du chargement des annonces');
+      }
+    } catch (e) {
+      print('Erreur lors de la vérification des annonces: $e');
+    }
+    return false;
+  }
+
+  Future<bool> fetchHasGardiennages() async {
+    try {
+      final responseGardiennages = await http.get(Uri.parse('$baseUrl/job/'));
+      if (responseGardiennages.statusCode == 200) {
+        final jsonData = json.decode(responseGardiennages.body);
+        for (var jobMesGardiennagesData in jsonData) {
+          if ((jobMesGardiennagesData['idUserGardien'] ?? '').toString() == _idUserLocal.toString()) {
+            print('il y a quelque chose');
+            return true;
+          }
+        }
+      } else {
+        print('Échec du chargement des gardiennages');
+      }
+    } catch (e) {
+      print('Erreur lors de la vérification des gardiennages: $e');
+    }
+    return false;
+  }
+
   //gestion du tap sur le footer
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+
+    // Appels API asynchrones
+    fetchHasAnnonces().then((hasAnnonces) {
+      fetchHasGardiennages().then((hasGardiennages) {
+        bool hasNewNotifications = hasAnnonces || hasGardiennages;
+
+        setState(() {
+          this.hasNewNotifications = hasNewNotifications;
+        });
+
     switch (index) {
       case 0:
         Navigator.of(context).pushAndRemoveUntil(
@@ -314,7 +385,9 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
         break;
       default:
         break;
-    }
+        }
+      });
+    });
   }
 
   //build
@@ -378,6 +451,7 @@ class _GestionAnnoncesPageState extends State<GestionAnnoncesPage>
       bottomNavigationBar: Footer(
         selectedIndex: _selectedIndex,
         onItemSelected: _onItemTapped,
+        hasNewNotifications: hasNewNotifications,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

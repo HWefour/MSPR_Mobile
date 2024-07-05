@@ -233,9 +233,11 @@ class _AnnoncePopupCardState extends State<AnnoncePopupCard>
                             (Route<dynamic> route) => false,
                           );
                         } else {
+                          print(response.statusCode);
                           // Gestion de l'échec de la réponse
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Erreur lors de la création du job ${response.statusCode}')),
+                            SnackBar(content: Text('test 1Erreur lors de la création du job ${response.statusCode}')),
+                          
                           );
                         }
                     },
