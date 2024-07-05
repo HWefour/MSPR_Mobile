@@ -726,7 +726,6 @@ class _HomePageState extends State<HomePage>
         final jsonData = json.decode(responseAnnonces.body);
         for (var jobMesAnnoncesData in jsonData) {
           if ((jobMesAnnoncesData['idUser'] ?? '').toString() == _idUserLocal.toString()) {
-            print('il y a quelque chose');
             return true;
           }
         }
