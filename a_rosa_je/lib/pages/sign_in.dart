@@ -204,7 +204,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               TextField(
                 controller: _cityController,
                 onChanged: (cityName) {
-                  if (cityName.isNotEmpty) {
+                  if (cityName.length >= 3) {
                     fetchCities(cityName);
                   }
                 },

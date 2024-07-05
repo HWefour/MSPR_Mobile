@@ -348,10 +348,10 @@ class _HomePageState extends State<HomePage>
                 ),
               ),
               onChanged: (cityName) {
-                if (cityName.isNotEmpty) {
-                  fetchCities(cityName);
-                }
-              },
+                  if (cityName.length >= 3) {
+                    fetchCities(cityName);
+                  }
+                },
             ),
           ),
         SizedBox(height: 8.0),
@@ -589,11 +589,11 @@ class _HomePageState extends State<HomePage>
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 ),
               ),
-              onChanged: (cityName) async {
-                if (cityName.isNotEmpty) {
-                  fetchCities(cityName);
-                }
-              },
+              onChanged: (cityName) {
+                  if (cityName.length >= 3) {
+                    fetchCities(cityName);
+                  }
+                },
             ),
           ),
         SizedBox(height: 8.0),
