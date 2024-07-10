@@ -47,7 +47,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
 
   Future<void> _loadConversations() async {
     try {
-      final response = await http.get(Uri.parse('http://localhost:1212/api/get-messages/$currentUserId/35')); // Exemple avec l'utilisateur 35, à remplacer dynamiquement
+      final response = await http.get(Uri.parse('http://localhost:1212/api/get-messages/$currentUserId/8')); // Exemple avec l'utilisateur 35, à remplacer dynamiquement
       if (response.statusCode == 200) {
         List<dynamic> messages = json.decode(response.body)['messages'];
         List<Map<String, dynamic>> fetchedConversations = await _getConversations(messages);
