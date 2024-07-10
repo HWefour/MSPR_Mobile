@@ -1,3 +1,4 @@
+import 'package:a_rosa_je/pages/conversation_menu.dart';
 import 'package:a_rosa_je/pages/create_annonce.dart';
 import 'package:a_rosa_je/pages/home.dart';
 import 'package:a_rosa_je/pages/politique.dart';
@@ -10,8 +11,8 @@ import 'pages/profil_info.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart'; // pour le stockage en local
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-// Importez votre page web_socket.dart ici
-import 'web_socket.dart'; // Remarque : Importez ici
+import 'web_socket.dart'; // Importez votre page web_socket.dart ici
+
 
 void main() async {
   await Hive.initFlutter();
@@ -59,6 +60,10 @@ class MyApp extends StatelessWidget {
           }
         },
       ),
+      routes: {
+        '/websocket': (context) => WebSocketPage(), // Ajout de la route vers WebSocketPage
+        '/messaging': (context) => MessagingScreen(), // Ajout de la route vers MessagingScreen
+      },
     );
   }
 }

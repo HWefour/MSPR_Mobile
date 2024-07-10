@@ -3,14 +3,20 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/html.dart' if (dart.library.io) 'package:web_socket_channel/io.dart';
+import 'package:http/http.dart' as http;
+import 'package:hive/hive.dart';
 
 class ConversationScreen extends StatefulWidget {
-  final String name;
+  final String currentUserId;
+  final String otherUserId;
 
   const ConversationScreen({
     Key? key,
-    required this.name,
+    required this.currentUserId,
+    required this.otherUserId,
   }) : super(key: key);
 
   @override
@@ -21,30 +27,81 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final TextEditingController _controller = TextEditingController();
   List<Map<String, dynamic>> _messages = [];
   final ImagePicker _picker = ImagePicker();
+  late final WebSocketChannel _channel;
+  String otherUsername = "";
 
   @override
   void initState() {
     super.initState();
+    _loadUsername();
     _loadMessages();
+    if (kIsWeb) {
+      _channel = HtmlWebSocketChannel.connect('ws://localhost:1212');
+    } else {
+      _channel = IOWebSocketChannel.connect('ws://localhost:1212');
+    }
+
+    // Écouter les messages reçus du serveur
+    _channel.stream.listen((message) {
+      setState(() {
+        _messages.add({
+          'isMe': false,
+          'text': message,
+          'time': DateTime.now().toString(),
+          'image': null,
+        });
+      });
+    });
   }
 
-  Future<void> _loadMessages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storedMessages = prefs.getString('messages_${widget.name}');
-    if (storedMessages != null) {
+  Future<void> _loadUsername() async {
+    final response = await http.get(Uri.parse('http://localhost:1212/api/get-username/${widget.otherUserId}'));
+    if (response.statusCode == 200) {
       setState(() {
-        _messages = List<Map<String, dynamic>>.from(json.decode(storedMessages));
+        otherUsername = json.decode(response.body)['username'];
       });
     } else {
-      setState(() {
-        _messages = allConversations[widget.name] ?? [];
-      });
+      throw Exception('Failed to load username');
     }
   }
 
-  Future<void> _saveMessages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('messages_${widget.name}', json.encode(_messages));
+  Future<void> _loadMessages() async {
+    final response = await http.get(Uri.parse('http://localhost:1212/api/get-messages/${widget.currentUserId}/${widget.otherUserId}'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body)['messages'];
+      setState(() {
+        _messages = data.map((message) => {
+          'isMe': message['idUser'].toString() == widget.currentUserId,
+          'text': message['content'],
+          'time': message['dates'],
+          'image': null,
+        }).toList();
+      });
+    } else {
+      throw Exception('Failed to load messages');
+    }
+  }
+
+  Future<void> _saveMessage(String text) async {
+    final response = await http.post(
+      Uri.parse('http://localhost:1212/api/add-message'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'idUser': widget.currentUserId,
+        'idUser_1': widget.otherUserId,
+        'idAdvertisement': null, // Ajouter l'ID de l'annonce si applicable
+        'content': text,
+        'dates': DateTime.now().toIso8601String(), // Inclure la date et l'heure pour le message
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      _loadMessages(); // Rafraîchir les messages après en avoir enregistré un nouveau
+    } else {
+      throw Exception('Failed to save message');
+    }
   }
 
   void _sendMessage(String text) {
@@ -53,11 +110,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
       _messages.add({
         'isMe': true,
         'text': text,
-        'time': 'Now',
+        'time': DateTime.now().toString(),
         'image': null,
       });
+      _channel.sink.add(text);
       _controller.clear();
-      _saveMessages();
+      _saveMessage(text);
     });
   }
 
@@ -66,10 +124,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
       _messages.add({
         'isMe': true,
         'text': '',
-        'time': 'Now',
+        'time': DateTime.now().toString(),
         'image': image.path,
       });
-      _saveMessages();
+      _saveMessage(''); 
     });
   }
 
@@ -81,10 +139,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   @override
+  void dispose() {
+    _channel.sink.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name),
+        title: Text('Chat avec $otherUsername'),
         backgroundColor: Colors.green,
       ),
       body: Column(
@@ -95,9 +159,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
               itemBuilder: (context, index) {
                 final message = _messages[index];
                 return MessageBubble(
-                  isMe: message['isMe'],
-                  text: message['text'],
-                  time: message['time'],
+                  isMe: message['isMe'] ?? false,
+                  text: message['text'] ?? '',
+                  time: message['time'] ?? '',
                   image: message['image'] != null ? XFile(message['image']) : null,
                 );
               },
@@ -190,123 +254,3 @@ class MessageBubble extends StatelessWidget {
     );
   }
 }
-
-// Exemple de données pour toutes les conversations
-final Map<String, List<Map<String, dynamic>>> allConversations = {
-  'Alex34': [
-    {
-      'isMe': true,
-      'text': 'Salut Alex, comment ça va?',
-      'time': '09:00',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Salut! Ça va bien, merci. Et toi?',
-      'time': '09:05',
-      'image': null,
-    },
-    {
-      'isMe': true,
-      'text': 'Ça va aussi. Tu seras disponible ce week-end pour aller courir?',
-      'time': '09:10',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Oui, ça me va! Samedi matin?',
-      'time': '09:15',
-      'image': null,
-    },
-    {
-      'isMe': true,
-      'text': 'Parfait, à samedi alors!',
-      'time': '09:20',
-      'image': null,
-    },
-  ],
-  'Lucas10': [
-    {
-      'isMe': true,
-      'text': 'Salut Lucas, as-tu des nouvelles de notre projet?',
-      'time': '14:00',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Salut, oui j’ai eu des nouvelles. On a le feu vert!',
-      'time': '14:05',
-      'image': null,
-    },
-    {
-      'isMe': true,
-      'text': 'Génial! On commence quand?',
-      'time': '14:10',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'On peut commencer dès lundi prochain.',
-      'time': '14:15',
-      'image': null,
-    },
-    {
-      'isMe': true,
-      'text': 'Parfait, je prépare tout pour lundi.',
-      'time': '14:20',
-      'image': null,
-    },
-  ],
-  'Haitam83': [
-    {
-      'isMe': true,
-      'text': 'Hey Haitam, tu viens à la fête demain?',
-      'time': '18:00',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Salut! Oui, je serai là!',
-      'time': '18:05',
-      'image': null,
-    },
-    {
-      'isMe': true,
-      'text': 'Super! Hâte de te voir.',
-      'time': '18:10',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Moi aussi, à demain!',
-      'time': '18:15',
-      'image': null,
-    },
-  ],
-  'Marine06': [
-    {
-      'isMe': true,
-      'text': 'Salut Marine, as-tu terminé le rapport?',
-      'time': '11:00',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Salut, oui je l’ai terminé hier soir.',
-      'time': '11:05',
-      'image': null,
-    },
-    {
-      'isMe': true,
-      'text': 'Super, je vais le relire cet après-midi.',
-      'time': '11:10',
-      'image': null,
-    },
-    {
-      'isMe': false,
-      'text': 'Merci! N’hésite pas à me faire des retours.',
-      'time': '11:15',
-      'image': null,
-    },
-  ],
-};

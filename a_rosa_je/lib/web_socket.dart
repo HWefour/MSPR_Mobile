@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/html.dart' if (dart.library.io) 'package:web_socket_channel/io.dart';
 
 class WebSocketPage extends StatefulWidget {
   @override
@@ -14,7 +16,11 @@ class _WebSocketPageState extends State<WebSocketPage> {
   @override
   void initState() {
     super.initState();
-    _channel = IOWebSocketChannel.connect('ws://localhost:1212');
+    if (kIsWeb) {
+      _channel = HtmlWebSocketChannel.connect('ws://localhost:1212');
+    } else {
+      _channel = IOWebSocketChannel.connect('ws://localhost:1212');
+    }
 
     // Écouter les messages reçus du serveur
     _channel.stream.listen((message) {
