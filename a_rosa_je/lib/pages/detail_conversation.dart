@@ -50,6 +50,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           'time': DateTime.now().toString(),
           'image': null,
         });
+        _messages.sort((a, b) => a['time'].compareTo(b['time']));
       });
     });
   }
@@ -76,6 +77,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           'time': message['dates'],
           'image': null,
         }).toList();
+        _messages.sort((a, b) => a['time'].compareTo(b['time'])); // Trier par date ici
       });
     } else {
       throw Exception('Failed to load messages');
@@ -113,6 +115,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         'time': DateTime.now().toString(),
         'image': null,
       });
+      _messages.sort((a, b) => a['time'].compareTo(b['time'])); // Trier par date ici
       _channel.sink.add(text);
       _controller.clear();
       _saveMessage(text);
@@ -127,7 +130,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         'time': DateTime.now().toString(),
         'image': image.path,
       });
-      _saveMessage(''); 
+      _messages.sort((a, b) => a['time'].compareTo(b['time'])); // Trier par date ici
+      _saveMessage('');
     });
   }
 
