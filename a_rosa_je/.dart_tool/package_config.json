@@ -908,7 +908,11 @@
       "languageVersion": "3.2"
     }
   ],
+<<<<<<< HEAD
   "generated": "2024-07-10T13:51:11.931249Z",
+=======
+  "generated": "2024-07-04T19:06:53.590836Z",
+>>>>>>> alex
   "generator": "pub",
   "generatorVersion": "3.4.3",
   "flutterRoot": "file:///D:/flutter",
