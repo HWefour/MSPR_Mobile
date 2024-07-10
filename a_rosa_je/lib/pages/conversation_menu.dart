@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'detail_conversation.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:hive/hive.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,42 +23,81 @@ class MessagingScreen extends StatefulWidget {
 }
 
 class _MessagingScreenState extends State<MessagingScreen> {
-  List<Map<String, String>> messages = [
-    {
-      'name': 'Alex34',
-      'message': 'Vous: Oh super! Je désespérais de...',
-      'time': '12:55'
-    },
-    {
-      'name': 'Lucas10',
-      'message': 'Merci beaucoup d\'avoir gardé mes pla...',
-      'time': '02/01/2024'
-    },    {
-      'name': 'Haitam83',
-      'message': 'Vous: Oh super! Je désespérais de...',
-      'time': '12/06/2024'
-    },
-    {
-      'name': 'Marine06',
-      'message': 'Merci beaucoup d\'avoir gardé mes pla...',
-      'time': '05/09/2023'
-    },
-  ];
-
-  List<Map<String, String>> filteredMessages = [];
+  String currentUserId = '';
+  List<Map<String, dynamic>> conversations = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    filteredMessages = messages;
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    var box = await Hive.openBox('userBox');
+    var userJson = box.get('userDetails');
+    if (userJson != null) {
+      Map<String, dynamic> user = jsonDecode(userJson);
+      setState(() {
+        currentUserId = user['idUser'].toString();
+      });
+      _loadConversations();
+    }
+  }
+
+  Future<void> _loadConversations() async {
+    try {
+      final response = await http.get(Uri.parse('http://localhost:1212/api/get-messages/$currentUserId/8')); // Exemple avec l'utilisateur 35, à remplacer dynamiquement
+      if (response.statusCode == 200) {
+        List<dynamic> messages = json.decode(response.body)['messages'];
+        List<Map<String, dynamic>> fetchedConversations = await _getConversations(messages);
+        setState(() {
+          conversations = fetchedConversations;
+          isLoading = false;
+        });
+      } else {
+        print('Failed to load messages: ${response.body}');
+        throw Exception('Failed to load messages');
+      }
+    } catch (e) {
+      print('Error loading conversations: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _getConversations(List<dynamic> messages) async {
+    Map<int, Map<String, dynamic>> lastMessages = {};
+    for (var message in messages) {
+      int otherUserId = message['idUser'] == int.parse(currentUserId) ? message['idUser_1'] : message['idUser'];
+      String otherUsername = await _getUsername(otherUserId.toString());
+      lastMessages[otherUserId] = {
+        'userId': otherUserId.toString(),
+        'username': otherUsername,
+        'lastMessage': message['content'],
+        'time': message['dates'],
+      };
+    }
+    return lastMessages.values.toList();
+  }
+
+  Future<String> _getUsername(String userId) async {
+    final response = await http.get(Uri.parse('http://localhost:1212/api/get-username/$userId'));
+    if (response.statusCode == 200) {
+      return json.decode(response.body)['username'];
+    } else {
+      throw Exception('Failed to get username');
+    }
   }
 
   void _filterMessages(String query) {
-    final filtered = messages
-        .where((message) => message['name']!.toLowerCase().contains(query.toLowerCase()))
+    final filtered = conversations
+        .where((conversation) =>
+            conversation['username']!.toLowerCase().contains(query.toLowerCase()))
         .toList();
     setState(() {
-      filteredMessages = filtered;
+      conversations = filtered;
     });
   }
 
@@ -66,24 +108,28 @@ class _MessagingScreenState extends State<MessagingScreen> {
         title: Text('Messagerie'),
         backgroundColor: Colors.green,
       ),
-      body: Column(
-        children: [
-          SearchBar(onTextChanged: _filterMessages),
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredMessages.length,
-              itemBuilder: (context, index) {
-                final message = filteredMessages[index];
-                return MessageTile(
-                  name: message['name']!,
-                  message: message['message']!,
-                  time: message['time']!,
-                );
-              },
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                SearchBar(onTextChanged: _filterMessages),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: conversations.length,
+                    itemBuilder: (context, index) {
+                      final conversation = conversations[index];
+                      return MessageTile(
+                        userId: conversation['userId']!,
+                        username: conversation['username']!,
+                        message: conversation['lastMessage']!,
+                        time: conversation['time']!,
+                        currentUserId: currentUserId,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -113,15 +159,19 @@ class SearchBar extends StatelessWidget {
 }
 
 class MessageTile extends StatelessWidget {
-  final String name;
+  final String userId;
+  final String username;
   final String message;
   final String time;
+  final String currentUserId;
 
   const MessageTile({
     Key? key,
-    required this.name,
+    required this.userId,
+    required this.username,
     required this.message,
     required this.time,
+    required this.currentUserId,
   }) : super(key: key);
 
   @override
@@ -131,14 +181,17 @@ class MessageTile extends StatelessWidget {
         backgroundColor: Colors.blue,
         child: Icon(Icons.person, color: Colors.white),
       ),
-      title: Text(name),
+      title: Text(username),
       subtitle: Text(message),
       trailing: Text(time),
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ConversationScreen(name: name),
+            builder: (context) => ConversationScreen(
+              currentUserId: currentUserId,
+              otherUserId: userId,
+            ),
           ),
         );
       },
