@@ -17,9 +17,9 @@ class _WebSocketPageState extends State<WebSocketPage> {
   void initState() {
     super.initState();
     if (kIsWeb) {
-      _channel = HtmlWebSocketChannel.connect('ws://localhost:1212');
+      _channel = IOWebSocketChannel.connect('ws://http://192.168.43.128:1212');
     } else {
-      _channel = IOWebSocketChannel.connect('ws://localhost:1212');
+      _channel = IOWebSocketChannel.connect('ws://http://192.168.43.128:1212');
     }
 
     // Écouter les messages reçus du serveur

@@ -122,7 +122,7 @@ class MesGardiennageTileJob extends StatelessWidget {
                     //statut en cours
                     Expanded(
                       child: Text(
-                        'Statut : ' + userName,
+                        'Statut : en attente',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 3,
                       ),
