@@ -848,30 +848,6 @@
       "languageVersion": "3.0"
     },
     {
-      "name": "webview_flutter",
-      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter-4.8.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.2"
-    },
-    {
-      "name": "webview_flutter_android",
-      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter_android-3.16.4",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
-      "name": "webview_flutter_platform_interface",
-      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter_platform_interface-2.10.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
-    },
-    {
-      "name": "webview_flutter_wkwebview",
-      "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter_wkwebview-3.13.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.2"
-    },
-    {
       "name": "win32",
       "rootUri": "file:///C:/Users/limou/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.5.1",
       "packageUri": "lib/",
@@ -908,7 +884,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-07-10T14:23:38.675777Z",
+  "generated": "2024-07-11T07:16:14.617624Z",
   "generator": "pub",
   "generatorVersion": "3.4.3",
   "flutterRoot": "file:///D:/flutter",

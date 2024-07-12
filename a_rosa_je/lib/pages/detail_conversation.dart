@@ -36,7 +36,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _loadUsername();
     _loadMessages();
     if (kIsWeb) {
-      _channel = HtmlWebSocketChannel.connect('ws://localhost:1212');
+      _channel = IOWebSocketChannel.connect('ws://localhost:1212');
     } else {
       _channel = IOWebSocketChannel.connect('ws://localhost:1212');
     }
@@ -56,7 +56,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   Future<void> _loadUsername() async {
-    final response = await http.get(Uri.parse('http://localhost:1212/api/get-username/${widget.otherUserId}'));
+    final response = await http.get(Uri.parse('http://192.168.43.128:1212/api/get-username/${widget.otherUserId}'));
     if (response.statusCode == 200) {
       setState(() {
         otherUsername = json.decode(response.body)['username'];
@@ -67,7 +67,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   Future<void> _loadMessages() async {
-    final response = await http.get(Uri.parse('http://localhost:1212/api/get-messages/${widget.currentUserId}/${widget.otherUserId}'));
+    final response = await http.get(Uri.parse('http://192.168.43.128:1212/api/get-messages/${widget.currentUserId}/${widget.otherUserId}'));
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body)['messages'];
       setState(() {
@@ -86,7 +86,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   Future<void> _saveMessage(String text) async {
     final response = await http.post(
-      Uri.parse('http://localhost:1212/api/add-message'),
+      Uri.parse('http://192.168.43.128:1212/api/add-message'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
